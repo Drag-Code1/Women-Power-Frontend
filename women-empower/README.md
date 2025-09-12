@@ -34,3 +34,45 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+Folder structure defination:
+path:public/ :::
+    assets/ :images,logo
+    fonts: fonts used
+    icons: icons used
+    
+
+path: src/app/  :::
+    components : Reusable UI components
+    ui/            : Buttons, Inputs, Modals, Navbar, Footer
+        forms/ : all forms
+        modals/ : all modals
+        utility: constant ui components
+            navbar.tsx
+            footer.tsx
+
+    product/       : ProductCard, ProductGrid, ProductFilter
+    cart/          : CartItem, CartSummary
+    hooks : Custom React hooks
+
+    lib  :Utility functions & helpers
+    api.ts         : API fetch -fetch / axios
+    constants.ts   : Constants ( currency, routes)
+    utils.ts       : Helper functions 
+    data : Mock/static data 
+    products.json
+    categories.json
+
+    types :TypeScript types/interfaces
+        product.ts
+        cart.ts
+        user.ts
+
+    styles :Global styles
+
+    services: major service implementations
+path: src/state-management/  :::
+    slices: individual state slices
+        cartSLice.tsx
+    store.tsx
+    provider.tsx
