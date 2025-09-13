@@ -1,13 +1,14 @@
 "use client";
+
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 
-interface SimpleSliderProps {
+interface ImageSliderProps {
   images?: string[];
   interval?: number;
 }
 
-const SimpleSlider: React.FC<SimpleSliderProps> = ({
+const ImageSlider: React.FC<ImageSliderProps> = ({
   images = ["/images/slider1.PNG", "/images/slider2.PNG", "/images/slider1.PNG"],
   interval = 4000,
 }) => {
@@ -41,6 +42,7 @@ const SimpleSlider: React.FC<SimpleSliderProps> = ({
           </div>
         ))}
       </div>
+
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
         {images.map((_, index) => (
           <button
@@ -56,4 +58,4 @@ const SimpleSlider: React.FC<SimpleSliderProps> = ({
   );
 };
 
-export default SimpleSlider;
+export default ImageSlider;
