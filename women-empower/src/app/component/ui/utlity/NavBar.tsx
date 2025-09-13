@@ -1,5 +1,5 @@
 "use client";
- 
+
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
@@ -12,7 +12,7 @@ import {
   ShoppingCartOutlined,
 } from "@mui/icons-material";
 import CartDrawer from "../modals/CartDrawer";
- 
+
 interface CartItem {
   id: number;
   name: string;
@@ -20,7 +20,7 @@ interface CartItem {
   quantity: number;
   image: string;
 }
- 
+
 const NavBar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -44,7 +44,7 @@ const NavBar: React.FC = () => {
       image: "/images/art2.jpg",
     },
   ]);
- 
+
   const suggestions = [
     "Modern Art",
     "Oil Paintings",
@@ -53,29 +53,29 @@ const NavBar: React.FC = () => {
     "Digital Arts",
     "Photography",
   ];
- 
+
   const filteredSuggestions = suggestions.filter((s) =>
     s.toLowerCase().includes(searchQuery.toLowerCase())
   );
- 
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
- 
+
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
     setSearchQuery("");
   };
   const toggleCart = () => setIsCartOpen(!isCartOpen);
- 
+
   const handleTabClick = (tabName: string) => {
     setActiveTab(tabName);
     setIsMobileMenuOpen(false);
   };
- 
+
   const updateQuantity = (id: number, change: number) => {
     setCartItems((items) =>
       items
@@ -87,18 +87,18 @@ const NavBar: React.FC = () => {
         .filter((item) => item.quantity > 0)
     );
   };
- 
+
   const removeItem = (id: number) => {
     setCartItems((items) => items.filter((item) => item.id !== id));
   };
- 
+
   const getTotalPrice = () => {
     return cartItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
   };
- 
+
   const navItems = [
     { name: "HOME", href: "/home" },
     { name: "ABOUT", href: "#" },
@@ -107,7 +107,7 @@ const NavBar: React.FC = () => {
     { name: "COURSES", href: "#" },
     { name: "CONTACT US", href: "#" },
   ];
- 
+
   const SearchBar = () => (
     <div className="w-full animate-fadeIn">
       <div className="max-w-4xl mx-auto px-4 py-3 relative">
@@ -117,7 +117,7 @@ const NavBar: React.FC = () => {
         >
           <Close className="w-6 h-6" />
         </button>
- 
+
         <div className="flex items-center bg-transparent border border-white rounded-lg px-3 py-2">
           <SearchOutlined className="text-white mr-2" />
           <input
@@ -129,7 +129,7 @@ const NavBar: React.FC = () => {
             autoFocus
           />
         </div>
- 
+
         {searchQuery && (
           <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-md max-h-60 overflow-y-auto">
             {filteredSuggestions.length > 0 ? (
@@ -151,7 +151,7 @@ const NavBar: React.FC = () => {
       </div>
     </div>
   );
- 
+
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50">
@@ -163,19 +163,8 @@ const NavBar: React.FC = () => {
           }`}
         >
           <div className="flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
-            {/* Logo + Mobile Menu */}
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={toggleMobileMenu}
-                className="lg:hidden p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
-              >
-                {isMobileMenuOpen ? (
-                  <Close className="w-6 h-6" />
-                ) : (
-                  <Menu className="w-6 h-6" />
-                )}
-              </button>
- 
+            {/* LEFT → Logo */}
+            <div className="flex items-center">
               <Image
                 src="/images/logo1.PNG"
                 alt="Logo"
@@ -184,8 +173,8 @@ const NavBar: React.FC = () => {
                 className="object-contain cursor-pointer"
               />
             </div>
- 
-            {/* Desktop Nav */}
+
+            {/* CENTER → Desktop Nav */}
             <div className="hidden lg:flex items-center space-x-8">
               {navItems.map((item, index) => (
                 <button
@@ -210,19 +199,32 @@ const NavBar: React.FC = () => {
                 </button>
               ))}
             </div>
- 
+
+            {/* RIGHT → Toggle + Icons */}
             <div className="flex items-center space-x-3">
+              {/* Mobile Menu Toggle (profile ke left me) */}
+              <button
+                onClick={toggleMobileMenu}
+                className="lg:hidden p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
+              >
+                {isMobileMenuOpen ? (
+                  <Close className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </button>
+
               <button
                 onClick={toggleSearch}
                 className="hidden lg:block p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
               >
                 <Search className="w-5 h-5" />
               </button>
- 
+
               <button className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg">
                 <Person className="w-5 h-5" />
               </button>
- 
+
               <div className="relative">
                 <button className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg">
                   <FavoriteBorder className="w-5 h-5" />
@@ -231,7 +233,7 @@ const NavBar: React.FC = () => {
                   0
                 </span>
               </div>
- 
+
               <div className="relative">
                 <button
                   onClick={toggleCart}
@@ -245,10 +247,10 @@ const NavBar: React.FC = () => {
               </div>
             </div>
           </div>
- 
+
           {/* Searchbar */}
           {isSearchOpen && <SearchBar />}
- 
+
           {/* Mobile Menu */}
           <div
             className={`lg:hidden transition-all duration-500 ease-in-out ${
@@ -260,7 +262,7 @@ const NavBar: React.FC = () => {
             <div className="px-4 py-3 border-t border-white/10">
               <SearchBar />
             </div>
- 
+
             <div className="px-4 sm:px-6 lg:px-8 pb-4 space-y-2 border-t border-white/10">
               {navItems.map((item, index) => (
                 <button
@@ -279,7 +281,7 @@ const NavBar: React.FC = () => {
           </div>
         </div>
       </nav>
- 
+
       <CartDrawer
         isCartOpen={isCartOpen}
         toggleCart={toggleCart}
@@ -288,10 +290,10 @@ const NavBar: React.FC = () => {
         removeItem={removeItem}
         getTotalPrice={getTotalPrice}
       />
- 
-      <div className="h-14"></div>
+
+      <div className="h-16"></div>
     </>
   );
 };
- 
+
 export default NavBar;
