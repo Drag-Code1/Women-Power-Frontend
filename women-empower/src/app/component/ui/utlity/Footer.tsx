@@ -17,14 +17,8 @@ interface FooterProps {
   description?: string;
   email?: string;
   phone?: string;
-  quickLinks?: Array<{
-    label: string;
-    href: string;
-  }>;
-  socialLinks?: Array<{
-    platform: "facebook" | "twitter" | "instagram" | "linkedin";
-    href: string;
-  }>;
+  quickLinks?: Array<{ label: string; href: string }>;
+  socialLinks?: Array<{ platform: "facebook" | "twitter" | "instagram" | "linkedin"; href: string }>;
   copyrightYear?: number;
   copyrightText?: string;
 }
@@ -67,62 +61,39 @@ const Footer: React.FC<FooterProps> = ({
   return (
     <footer className="bg-[#f8f8f8] border-t border-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
-        {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 justify-items-center">
-          {/* Brand Section */}
+          
           <div className="space-y-4 max-w-sm text-center">
-            <div className="flex flex-col items-center justify-center space-y-2">
-              <Image
-                src={logoSrc}
-                alt={companyName}
-                width={130}
-                height={80}
-                className="rounded-lg"
-              />
-              <h2 className="text-xl font-semibold text-[#675744]">
-                {companyName}
-              </h2>
+            <div className="flex flex-col items-center space-y-2">
+              <Image src={logoSrc} alt={companyName} width={130} height={80} className="rounded-lg" />
+              <h2 className="text-xl font-semibold text-[#675744]">{companyName}</h2>
             </div>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              {description}
-            </p>
+            <p className="text-gray-600 text-sm leading-relaxed">{description}</p>
           </div>
 
-          {/* Quick Links Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">Quick Links</h3>
             <nav className="space-y-3">
               {quickLinks.map((link, index) => (
-                <Link
-                  key={index}
-                  href={link.href}
-                  className="block text-gray-600 hover:text-[#61503c] transition-colors duration-200 text-sm"
-                >
+                <Link key={index} href={link.href} className="block text-gray-600 hover:text-[#61503c] text-sm">
                   {link.label}
                 </Link>
               ))}
             </nav>
           </div>
 
-          {/* Contact Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">Contact Us</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
                 <EmailOutlined className="w-4 h-4 text-gray-600" />
-                <Link
-                  href={`mailto:${email}`}
-                  className="text-gray-900 hover:text-[#61503c] transition-colors duration-200"
-                >
+                <Link href={`mailto:${email}`} className="text-gray-900 hover:text-[#61503c]">
                   {email}
                 </Link>
               </div>
               <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
                 <PhoneOutlined className="w-4 h-4 text-gray-600" />
-                <Link
-                  href={`tel:${phone.replace(/\s/g, "")}`}
-                  className="text-gray-900 hover:text-[#61503c] transition-colors duration-200"
-                >
+                <Link href={`tel:${phone.replace(/\s/g, "")}`} className="text-gray-900 hover:text-[#61503c]">
                   {phone}
                 </Link>
               </div>
@@ -130,14 +101,8 @@ const Footer: React.FC<FooterProps> = ({
                 <p className="text-sm text-gray-600 mb-3">Follow us</p>
                 <div className="flex justify-center space-x-4">
                   {socialLinks.map((social, index) => (
-                    <Link
-                      key={index}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-600 hover:text-[#61503c] transition-colors duration-200"
-                      aria-label={`Follow us on ${social.platform}`}
-                    >
+                    <Link key={index} href={social.href} target="_blank" rel="noopener noreferrer"
+                      className="text-gray-600 hover:text-[#61503c]">
                       {getSocialIcon(social.platform)}
                     </Link>
                   ))}
@@ -147,7 +112,6 @@ const Footer: React.FC<FooterProps> = ({
           </div>
         </div>
 
-        {/* Copyright Section */}
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-600">
             © {copyrightYear} {copyrightText}
