@@ -3,15 +3,17 @@ import TopCategories from "./component/product/TopCategories";
 import ProductsGrid from "./component/product/ProductsGrid";
 import ProductShowcase from "./component/product/ProductShowcase";
 import ReviewContainer from "./component/product/ReviewContainer";
+import CraftGiftHero from "./component/product/CraftGiftHero";
 
 export default function Home() {
   return (
-    <div className="mt-[5rem]">
+    <div>
       <ImageSlider />
       <TopCategories />
       <ProductsGrid />
       <ProductShowcase />
       <ReviewContainer />
+      <CraftGiftHero />
     </div>
   );
 }

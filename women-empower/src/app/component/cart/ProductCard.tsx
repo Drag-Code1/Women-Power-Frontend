@@ -148,7 +148,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   {cartQuantity === 0 ? (
     <button
       onClick={handleAddToCart}
-      className="w-[85%] bg-[#867259eb] hover:bg-[#61503c] text-white text-sm font-medium py-2 px-3 rounded-md transition-colors duration-200 flex items-center justify-center gap-2"
+      className="w-[85%] bg-[#867259eb] hover:bg-[#61503c] text-white text-sm font-medium py-2 px-3 rounded-md transition-colors duration-200 flex items-center justify-center gap-2 hover:scale-105"
     >
       <ShoppingCartIcon sx={{ fontSize: 16 }} />
       Add To Cart

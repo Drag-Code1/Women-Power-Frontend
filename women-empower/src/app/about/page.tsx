@@ -1,13 +1,8 @@
-'use client';
-
-import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
-
-const images = [
-  '/images/rangoli1.jpg',
-
-  
-];
+"use client";
+import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
+import ReviewContainer from "../component/product/ReviewContainer";
+const images = ["/images/rangoli1.jpg"];
 
 export default function AboutSection() {
   const [current, setCurrent] = useState(0);
@@ -45,7 +40,6 @@ export default function AboutSection() {
 
       {/* Two-column layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
-        
         {/* Image Carousel (Left) */}
         <div
           ref={carouselRef}
@@ -66,27 +60,32 @@ export default function AboutSection() {
         {/* Description (Right) */}
         <div className="bg-[#f7f7f7] rounded-2xl p-8 shadow-md text-center md:text-left leading-relaxed max-w-4xl mx-auto">
           <p className="relative inline-block text-[#5C452B] font-semibold text-lg mb-6 pb-3">
-            <span>“SUAVE RANGOLI ~ Handcrafted by Namrta Gupta.”</span>
+            <span>
+              “WOMAN EMPOWERING JOURNEY ~ Handcrafted by Namrta Gupta.”
+            </span>
             <span
-  className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-1 rounded-full"
-  style={{ width: '30%', backgroundColor: '#fdc700' }}
-/>
-
+              className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-1 rounded-full"
+              style={{ width: "30%", backgroundColor: "#fdc700" }}
+            />
           </p>
 
           <p>
-            We founded this venture to promote Indian traditional art through decorative Kundan items,
-            creating an exceptional aura. This art, integral to Indian culture, is renowned for its
-            meticulous work with precious stones.
-            <br /><br />
-            Our mission is to preserve and promote this heritage, bringing it into modern homes with a
-            contemporary touch. Each piece is handcrafted by skilled artisans, ensuring uniqueness and high
-            quality. By incorporating our products, you beautify your spaces and support local artisans,
-            keeping an ancient tradition alive.
+            We founded this venture to promote Indian traditional art through
+            decorative Kundan items, creating an exceptional aura. This art,
+            integral to Indian culture, is renowned for its meticulous work with
+            precious stones.
+            <br />
+            <br />
+            Our mission is to preserve and promote this heritage, bringing it
+            into modern homes with a contemporary touch. Each piece is
+            handcrafted by skilled artisans, ensuring uniqueness and high
+            quality. By incorporating our products, you beautify your spaces and
+            support local artisans, keeping an ancient tradition alive.
           </p>
         </div>
-
       </div>
+      <ReviewContainer />
     </section>
+      
   );
 }

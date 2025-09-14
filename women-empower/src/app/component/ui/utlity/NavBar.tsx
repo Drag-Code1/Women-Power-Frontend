@@ -254,6 +254,8 @@ const NavBar: React.FC = () => {
         removeItem={removeItem}
         getTotalPrice={getTotalPrice}
       />
+
+      <div className="h-20"></div>
     </>
   );
 };
