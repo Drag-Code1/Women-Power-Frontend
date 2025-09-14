@@ -62,8 +62,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                 <ShoppingCartOutlined className="w-5 h-5 text-[#61503c]" />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-gray-900">Shopping Cart</h2>
-                <p className="text-xs text-gray-500">{cartItems.length} items</p>
+                <h2 className="text-lg font-bold text-gray-900">
+                  Shopping Cart
+                </h2>
+                <p className="text-xs text-gray-500">
+                  {cartItems.length} items
+                </p>
               </div>
             </div>
             <button
@@ -107,7 +111,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                             ART
                           </span>
                         </div>
-                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#61503c] text-white text-xs rounded-full flex items-center justify-center font-bold">
+                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 text-black text-xs rounded-full flex items-center justify-center font-bold">
                           {item.quantity}
                         </div>
                       </div>

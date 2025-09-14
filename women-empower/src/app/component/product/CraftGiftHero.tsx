@@ -34,7 +34,7 @@ const CraftGiftHero = () => {
   return (
     <div
       className="relative w-full min-h-[300px] max-h-[500px] flex items-center justify-center overflow-hidden"
-      style={{ backgroundColor: "#f6f0e9" }}
+      style={{ backgroundColor: "#e5dbcfff" }}
     >
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8">
         <h1
