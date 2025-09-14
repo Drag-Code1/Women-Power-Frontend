@@ -1,4 +1,3 @@
-"use client";
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -30,9 +29,9 @@ const Footer: React.FC<FooterProps> = ({
   email = "team@womanej.com",
   phone = "+1 (555) 123-4567",
   quickLinks = [
-    { label: "Terms & Conditions", href: "/terms" },
-    { label: "Return & Exchange", href: "/return-exchange" },
-    { label: "FAQ", href: "/FAQ" },
+    { label: "Terms & Conditions", href: "/terms-and-conditions" },
+    { label: "Return & Exchange Policy", href: "/return-exchange-policy" },
+    { label: "FAQ", href: "/faq" },
   ],
   socialLinks = [
     { platform: "facebook", href: "https://facebook.com/artspace" },
@@ -40,7 +39,7 @@ const Footer: React.FC<FooterProps> = ({
     { platform: "instagram", href: "https://instagram.com/artspace" },
     { platform: "linkedin", href: "https://linkedin.com/company/artspace" },
   ],
-  copyrightYear = 2024,
+  copyrightYear = new Date().getFullYear(),
   copyrightText = "Woman Empowering Journey. All rights reserved. Crafted with ❤️ for artists and art lovers.",
 }) => {
   const getSocialIcon = (platform: string) => {
