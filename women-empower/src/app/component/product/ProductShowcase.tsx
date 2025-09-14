@@ -62,7 +62,7 @@ const ProductShowcase: React.FC = () => {
                   <button
                     key={index}
                     onClick={() => goToImage(index)}
-                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300  ${
                       index === currentImageIndex 
                         ? 'bg-[#61503c]' 
                         : 'bg-gray-300 hover:bg-gray-400'
@@ -90,7 +90,7 @@ const ProductShowcase: React.FC = () => {
               
        
               <div className="pt-3 flex justify-center lg:justify-start">
-                <button className="bg-[#867259eb] hover:bg-[#61503c] text-white px-6 py-2.5 rounded-md font-medium transition-colors duration-300">
+                <button className="bg-[#867259eb] hover:bg-[#61503c] text-white px-6 py-2.5 rounded-md font-medium transition-colors duration-300 hover:scale-105">
                   View More
                 </button>
               </div>

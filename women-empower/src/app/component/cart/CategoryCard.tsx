@@ -32,7 +32,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onLearnMore }) =>
         </h3>
         <button
           onClick={() => onLearnMore(category)}
-          className="w-full bg-[#867259eb] hover:bg-[#61503c] text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors duration-200"
+          className="w-full bg-[#867259eb] hover:bg-[#61503c] text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 hover:scale-105"
         >
           Learn More
         </button>
