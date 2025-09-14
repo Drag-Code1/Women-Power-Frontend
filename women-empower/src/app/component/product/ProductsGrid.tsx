@@ -1,21 +1,21 @@
-"use client";
+// "use client";
 
 import React from "react";
 import ProductCard from "../cart/ProductCard";
 import { popularProducts, Product } from "../../data/popularProducts";
 
 const ProductsGrid: React.FC = () => {
-  const handleAddToCart = (product: Product) => {
-    console.log("Added to cart:", product.title);
-  };
+  // const handleAddToCart = (product: Product) => {
+  //   console.log("Added to cart:", product.title);
+  // };
 
-  const handleWishlist = (product: Product) => {
-    console.log("Added to wishlist:", product.title);
-  };
+  // const handleWishlist = (product: Product) => {
+  //   console.log("Added to wishlist:", product.title);
+  // };
 
-  const handleQuickView = (product: Product) => {
-    console.log("Quick view:", product.title);
-  };
+  // const handleQuickView = (product: Product) => {
+  //   console.log("Quick view:", product.title);
+  // };
 
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -31,9 +31,9 @@ const ProductsGrid: React.FC = () => {
           <ProductCard
             key={product.id}
             product={product}
-            onAddToCart={handleAddToCart}
-            onWishlist={handleWishlist}
-            onQuickView={handleQuickView}
+            // onAddToCart={handleAddToCart}
+            // onWishlist={handleWishlist}
+            // onQuickView={handleQuickView}
           />
         ))}
       </div>

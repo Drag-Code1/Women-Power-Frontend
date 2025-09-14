@@ -11,6 +11,7 @@ import {
   ShoppingCartOutlined,
 } from "@mui/icons-material";
 import CartDrawer from "../modals/CartDrawer";
+import { NavLinkButton } from "../buttons/NavButtons";
 
 interface CartItem {
   id: number;
@@ -229,31 +230,41 @@ const NavBar: React.FC = () => {
 
             <div className="px-4 sm:px-6 lg:px-8 pb-4 space-y-2 border-t border-white/10">
               {navItems.map((item, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleTabClick(item.name)}
-                  className={`w-full text-left p-3 rounded-lg transition-all duration-300 mt-2 ${
-                    activeTab === item.name
-                      ? "bg-yellow-400/20 text-yellow-100"
-                      : "text-white hover:text-yellow-400 hover:bg-white/10"
-                  }`}
-                >
-                  <span className="font-medium tracking-wide">{item.name}</span>
-                </button>
+                // <button
+                //   key={i}
+                //   onClick={() => handleTabClick(item.name)}
+                //   className={`w-full text-left p-3 rounded-lg transition-all duration-300 mt-2 ${
+                //     activeTab === item.name
+                //       ? "bg-yellow-400/20 text-yellow-100"
+                //       : "text-white hover:text-yellow-400 hover:bg-white/10"
+                //   }`}
+                // >
+                //   <span className="font-medium tracking-wide">{item.name}</span>
+                // </button>
+                <NavLinkButton key={item.name} item={item}/>
               ))}
             </div>
           </div>
         </div>
       </nav>
-
-      <CartDrawer
+         <div
+        className={`fixed inset-0 backdrop-blur-sm bg-black/20 z-40 transition-all duration-300 ${
+          isCartOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        }`}
+        onClick={toggleCart}
+      />
+  <CartDrawer
         isCartOpen={isCartOpen}
         toggleCart={toggleCart}
         cartItems={cartItems}
-        updateQuantity={updateQuantity}
-        removeItem={removeItem}
-        getTotalPrice={getTotalPrice}
+        // updateQuantity={updateQuantity}
+        // removeItem={removeItem}
+        // getTotalPrice={getTotalPrice}
       />
+
+      {/* </div> */}
+
+    
     </>
   );
 };

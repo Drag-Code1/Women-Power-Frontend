@@ -1,13 +1,15 @@
+// "use client";
 import React from "react";
 import Image from "next/image";
 import { Category } from "@/app/data/categoriesData";
+import { LearnMoreButton } from "../ui/buttons/LearnMoreButton";
 
 interface CategoryCardProps {
   category: Category;
   onLearnMore: (category: Category) => void;
 }
 
-const CategoryCard: React.FC<CategoryCardProps> = ({ category, onLearnMore }) => {
+const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   return (
     <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100">
       {category.count && (
@@ -30,12 +32,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onLearnMore }) =>
         <h3 className="font-semibold text-gray-800 text-sm sm:text-base mb-3 text-center leading-tight">
           {category.name}
         </h3>
-        <button
-          onClick={() => onLearnMore(category)}
+        {/* <button
+          // onClick={() => onLearnMore(category)}
           className="w-full bg-[#867259eb] hover:bg-[#61503c] text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors duration-200"
         >
           Learn More
-        </button>
+        </button> */}
+        <LearnMoreButton categoryName= {category.name}/>
       </div>
     </div>
   );

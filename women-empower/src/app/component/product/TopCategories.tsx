@@ -1,12 +1,50 @@
-"use client";
+// "use client";
 
 import { categoriesData, Category } from "../../data/categoriesData";
 import CategoryCard from "../cart/CategoryCard";
 
 const TopCategories: React.FC = () => {
-  const handleLearnMore = (category: Category) => {
-    console.log("Learn more about:", category.name);
-  };
+  // const handleLearnMore = (category: Category) => {
+  //   console.log("Learn more about:", category.name);
+  // };
+ const categoriesData: Category[] = [
+  {
+    id: 1,
+    name: "Rangolis",
+    image: "/images/images.jpg",
+    count: 20,
+  },
+  {
+    id: 2,
+    name: "Spiritual",
+    image: "/images/images.jpg",
+    count: 12,
+  },
+  {
+    id: 3,
+    name: "Resin",
+    image: "/images/images.jpg",
+    count: 3,
+  },
+  {
+    id: 4,
+    name: "Shubh Labh",
+    image: "/images/images.jpg",
+    count: 9,
+  },
+  {
+    id: 5,
+    name: "Diya",
+    image: "/images/images.jpg",
+    count: 10,
+  },
+  {
+    id: 6,
+    name: "Lapdesk",
+    image: "/images/images.jpg",
+    count: 5,
+  },
+];
 
   return (
     <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
@@ -22,7 +60,7 @@ const TopCategories: React.FC = () => {
           <CategoryCard
             key={category.id}
             category={category}
-            onLearnMore={handleLearnMore}
+            // onLearnMore={handleLearnMore}
           />
         ))}
       </div>
