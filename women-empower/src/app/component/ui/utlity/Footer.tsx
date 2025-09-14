@@ -41,7 +41,7 @@ const Footer: React.FC<FooterProps> = ({
     { platform: "linkedin", href: "https://linkedin.com/company/artspace" },
   ],
   copyrightYear = 2024,
-  copyrightText = "ArtSpace. All rights reserved. Crafted with ❤️ for artists and art lovers.",
+  copyrightText = "Woman Empowering Journey. All rights reserved. Crafted with ❤️ for artists and art lovers.",
 }) => {
   const getSocialIcon = (platform: string) => {
     switch (platform) {
