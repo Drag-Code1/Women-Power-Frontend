@@ -37,6 +37,7 @@ const ProductsGrid: React.FC = () => {
           />
         ))}
       </div>
+      
     </section>
   );
 };
