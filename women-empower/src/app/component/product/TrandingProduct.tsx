@@ -5,7 +5,7 @@ import ProductCardNew from "../cart/ProductCard";
 import { Product } from "../cart/ProductCard";
 import { productsData } from "../../data/popularProducts";
 
-const ProductsGrid: React.FC = () => {
+const TrandingProducts: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -42,7 +42,7 @@ const ProductsGrid: React.FC = () => {
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-[#f8f8f8]">
       <div className="mb-4 sm:mb-5 text-left">
-        <h2 className="text-black text-2xl sm:text-2xl">Popular Products</h2>
+        <h2 className="text-black text-2xl sm:text-2xl">Trending Products</h2>
       </div>
 
       <div className="relative">
@@ -109,4 +109,4 @@ const ProductsGrid: React.FC = () => {
   );
 };
 
-export default ProductsGrid;
+export default TrandingProducts;

@@ -1,10 +1,24 @@
 // app/ProductFilterApp.tsx
 "use client";
 import React, { useMemo, useState, useEffect } from "react";
-import { Search, Grid, List, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search,
+  Grid,
+  List,
+  SlidersHorizontal,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { allProducts } from "../../data/products";
 import ProductCardNew from "../cart/ProductCardNew";
 import Filters from "./Filters";
+
+// Material UI
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 const ProductFilterApp = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,18 +30,13 @@ const ProductFilterApp = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
 
-  // Check if mobile view
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategories, selectedPriceRanges, sortBy]);
@@ -51,19 +60,15 @@ const ProductFilterApp = () => {
     "Rating",
   ];
 
-  const toggleCategory = (category: string) => {
+  const toggleCategory = (category: string) =>
     setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
-  };
 
-  const togglePriceRange = (range: string) => {
+  const togglePriceRange = (range: string) =>
     setSelectedPriceRanges((prev) =>
       prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]
     );
-  };
 
   const clearFilters = () => {
     setSelectedCategories([]);
@@ -78,17 +83,16 @@ const ProductFilterApp = () => {
         p.description.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory =
-        selectedCategories.length === 0 ||
-        selectedCategories.includes(p.category);
+        selectedCategories.length === 0 || selectedCategories.includes(p.category);
 
       let matchesPrice = selectedPriceRanges.length === 0;
       if (selectedPriceRanges.length > 0) {
-        matchesPrice = priceRanges.some((range) => {
-          if (selectedPriceRanges.includes(range.label)) {
-            return p.price >= range.min && p.price <= range.max;
-          }
-          return false;
-        });
+        matchesPrice = priceRanges.some(
+          (range) =>
+            selectedPriceRanges.includes(range.label) &&
+            p.price >= range.min &&
+            p.price <= range.max
+        );
       }
 
       return matchesSearch && matchesCategory && matchesPrice;
@@ -115,7 +119,6 @@ const ProductFilterApp = () => {
     return filtered;
   }, [searchTerm, selectedCategories, selectedPriceRanges, sortBy]);
 
-  // Pagination logic
   const productsPerPage = isMobile ? 12 : 16;
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
   const startIndex = (currentPage - 1) * productsPerPage;
@@ -124,48 +127,26 @@ const ProductFilterApp = () => {
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const goToPrevPage = () => currentPage > 1 && goToPage(currentPage - 1);
+  const goToNextPage = () => currentPage < totalPages && goToPage(currentPage + 1);
 
-  const goToPrevPage = () => {
-    if (currentPage > 1) {
-      goToPage(currentPage - 1);
-    }
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      goToPage(currentPage + 1);
-    }
-  };
-
-  // Generate page numbers for pagination
   const getPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = isMobile ? 3 : 5;
-    
     if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
       const sidePages = Math.floor(maxVisiblePages / 2);
       let startPage = Math.max(1, currentPage - sidePages);
       let endPage = Math.min(totalPages, currentPage + sidePages);
-      
       if (endPage - startPage + 1 < maxVisiblePages) {
-        if (startPage === 1) {
-          endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-        } else {
-          startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
+        if (startPage === 1) endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        else startPage = Math.max(1, endPage - maxVisiblePages + 1);
       }
-      
-      for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-      }
+      for (let i = startPage; i <= endPage; i++) pages.push(i);
     }
-    
     return pages;
   };
 
@@ -185,9 +166,7 @@ const ProductFilterApp = () => {
                 <button
                   onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-md transition-colors ${
-                    viewMode === "grid"
-                      ? "bg-white shadow-sm"
-                      : "hover:bg-gray-200"
+                    viewMode === "grid" ? "bg-white shadow-sm" : "hover:bg-gray-200"
                   }`}
                 >
                   <Grid className="w-4 h-4" />
@@ -195,9 +174,7 @@ const ProductFilterApp = () => {
                 <button
                   onClick={() => setViewMode("list")}
                   className={`p-2 rounded-md transition-colors ${
-                    viewMode === "list"
-                      ? "bg-white shadow-sm"
-                      : "hover:bg-gray-200"
+                    viewMode === "list" ? "bg-white shadow-sm" : "hover:bg-gray-200"
                   }`}
                 >
                   <List className="w-4 h-4" />
@@ -254,39 +231,26 @@ const ProductFilterApp = () => {
             />
           </div>
 
-          {/* Mobile Filters Drawer */}
-          {showFilters && (
-            <div
-              className={`fixed inset-0 bg-white/40 backdrop-blur-sm z-50 md:hidden transition-opacity duration-300 ${
-                showFilters ? "opacity-100" : "opacity-0"
-              }`}
-            >
-              <div
-                className={`absolute top-0 left-0 h-full w-72 bg-white shadow-lg p-4 overflow-y-auto transform transition-transform duration-300 ${
-                  showFilters ? "translate-x-0" : "-translate-x-full"
-                }`}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold">Filters</h2>
-                  <button
-                    onClick={() => setShowFilters(false)}
-                    className="text-gray-600 hover:text-black"
-                  >
-                    ✕
-                  </button>
-                </div>
-                <Filters
-                  categories={categories}
-                  selectedCategories={selectedCategories}
-                  toggleCategory={toggleCategory}
-                  priceRanges={priceRanges}
-                  selectedPriceRanges={selectedPriceRanges}
-                  togglePriceRange={togglePriceRange}
-                  clearFilters={clearFilters}
-                />
-              </div>
-            </div>
-          )}
+          {/* Mobile Filters Modal */}
+          <Dialog open={showFilters} onClose={() => setShowFilters(false)} fullWidth>
+            <DialogTitle className="flex justify-between items-center">
+              Filters
+              <IconButton onClick={() => setShowFilters(false)}>
+                <CloseIcon />
+              </IconButton>
+            </DialogTitle>
+            <DialogContent dividers>
+              <Filters
+                categories={categories}
+                selectedCategories={selectedCategories}
+                toggleCategory={toggleCategory}
+                priceRanges={priceRanges}
+                selectedPriceRanges={selectedPriceRanges}
+                togglePriceRange={togglePriceRange}
+                clearFilters={clearFilters}
+              />
+            </DialogContent>
+          </Dialog>
 
           {/* Main */}
           <div className="flex-1 p-4 sm:p-6">
@@ -299,16 +263,15 @@ const ProductFilterApp = () => {
                       : "space-y-4"
                   }
                 >
-                  {currentProducts.map((product) => {
-                    // Ensure netPrice is present; fallback to price if not available
-                    const productWithNetPrice = {
-                      ...product,
-                      netPrice: product.netPrice !== undefined ? product.netPrice : product.price,
-                    };
-                    return (
-                      <ProductCardNew key={product.id} product={productWithNetPrice} />
-                    );
-                  })}
+                  {currentProducts.map((product) => (
+                    <ProductCardNew
+                      key={product.id}
+                      product={{
+                        ...product,
+                        netPrice: product.netPrice ?? product.price,
+                      }}
+                    />
+                  ))}
                 </div>
 
                 {/* Pagination */}
