@@ -6,10 +6,9 @@ export interface Product {
   id: number;
   title: string;
   description: string;
-  price: number; // Original price
+  netPrice: number;      // Original MRP
+  offerPrice?: number;   // Discounted price (optional)
   currency: string;
-  netPrice: number; // Actual product price
-  offerPrice?: number; // Discounted price (optional)
   image: string;
   category: string;
   stock: boolean;
@@ -25,24 +24,30 @@ interface Props {
 const ProductCardNew: React.FC<Props> = ({ product }) => {
   const [isLiked, setIsLiked] = useState(false);
 
-  // Calculate discount percentage
-  const discountPercentage = product.offerPrice 
-    ? Math.round(((product.netPrice - product.offerPrice) / product.netPrice) * 100)
-    : 0;
+  // ✅ Calculate discount percentage
+  const discountPercentage =
+    product.offerPrice && product.offerPrice < product.netPrice
+      ? Math.round(((product.netPrice - product.offerPrice) / product.netPrice) * 100)
+      : 0;
 
   return (
     <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden">
+      {/* Product Image */}
       <div className="relative">
         <img
           src={product.image}
           alt={product.title}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        {product.isTrending && discountPercentage > 0 && (
+
+        {/* ✅ Show Discount Badge */}
+        {discountPercentage > 0 && (
           <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs font-medium">
             {discountPercentage}% OFF
           </div>
         )}
+
+        {/* ❤️ Like button */}
         <button
           onClick={() => setIsLiked(!isLiked)}
           className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm"
@@ -55,7 +60,9 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
         </button>
       </div>
 
+      {/* Product Details */}
       <div className="p-4">
+        {/* Category + Rating */}
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs text-gray-500 uppercase tracking-wide">
             {product.category}
@@ -66,17 +73,20 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
           </div>
         </div>
 
+        {/* Title */}
         <h3 className="font-medium text-gray-900 mb-1 line-clamp-2 text-sm">
           {product.title}
         </h3>
 
+        {/* Description */}
         <p className="text-gray-600 text-xs mb-3 line-clamp-1">
           {product.description}
         </p>
 
+        {/* Price Section */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            {product.offerPrice ? (
+            {product.offerPrice && product.offerPrice < product.netPrice ? (
               <>
                 <div className="text-lg font-semibold text-gray-900">
                   ₹{product.offerPrice.toLocaleString()}

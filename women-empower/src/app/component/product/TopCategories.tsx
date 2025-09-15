@@ -1,69 +1,7 @@
 "use client";
 
 import React from "react";
-
-const categoriesData = [
-  {
-    id: 1,
-    name: "Rangoli",
-    image:"/images/demo4.jpg",
-    count: 12,
-  },
-  {
-    id: 2,
-    name: "Spiritual",
-    image: "/images/images.jpg",
-    count: 25,
-  },
-  {
-    id: 3,
-    name: "Resin",
-    image: "/images/images.jpg",
-    count: 18,
-  },
-  {
-    id: 4,
-    name: "Shubh Labh",
-    image: "/images/images.jpg",
-    count: 30,
-  },
-  {
-    id: 5,
-    name: "Lapdesk",
-    image: "/images/images.jpg",
-    count: 22,
-  },
-  {
-    id: 6,
-    name: "Diya & Thali",
-    image: "/images/demo4.jpg",
-    count: 15,
-  },
-  {
-    id: 7,
-    name: "Decor",
-    image: "/images/demo4.jpg",
-    count: 8,
-  },
-  {
-    id: 8,
-    name: "Gift",
-    image: "/images/images.jpg",
-    count: 35,
-  },
-  {
-    id: 9,
-    name: "Lapdesk",
-    image: "/images/images.jpg",
-    count: 40,
-  },
-  {
-    id: 10,
-    name: "Diya & Thali",
-    image: "/images/images.jpg",
-    count: 40,
-  },
-];
+import { allProducts } from "../../data/products";
 
 interface Category {
   id: number;
@@ -121,6 +59,24 @@ const TopCategories: React.FC = () => {
     console.log("Learn more about:", category.name);
   };
 
+  // ✅ Extract unique categories from allProducts
+  const categoriesMap: Record<string, Category> = {};
+  allProducts.forEach((product, index) => {
+    if (!categoriesMap[product.category]) {
+      categoriesMap[product.category] = {
+        id: index + 1,
+        name: product.category,
+        image: product.image, // use first product image of that category
+        count: 1,
+      };
+    } else {
+      categoriesMap[product.category].count =
+        (categoriesMap[product.category].count || 0) + 1;
+    }
+  });
+
+  const categories = Object.values(categoriesMap);
+
   return (
     <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-[#f8f8f8]">
       {/* Scrollable Categories Container */}
@@ -131,7 +87,7 @@ const TopCategories: React.FC = () => {
             className="flex gap-4 sm:gap-5 md:gap-6 pb-4"
             style={{ width: "max-content" }}
           >
-            {categoriesData.map((category) => (
+            {categories.map((category) => (
               <CategoryCard
                 key={category.id}
                 category={category}
