@@ -1,6 +1,11 @@
 import React from "react";
-import Image from "next/image";
-import { Category } from "@/app/data/categoriesData";
+
+interface Category {
+  id: number;
+  name: string;
+  image: string;
+  count?: number;
+}
 
 interface CategoryCardProps {
   category: Category;
@@ -9,32 +14,35 @@ interface CategoryCardProps {
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category, onLearnMore }) => {
   return (
-    <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100">
+    <div className="flex-shrink-0 w-32 sm:w-36 md:w-40 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200 hover:border-[#61503c] group cursor-pointer">
+      {/* Count Badge */}
       {category.count && (
-        <div className="absolute top-3 right-3 z-10 bg-[#fdc700] text-[#61503c] text-sm font-semibold rounded-full w-8 h-8 flex items-center justify-center shadow-lg">
-          {category.count.toString().padStart(2, "0")}
+        <div className="absolute top-2 right-2 z-10 bg-[#fdc700] text-[#61503c] text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-sm">
+          {category.count}
         </div>
       )}
 
-      <div className="relative w-full h-32 sm:h-40 bg-gray-100 overflow-hidden">
-        <Image
-          src={category.image || "/placeholder-image.jpg"}
+      {/* Image Container */}
+      <div className="relative w-full h-20 sm:h-24 md:h-28 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+        <img
+          src={category.image || "https://via.placeholder.com/150x150?text=No+Image"}
           alt={category.name}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
-          sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-all duration-300"></div>
       </div>
 
-      <div className="p-4 sm:p-5">
-        <h3 className="font-semibold text-gray-800 text-sm sm:text-base mb-3 text-center leading-tight">
+      {/* Content */}
+      <div className="p-3 sm:p-4">
+        <h3 className="font-medium text-gray-800 text-xs sm:text-sm text-center leading-tight mb-3 min-h-[32px] flex items-center justify-center">
           {category.name}
         </h3>
+        
         <button
           onClick={() => onLearnMore(category)}
-          className="w-full bg-[#867259eb] hover:bg-[#61503c] text-white text-sm font-medium py-2.5 px-4 rounded-lg transition-colors duration-200 hover:scale-105"
+          className="w-full bg-[#61503c] hover:bg-[#4a3e30] text-white text-xs sm:text-sm font-medium py-2 px-3 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#61503c] focus:ring-opacity-50"
         >
-          Learn More
+          Explore
         </button>
       </div>
     </div>

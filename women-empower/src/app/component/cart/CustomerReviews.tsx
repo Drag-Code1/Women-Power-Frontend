@@ -29,7 +29,7 @@ const CustomerReviews: React.FC = () => {
   }, []);
 
   return (
-    <div className="bg-white py-12 px-4">
+    <div className="bg-[#f8f8f8] py-12 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="mb-8 sm:mb-10 text-center">
           <h2 className="text-gray-900 text-2xl sm:text-2xl">
@@ -46,7 +46,7 @@ const CustomerReviews: React.FC = () => {
           <div className="lg:w-1/2 flex justify-center">
             <div
               key={activeIndex}
-              className="animate-fade-in max-w-xs w-full bg-[#f8f8f8] rounded-xl p-6 shadow-md border border-gray-100 text-center"
+              className="animate-fade-in max-w-xs w-full bg-white rounded-xl p-6 shadow-md border border-gray-100 text-center"
             >
               <Avatar
                 src={reviewsData[activeIndex].avatar}
@@ -77,7 +77,7 @@ const CustomerReviews: React.FC = () => {
           </div>
 
           <div className="lg:w-1/2">
-            <div className="bg-[#f8f8f8] rounded-lg p-6 shadow-md border border-gray-200 min-h-[200px] flex flex-col justify-center">
+            <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200 min-h-[200px] flex flex-col justify-center">
               <FormatQuoteIcon className="text-[#61503c] text-5xl mb-2" />
               <p
                 key={activeIndex}

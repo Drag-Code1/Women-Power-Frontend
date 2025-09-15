@@ -36,17 +36,17 @@ const ProductShowcase: React.FC = () => {
   };
 
   return (
-    <div className="bg-[#f8f8f8] py-6 px-4">
+    <div className="bg-white py-6 px-4">
       <div className="max-w-6xl mx-auto">
         
 
-        <div className="bg-[#f8f8f8] rounded-lg overflow-hidden flex flex-col lg:flex-row items-center">
+        <div className="bg-white rounded-lg overflow-hidden flex flex-col lg:flex-row items-center">
           
      
-          <div className="lg:w-1/2 relative bg-[#f8f8f8] p-6">
+          <div className="lg:w-1/2 relative bg-white p-6">
             <div className="relative max-w-md mx-auto">
          
-              <div className="relative overflow-hidden rounded-lg bg-[#f8f8f8] shadow-sm">
+              <div className="relative overflow-hidden rounded-lg bg-white shadow-sm">
                 <div className="aspect-[4/3] relative">
                   <img
                     src={productImages[currentImageIndex].src}
