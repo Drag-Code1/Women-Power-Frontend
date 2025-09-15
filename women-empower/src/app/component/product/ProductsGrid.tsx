@@ -1,18 +1,21 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import ProductCardNew from "../cart/ProductCard";
-import { Product } from "../cart/ProductCard";
-import { productsData } from "../../data/popularProducts";
+import ProductCardNew, { Product } from "../cart/ProductCardNew"; // ✅ Use ProductCardNew
+import { allProducts } from "../../data/products";
 
 const ProductsGrid: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // ✅ Filter only popular products
+  const popularProducts = allProducts.filter((p) => p.isPopular);
+
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.children[0]?.clientWidth || 0;
-      const gap = 24; // 6 * 4px (gap-6)
+      const cardWidth =
+        scrollContainerRef.current.children[0]?.clientWidth || 0;
+      const gap = 24; // gap-6 (6 * 4px)
       const scrollAmount = cardWidth + gap;
 
       scrollContainerRef.current.scrollBy({
@@ -26,8 +29,9 @@ const ProductsGrid: React.FC = () => {
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.children[0]?.clientWidth || 0;
-      const gap = 24; // 6 * 4px (gap-6)
+      const cardWidth =
+        scrollContainerRef.current.children[0]?.clientWidth || 0;
+      const gap = 24;
       const scrollAmount = cardWidth + gap;
 
       scrollContainerRef.current.scrollBy({
@@ -35,7 +39,9 @@ const ProductsGrid: React.FC = () => {
         behavior: "smooth",
       });
 
-      setCurrentIndex((prev) => Math.min(productsData.length - 1, prev + 1));
+      setCurrentIndex((prev) =>
+        Math.min(popularProducts.length - 1, prev + 1)
+      );
     }
   };
 
@@ -84,14 +90,14 @@ const ProductsGrid: React.FC = () => {
           </svg>
         </button>
 
-        {/* Products Container with shadow */}
-        <div className="bg-[#f8f8f8] p-4 rounded-lg ">
+        {/* Products Container */}
+        <div className="bg-[#f8f8f8] p-4 rounded-lg">
           <div
             ref={scrollContainerRef}
             className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {productsData.map((product: Product) => (
+            {popularProducts.map((product: Product) => (
               <div key={product.id} className="flex-shrink-0 w-64 sm:w-72">
                 <ProductCardNew product={product} />
               </div>
