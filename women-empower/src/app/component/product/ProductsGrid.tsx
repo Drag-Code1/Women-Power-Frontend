@@ -48,7 +48,7 @@ const ProductsGrid: React.FC = () => {
   return (
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-[#f8f8f8]">
       <div className="mb-4 sm:mb-5 text-left">
-        <h2 className="text-black text-2xl sm:text-2xl">Popular Products</h2>
+        <h3 className="text-black text-2xl sm:text-2xl">Popular Products</h3>
       </div>
 
       <div className="relative">
@@ -91,10 +91,10 @@ const ProductsGrid: React.FC = () => {
         </button>
 
         {/* Products Container */}
-        <div className="bg-[#f8f8f8] p-4 rounded-lg">
+        <div className="bg-[#f8f8f8] rounded-lg">
           <div
             ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth"
+            className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             {popularProducts.map((product: Product) => (
