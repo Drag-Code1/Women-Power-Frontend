@@ -46,7 +46,8 @@ const ProductsGrid: React.FC = () => {
   };
 
   return (
-    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-[#f8f8f8]">
+    <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-white rounded-sm ">
       <div className="mb-4 sm:mb-5 text-left">
         <h3 className="text-black text-2xl sm:text-2xl">Popular Products</h3>
       </div>
@@ -91,7 +92,7 @@ const ProductsGrid: React.FC = () => {
         </button>
 
         {/* Products Container */}
-        <div className="bg-[#f8f8f8] rounded-lg">
+        <div className="bg-white rounded-lg">
           <div
             ref={scrollContainerRef}
             className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
@@ -112,6 +113,7 @@ const ProductsGrid: React.FC = () => {
         }
       `}</style>
     </section>
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 // Material UI Icons
 import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
@@ -12,6 +12,7 @@ import reviewsData from "@/app/data/reviewsData";
 const CustomerReviews: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const reviewsPerPage = isMobile ? 1 : 3;
   const totalPages = Math.ceil(reviewsData.length / reviewsPerPage);
@@ -25,12 +26,25 @@ const CustomerReviews: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // ✅ Auto-slide control
   useEffect(() => {
-    const interval = setInterval(() => {
+    startAutoSlide();
+    return () => stopAutoSlide();
+  }, [totalPages]);
+
+  const startAutoSlide = () => {
+    stopAutoSlide();
+    intervalRef.current = setInterval(() => {
       setCurrentPage((prev) => (prev + 1) % totalPages);
     }, 5000);
-    return () => clearInterval(interval);
-  }, [totalPages]);
+  };
+
+  const stopAutoSlide = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  };
 
   const getCurrentReviews = () => {
     const startIndex = currentPage * reviewsPerPage;
@@ -60,23 +74,27 @@ const CustomerReviews: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-[#f8f8f8]">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-[#f6f0e3] rounded-sm ">
       {/* Header */}
-       <div className="mb-4 sm:mb-5 text-left">
-        <h3 className="text-black text-2xl sm:text-2xl">Our Customer Reviews</h3>
+      <div className="mb-4 sm:mb-5 text-left">
+        <h3 className="text-b text-2xl sm:text-2xl">Our Customer Reviews</h3>
       </div>
 
       {/* Reviews */}
       <div
         className={`grid gap-6 mb-8 transition-transform duration-700 ease-in-out`}
         style={{
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(280px, 1fr))",
+          gridTemplateColumns: isMobile
+            ? "1fr"
+            : "repeat(auto-fit, minmax(280px, 1fr))",
         }}
       >
         {getCurrentReviews().map((review) => (
           <div
             key={`${review.id}-${currentPage}`}
             className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-500 p-5 border border-gray-100 animate-slide-in"
+            onMouseEnter={stopAutoSlide}   // ✅ Hover par stop
+            onMouseLeave={startAutoSlide} // ✅ Hover hatne par resume
           >
             <FormatQuoteIcon className="text-[#61503c] mb-2 w-6 h-6" />
             <p className="text-gray-700 leading-relaxed mb-4">

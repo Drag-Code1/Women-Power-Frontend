@@ -29,7 +29,7 @@ const CourseCard = ({ course }: { course: Course }) => (
     <div className="relative overflow-hidden">
       <img src={course.thumbnail} alt={course.title}
         className="w-full h-38 object-cover group-hover:scale-105 transition-transform duration-300" />
-      <div className="absolute inset-0 bg-gray-900 bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+      <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
         <Play className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black bg-opacity-50 rounded-full p-3" />
       </div>
 

@@ -8,14 +8,18 @@ interface ArtistCardProps {
 }
 
 const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => (
-  <div className="bg-white rounded-2xl shadow-sm p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto h-full">
+  <div
+    className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 
+               p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 
+               w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto h-full"
+  >
     {/* Artist Photo */}
     <div className="flex-shrink-0">
       <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-gray-100">
         <img
           src={artist.image}
           alt={artist.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
         />
       </div>
     </div>
@@ -25,7 +29,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => (
         <h3 className="font-semibold text-lg sm:text-xl text-black mb-1 truncate">
           {artist.name}
         </h3>
-        <p className="text-blue-600 text-xs sm:text-sm font-medium mb-2">
+        <p className="text-[#61503c] text-xs sm:text-sm font-medium mb-2">
           {artist.category}
         </p>
 
