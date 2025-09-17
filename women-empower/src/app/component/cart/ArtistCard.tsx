@@ -20,7 +20,6 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => (
       </div>
     </div>
 
-    {/* Artist Details */}
     <div className="flex-grow flex flex-col justify-between text-center sm:text-left">
       <div>
         <h3 className="font-semibold text-lg sm:text-xl text-black mb-1 truncate">
