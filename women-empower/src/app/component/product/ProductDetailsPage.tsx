@@ -50,8 +50,9 @@ const ProductDetailsPage = () => {
   };
 
   return (
+    
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-6">
         
         {/* Main Product Grid */}
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
@@ -95,7 +96,7 @@ const ProductDetailsPage = () => {
               
               {/* Title & Rating */}
               <div className="mb-6">
-                <h1 className="text-2xl lg:text-3xl font-semibold text-gray-900 mb-2">
+                <h1 className="text-2xl lg:text-3xl  text-gray-900 mb-2">
                   {productData.title}
                 </h1>
                 <p className="text-gray-600 mb-3">{productData.subtitle}</p>
@@ -111,7 +112,7 @@ const ProductDetailsPage = () => {
               {/* Price */}
               <div className="mb-6">
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="text-3xl  text-gray-900">
                     ₹{productData.price.toLocaleString()}
                   </span>
                   <span className="text-lg text-gray-400 line-through">
@@ -153,19 +154,19 @@ const ProductDetailsPage = () => {
 
               {/* Action Buttons */}
               <div className="space-y-3 mb-8">
-                <button className="w-full bg-[#695946] text-white py-4 px-6 rounded-lg font-medium hover:bg-[#5a4a3a] transition-colors shadow-sm">
+                <button className="w-full bg-[#695946] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#5a4a3a] transition-colors shadow-sm">
                   Add to Cart
                 </button>
                 
                 <div className="flex gap-3">
-                  <button className="flex-1 border border-gray-200 text-gray-900 py-4 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                  <button className="flex-1 border border-gray-200 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
                     <ShoppingCart size={18} />
                     Buy Now
                   </button>
                   
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
-                    className={`px-4 py-4 rounded-lg border transition-all duration-200 ${
+                    className={`px-4 py-3 rounded-lg border transition-all duration-200 ${
                       isWishlisted
                         ? "border-red-200 bg-red-50 text-red-600"
                         : "border-gray-200 hover:bg-gray-50 text-gray-600 hover:border-red-200"
