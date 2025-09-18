@@ -454,7 +454,6 @@ const ArtistDirectoryApp = () => {
             transform: translateY(0);
           }
         }
-        
         .animate-fadeIn {
           animation: fadeIn 0.5s ease-out;
         }
