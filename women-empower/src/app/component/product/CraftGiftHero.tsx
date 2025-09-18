@@ -1,10 +1,12 @@
-'use client';
+"use client";
 import React, { useState, useEffect } from "react";
 
 const CraftGiftHero = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [textCycle, setTextCycle] = useState(0);
-  const [particles, setParticles] = useState<{ left: string; top: string; delay: string; duration: string }[]>([]);
+  const [particles, setParticles] = useState<
+    { left: string; top: string; delay: string; duration: string }[]
+  >([]);
 
   const textVariants = [
     "Give the Gift of Craft",
@@ -19,7 +21,6 @@ const CraftGiftHero = () => {
       setTextCycle((prev) => (prev + 1) % textVariants.length);
     }, 4000);
 
-    // particles positions generate only on client
     const newParticles = [...Array(3)].map(() => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
@@ -32,14 +33,23 @@ const CraftGiftHero = () => {
   }, []);
 
   return (
-    <div
-      className="relative w-full min-h-[300px] max-h-[500px] flex items-center justify-center overflow-hidden"
-      style={{ backgroundColor: "#e5dbcfff" }}
-    >
+    <div className="relative w-full min-h-[300px] max-h-[500px] flex items-center justify-center overflow-hidden">
+      {/* Background Image with Scale Animation */}
+      <div
+        className="absolute inset-0 bg-cover bg-center transform scale-105 animate-zoom"
+        style={{
+          backgroundImage: "url('/images/green-diwali.jpg')",
+        }}
+      ></div>
+
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent z-0"></div>
+
+      {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 sm:px-6 lg:px-8">
         <h1
           key={textCycle}
-          className={`text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 transition-all duration-1000 ${
+          className={`text-xl sm:text-2xl md:text-3xl font-bold text-white transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
           style={{ fontFamily: "Georgia, serif" }}
@@ -48,7 +58,7 @@ const CraftGiftHero = () => {
         </h1>
 
         <p
-          className={`mt-3 text-sm sm:text-base text-gray-600 transition-all duration-1000 delay-200 ${
+          className={`mt-3 text-sm sm:text-base text-gray-200 transition-all duration-1000 delay-200 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
           }`}
         >
@@ -71,7 +81,7 @@ const CraftGiftHero = () => {
             key={i}
             className="absolute w-2 h-2 rounded-full animate-float opacity-40"
             style={{
-              backgroundColor: "#61503c",
+              backgroundColor: "#fff",
               left: p.left,
               top: p.top,
               animationDelay: p.delay,
@@ -93,6 +103,22 @@ const CraftGiftHero = () => {
         }
         .animate-float {
           animation: float 5s ease-in-out infinite;
+        }
+
+        /* Background Image Zoom Animation */
+        @keyframes zoom {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.1);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+        .animate-zoom {
+          animation: zoom 12s ease-in-out infinite;
         }
       `}</style>
     </div>

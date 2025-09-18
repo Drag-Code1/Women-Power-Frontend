@@ -5,6 +5,8 @@ import TrandingProducts from "./component/product/TrandingProduct";
 import ProductShowcase from "./component/product/ProductShowcase";
 import ReviewContainer from "./component/product/ReviewContainer";
 import CraftGiftHero from "./component/product/CraftGiftHero";
+import TopRatedArtists from "./component/product/TopRatedArtists";
+import PopularCourses from "./component/product/PopularCourses";
 
 
 export default function Home() {
@@ -13,7 +15,9 @@ export default function Home() {
       <ImageSlider />
       <TopCategories />
       <ProductsGrid />
+      <TopRatedArtists />
       <TrandingProducts />
+      <PopularCourses />
       <ProductShowcase />
       <ReviewContainer />
       <CraftGiftHero />

@@ -1,57 +1,53 @@
 // data/reviewsData.ts
 
 const reviewsData = [
-   {
+  {
     id: 1,
     name: "Sarah Johnson",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108755-2616b612b586?w=100&h=100&fit=crop&crop=face",
     rating: 5,
     date: "2 days ago",
-    review: "Absolutely loved the service! Will recommend to everyone.",
+    review:
+      "Absolutely amazing service! The quality exceeded my expectations and the delivery was super fast. Highly recommend to everyone!",
   },
   {
     id: 2,
     name: "Michael Chen",
-    avatar: "",
     rating: 5,
     date: "1 week ago",
-    review: "Great quality and quick delivery. Very satisfied.",
+    review:
+      "Best purchase I've made this year. The product quality is top-notch and customer service is outstanding. Will definitely buy again!",
   },
   {
     id: 3,
-    name: "Emma Williams",
-    avatar: "",
+    name: "Emma Wilson",
     rating: 4,
     date: "2 weeks ago",
     review:
-      "Very satisfied with the service. The attention to detail and quality is impressive.",
+      "Great experience overall. Fast shipping, good packaging, and the product works exactly as described. Very satisfied with my purchase.",
   },
   {
     id: 4,
     name: "David Rodriguez",
-    avatar: "",
     rating: 5,
     date: "3 weeks ago",
     review:
-      "Outstanding quality and exceptional customer service. Highly recommended!",
+      "Exceptional quality and service! I've been a customer for years and they never disappoint. Highly professional team.",
   },
   {
     id: 5,
-    name: "Lisa Anderson",
-    avatar: "",
+    name: "Lisa Thompson",
     rating: 5,
     date: "1 month ago",
-    review: "Perfect experience, will definitely come back again.",
+    review:
+      "Perfect! Everything arrived exactly as promised. The attention to detail is impressive and customer support is very responsive.",
   },
   {
     id: 6,
-    name: "James Wilson",
-    avatar: "",
+    name: "James Parker",
     rating: 4,
     date: "1 month ago",
     review:
-      "Great value for money. The quality of work and attention to detail was impressive.",
+      "Really happy with my purchase. Good value for money and the quality is solid. Delivery was prompt and packaging was secure.",
   },
 ];
 

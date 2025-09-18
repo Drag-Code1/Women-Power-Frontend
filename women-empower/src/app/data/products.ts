@@ -36,7 +36,7 @@ export const allProducts: Product[] = [
     "description": "Exceptional Handmade Rangoli",
     "price": 325,
     "netPrice": 350,
-    "offerPrice": 325,
+    "offerPrice": 70,
     "currency": "INR",
     "image": "/images/demo4.jpg",
     "category": "Rangoli",

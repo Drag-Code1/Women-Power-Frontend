@@ -58,7 +58,7 @@ const Footer: React.FC<FooterProps> = ({
   };
 
   return (
-    <footer className="bg-[#f8f8f8] border-t border-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <footer className="bg-[#f6f0e3] border-t border-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12 justify-items-center">
           

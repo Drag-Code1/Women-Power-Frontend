@@ -5,7 +5,7 @@ import ProductCardNew, { Product } from "../cart/ProductCardNew"; // ✅ Use Pro
 import { allProducts } from "../../data/products";
 import "@/app/globals.css"; // ✅ Import global CSS for scrollbar-hide
 
-const TrendingProducts: React.FC = () => {
+const RelatedProducts: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -50,7 +50,7 @@ const TrendingProducts: React.FC = () => {
      <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
     <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-white rounded-sm ">
       <div className="mb-4 sm:mb-5 text-left">
-        <h3 className="text-black text-2xl sm:text-2xl">Trending Products</h3>
+        <h3 className="text-black text-2xl sm:text-2xl">Related Products</h3>
       </div>
 
       <div className="relative">
@@ -112,4 +112,4 @@ const TrendingProducts: React.FC = () => {
   );
 };
 
-export default TrendingProducts;
+export default RelatedProducts;
