@@ -1,8 +1,6 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Person,
   FavoriteBorder,
@@ -13,7 +11,7 @@ import {
   ShoppingCartOutlined,
 } from "@mui/icons-material";
 import CartDrawer from "../modals/CartDrawer";
-import SignUp from "../forms/SignUp";
+import Link from "next/link";
 
 interface CartItem {
   id: number;
@@ -27,6 +25,7 @@ const NavBar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("HOME");
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([
@@ -34,17 +33,8 @@ const NavBar: React.FC = () => {
     { id: 2, name: "Modern Sculpture", price: 5999, quantity: 2, image: "/images/art2.jpg" },
   ]);
 
-  // Fake login state (replace with real auth)
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
-  const [user] = useState({ name: "User", mobile: "+91 9876543210" });
-  const [showSignUp, setShowSignUp] = useState(false); // State to control Sign Up modal
-
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const profileRef = useRef<HTMLDivElement>(null);
-
-  const pathname = usePathname();
-
   const suggestions = ["Modern Art", "Oil Paintings", "Sketch Artists", "Sculptures", "Digital Arts", "Photography"];
+
   const filteredSuggestions = suggestions.filter((s) =>
     s.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -61,17 +51,9 @@ const NavBar: React.FC = () => {
     };
     window.addEventListener("resize", handleResize);
 
-    const handleClickOutside = (event: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
-        setIsProfileOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", handleResize);
-      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isSearchOpen]);
 
@@ -81,6 +63,10 @@ const NavBar: React.FC = () => {
     setSearchQuery("");
   };
   const toggleCart = () => setIsCartOpen(!isCartOpen);
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
+    setIsMobileMenuOpen(false);
+  };
 
   const updateQuantity = (id: number, change: number) => {
     setCartItems((items) =>
@@ -168,41 +154,36 @@ const NavBar: React.FC = () => {
                 {isMobileMenuOpen ? <Close className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
 
-              <Link href="/">
-                <Image
-                  src="/images/logo1.PNG"
-                  alt="Logo"
-                  width={150}
-                  height={50}
-                  className="object-contain cursor-pointer"
-                />
-              </Link>
+              <Image
+                src="/images/logo1.PNG"
+                alt="Logo"
+                width={150}
+                height={50}
+                className="object-contain cursor-pointer"
+              />
             </div>
 
-            {/* Desktop Nav */}
             <div className="hidden lg:flex items-center space-x-8">
-              {navItems.map((item, i) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={i}
-                    href={item.href}
-                    className={`relative px-1 py-2 transition-all duration-300 group ${
-                      isActive ? "text-yellow-400" : "text-white hover:text-yellow-400"
+              {navItems.map((item, i) => (
+                <Link
+                  key={i}
+                  href={item.href}
+                  passHref
+                  className={`relative px-1 py-2 transition-all duration-300 group ${
+                    activeTab === item.name ? "text-yellow-400" : "text-white hover:text-yellow-400"
+                  }`}
+                  onClick={() => handleTabClick(item.name)}
+                >
+                  <span className="font-medium text-sm tracking-wide">{item.name}</span>
+                  <div
+                    className={`absolute bottom-0 left-0 h-0.5 bg-yellow-400 transition-all duration-300 ${
+                      activeTab === item.name ? "w-full" : "w-0 group-hover:w-full"
                     }`}
-                  >
-                    <span className="font-medium text-sm tracking-wide">{item.name}</span>
-                    <div
-                      className={`absolute bottom-0 left-0 h-0.5 bg-yellow-400 transition-all duration-300 ${
-                        isActive ? "w-full" : "w-0 group-hover:w-full"
-                      }`}
-                    />
-                  </Link>
-                );
-              })}
+                  />
+                </Link>
+              ))}
             </div>
 
-            {/* Right Side Icons */}
             <div className="flex items-center space-x-3">
               <button
                 onClick={toggleSearch}
@@ -211,54 +192,10 @@ const NavBar: React.FC = () => {
                 <Search className="w-5 h-5" />
               </button>
 
-              {/* Profile / Sign Up */}
-              <div className="relative" ref={profileRef}>
-                {isLoggedIn ? (
-                  <>
-                    <button
-                      onClick={() => setIsProfileOpen(!isProfileOpen)}
-                      className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
-                    >
-                      <Person className="w-5 h-5" />
-                    </button>
-                    {isProfileOpen && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg overflow-hidden z-50">
-                        <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                          Hello, <span className="font-semibold">{user.name}</span>
-                          <br />
-                          <span className="text-gray-500">{user.mobile}</span>
-                        </div>
-                        <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100">
-                          Delete Account
-                        </button>
-                        <button
-                          onClick={() => setIsLoggedIn(false)}
-                          className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                        >
-                          Logout
-                        </button>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  // Replace the Sign Up Link with a button
-                  <>
-                    <button
-                      onClick={() => setShowSignUp(true)}
-                      className="px-3 py-1.5 rounded-md bg-yellow-400 text-gray-900 font-semibold text-sm hover:bg-yellow-300"
-                    >
-                      Sign Up
-                    </button>
-                    {showSignUp && (
-                      <div className="fixed inset-0 z-[999] flex items-center justify-center">
-                        <SignUp onClose={() => setShowSignUp(false)} />
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
+              <button className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg">
+                <Person className="w-5 h-5" />
+              </button>
 
-              {/* Wishlist */}
               <div className="relative">
                 <button className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg">
                   <FavoriteBorder className="w-5 h-5" />
@@ -268,7 +205,6 @@ const NavBar: React.FC = () => {
                 </span>
               </div>
 
-              {/* Cart */}
               <div className="relative">
                 <button
                   onClick={toggleCart}
@@ -285,7 +221,6 @@ const NavBar: React.FC = () => {
 
           {isSearchOpen && <SearchBar />}
 
-          {/* Mobile Menu */}
           <div
             className={`lg:hidden transition-all duration-500 ease-in-out ${
               isMobileMenuOpen ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
@@ -296,29 +231,26 @@ const NavBar: React.FC = () => {
             </div>
 
             <div className="px-4 sm:px-6 lg:px-8 pb-4 space-y-2 border-t border-white/10">
-              {navItems.map((item, i) => {
-                const isActive = pathname === item.href;
-                return (
-                  <Link
-                    key={i}
-                    href={item.href}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`block w-full text-left p-3 rounded-lg transition-all duration-300 mt-2 ${
-                      isActive
-                        ? "bg-yellow-400/20 text-yellow-100"
-                        : "text-white hover:text-yellow-400 hover:bg-white/10"
-                    }`}
-                  >
-                    <span className="font-medium tracking-wide">{item.name}</span>
-                  </Link>
-                );
-              })}
+              {navItems.map((item, i) => (
+                <Link
+                  key={i}
+                  href={item.href}
+                  passHref
+                  className={`w-full block text-left p-3 rounded-lg transition-all duration-300 mt-2 ${
+                    activeTab === item.name
+                      ? "bg-yellow-400/20 text-yellow-100"
+                      : "text-white hover:text-yellow-400 hover:bg-white/10"
+                  }`}
+                  onClick={() => handleTabClick(item.name)}
+                >
+                  <span className="font-medium tracking-wide">{item.name}</span>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Cart Drawer */}
       <CartDrawer
         isCartOpen={isCartOpen}
         toggleCart={toggleCart}
