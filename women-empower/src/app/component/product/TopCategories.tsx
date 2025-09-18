@@ -1,114 +1,112 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import { allProducts } from "../../data/products";
+import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material"; // ✅ MUI Icons
+import "@/app/globals.css"; 
 
 interface Category {
   id: number;
   name: string;
-  image: string;
-  count?: number;
+  count: number;
 }
 
 interface CategoryCardProps {
   category: Category;
-  onLearnMore: (category: Category) => void;
 }
 
-const CategoryCard: React.FC<CategoryCardProps> = ({
-  category,
-  onLearnMore,
-}) => {
+const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   return (
-    <div className="flex-shrink-0 w-28 sm:w-32 md:w-36 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-200 hover:border-[#61503c] group cursor-pointer relative">
-      {/* Count Badge */}
-      {category.count && (
-        <div className="absolute top-2 right-2 z-10 bg-yellow-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-sm">
-          {category.count.toString().padStart(2, "0")}
-        </div>
-      )}
-
-      {/* Larger Image Container */}
-      <div className="relative w-full h-24 sm:h-28 md:h-32 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+    <div className="flex-shrink-0 w-28 sm:w-32 md:w-36 bg-white rounded-xl transition duration-300 overflow-hidden cursor-pointer relative">
+      <div className="relative w-full h-24 sm:h-28 md:h-32 overflow-hidden flex items-center justify-center">
         <img
-          src={category.image}
+          src="/images/tedee.png"
           alt={category.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-20 h-20 object-cover hover:scale-105 transition-transform duration-300"
         />
       </div>
-
-      {/* Compact Content */}
-      <div className="p-2 sm:p-3">
-        <h3 className="font-medium text-gray-800 text-xs sm:text-sm text-center leading-tight mb-2 min-h-[28px] flex items-center justify-center">
+      <div className="p-1 sm:p-1">
+        <h3 className="font-medium text-gray-800 text-xs sm:text-sm text-center leading-tight min-h-[28px] flex items-center justify-center">
           {category.name}
         </h3>
-
-        <button
-          onClick={() => onLearnMore(category)}
-          className="w-full bg-[#61503c] hover:bg-[#4a3e30] text-white text-xs font-medium py-1.5 px-2 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-[#61503c] focus:ring-opacity-50"
-        >
-          Learn More
-        </button>
       </div>
     </div>
   );
 };
 
 const TopCategories: React.FC = () => {
-  const handleLearnMore = (category: Category) => {
-    console.log("Learn more about:", category.name);
-  };
-
-  // ✅ Extract unique categories from allProducts
   const categoriesMap: Record<string, Category> = {};
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   allProducts.forEach((product, index) => {
     if (!categoriesMap[product.category]) {
       categoriesMap[product.category] = {
         id: index + 1,
         name: product.category,
-        image: product.image, // use first product image of that category
         count: 1,
       };
     } else {
-      categoriesMap[product.category].count =
-        (categoriesMap[product.category].count || 0) + 1;
+      categoriesMap[product.category].count += 1;
     }
   });
 
   const categories = Object.values(categoriesMap);
 
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const firstChild = scrollContainerRef.current.children[0] as HTMLElement;
+      const cardWidth = firstChild?.clientWidth || 0;
+      const gap = 24; // same as gap-6 (1.5rem)
+      const scrollAmount = cardWidth + gap;
+
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+
+      setCurrentIndex((prev) =>
+        direction === "left"
+          ? Math.max(0, prev - 1)
+          : Math.min(categories.length - 1, prev + 1)
+      );
+    }
+  };
+
   return (
-    <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-[#f8f8f8]">
-      {/* Scrollable Categories Container */}
-      <div className="relative">
-        {/* Horizontal Scrolling Container */}
-        <div className="overflow-x-auto scrollbar-hide">
-          <div
-            className="flex gap-4 sm:gap-5 md:gap-6 pb-4"
-            style={{ width: "max-content" }}
-          >
+    <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+      <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 bg-white rounded-sm relative">
+        
+        {/* Left Arrow */}
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full 
+                     flex items-center justify-center shadow-md bg-white text-gray-700 
+                     hover:bg-gray-100 transition-all"
+        >
+          <ArrowBackIos fontSize="small" />
+        </button>
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full 
+                     flex items-center justify-center shadow-md bg-white text-gray-700 
+                     hover:bg-gray-100 transition-all"
+        >
+          <ArrowForwardIos fontSize="small" />
+        </button>
+
+        {/* Scrollable Categories */}
+        <div ref={scrollContainerRef} className="overflow-x-auto scroll-smooth scrollbar-hide">
+          <div className="flex gap-4 sm:gap-5 md:gap-6 w-max">
             {categories.map((category) => (
-              <CategoryCard
-                key={category.id}
-                category={category}
-                onLearnMore={handleLearnMore}
-              />
+              <CategoryCard key={category.id} category={category} />
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Custom Scrollbar Hide Styles */}
-      <style jsx>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-    </section>
+      </section>
+    </div>
   );
 };
 

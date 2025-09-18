@@ -25,7 +25,8 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
   }, [images.length, interval]);
 
   return (
-    <div className="relative w-full h-[400px] overflow-hidden">
+    <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+    <div className="relative w-full h-[400px] overflow-hidden rounded-sm">
       <div
         className="flex transition-transform duration-700 ease-in-out h-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
@@ -54,6 +55,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
           />
         ))}
       </div>
+    </div>
     </div>
   );
 };
