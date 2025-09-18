@@ -11,6 +11,7 @@ import {
   ShoppingCartOutlined,
 } from "@mui/icons-material";
 import CartDrawer from "../modals/CartDrawer";
+import { usePathname, useRouter } from "next/navigation";
 
 interface CartItem {
   id: number;
@@ -24,7 +25,6 @@ const NavBar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("HOME");
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [cartItems, setCartItems] = useState<CartItem[]>([
@@ -33,10 +33,12 @@ const NavBar: React.FC = () => {
   ]);
 
   const suggestions = ["Modern Art", "Oil Paintings", "Sketch Artists", "Sculptures", "Digital Arts", "Photography"];
-
   const filteredSuggestions = suggestions.filter((s) =>
     s.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -62,8 +64,9 @@ const NavBar: React.FC = () => {
     setSearchQuery("");
   };
   const toggleCart = () => setIsCartOpen(!isCartOpen);
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
+
+  const handleNav = (href: string) => {
+    router.push(href);
     setIsMobileMenuOpen(false);
   };
 
@@ -86,12 +89,12 @@ const NavBar: React.FC = () => {
   };
 
   const navItems = [
-    { name: "HOME", href: "/home" },
-    { name: "ABOUT", href: "#" },
-    { name: "ARTS", href: "#" },
-    { name: "ARTISTS", href: "#" },
-    { name: "COURSES", href: "#" },
-    { name: "CONTACT US", href: "#" },
+    { name: "HOME", href: "/" },
+    { name: "ABOUT", href: "/about" },
+    { name: "ARTS", href: "/arts" },
+    { name: "ARTISTS", href: "/artists" },
+    { name: "COURSES", href: "/courses" },
+    { name: "CONTACT US", href: "/contact" },
   ];
 
   const SearchBar = () => (
@@ -166,15 +169,18 @@ const NavBar: React.FC = () => {
               {navItems.map((item, i) => (
                 <button
                   key={i}
-                  onClick={() => handleTabClick(item.name)}
-                  className={`relative px-1 py-2 transition-all duration-300 group ${
-                    activeTab === item.name ? "text-yellow-400" : "text-white hover:text-yellow-400"
+                  type="button"
+                  onClick={() => handleNav(item.href)}
+                  className={`relative px-1 py-2 transition-all duration-300 group bg-transparent ${
+                    pathname === item.href
+                      ? "text-yellow-400"
+                      : "text-white hover:text-yellow-400"
                   }`}
                 >
                   <span className="font-medium text-sm tracking-wide">{item.name}</span>
                   <div
                     className={`absolute bottom-0 left-0 h-0.5 bg-yellow-400 transition-all duration-300 ${
-                      activeTab === item.name ? "w-full" : "w-0 group-hover:w-full"
+                      pathname === item.href ? "w-full" : "w-0 group-hover:w-full"
                     }`}
                   />
                 </button>
@@ -231,9 +237,10 @@ const NavBar: React.FC = () => {
               {navItems.map((item, i) => (
                 <button
                   key={i}
-                  onClick={() => handleTabClick(item.name)}
-                  className={`w-full text-left p-3 rounded-lg transition-all duration-300 mt-2 ${
-                    activeTab === item.name
+                  type="button"
+                  onClick={() => handleNav(item.href)}
+                  className={`w-full block text-left p-3 rounded-lg transition-all duration-300 mt-2 bg-transparent ${
+                    pathname === item.href
                       ? "bg-yellow-400/20 text-yellow-100"
                       : "text-white hover:text-yellow-400 hover:bg-white/10"
                   }`}
