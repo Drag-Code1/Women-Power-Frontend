@@ -9,6 +9,7 @@ import {
   Delete,
   ArrowForward,
 } from "@mui/icons-material";
+import { useRouter } from "next/navigation";
 
 interface CartItem {
   id: number;
@@ -40,20 +41,19 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
   const discount = 500;
   const subtotal = getTotalPrice();
   const finalTotal = Math.max(0, subtotal + shipping - discount);
+  const router = useRouter();
 
   return (
     <>
       <div
-        className={`fixed inset-0 backdrop-blur-sm bg-black/20 z-40 transition-all duration-300 ${
-          isCartOpen ? "opacity-100 visible" : "opacity-0 invisible"
-        }`}
+        className={`fixed inset-0 backdrop-blur-sm bg-black/20 z-40 transition-all duration-300 ${isCartOpen ? "opacity-100 visible" : "opacity-0 invisible"
+          }`}
         onClick={toggleCart}
       />
 
       <div
-        className={`fixed top-0 right-0 h-full w-[100%] sm:w-[28rem] bg-white shadow-2xl z-50 transform transition-all duration-500 ease-out ${
-          isCartOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+        className={`fixed top-0 right-0 h-full w-[100%] sm:w-[28rem] bg-white shadow-2xl z-50 transform transition-all duration-500 ease-out ${isCartOpen ? "translate-x-0" : "translate-x-full"
+          }`}
       >
         <div className="flex flex-col h-full bg-gradient-to-b from-white to-gray-50">
           <div className="flex items-center justify-between p-4 border-b border-gray-100 bg-white flex-shrink-0">
@@ -195,7 +195,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                 </div>
 
                 <div className="space-y-2">
-                  <button className="w-full bg-gradient-to-r from-[#61503c] to-[#61503c]/90 text-white py-3 rounded-lg font-semibold text-base hover:from-[#61503c]/90 hover:to-[#61503c] transition-all shadow">
+                  <button
+                    onClick={() => {
+                      toggleCart();
+                      router.push("/checkout"); // go to checkout page
+                    }}
+                    className="w-full bg-gradient-to-r from-[#61503c] to-[#61503c]/90 text-white py-3 rounded-lg font-semibold text-base hover:from-[#61503c]/90 hover:to-[#61503c] transition-all shadow">
                     <span>Proceed to Checkout</span>
                     <ArrowForward className="w-5 h-5 inline ml-1" />
                   </button>
