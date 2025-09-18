@@ -235,6 +235,7 @@ const ArtistDirectoryApp = () => {
   const endIndex = Math.min(startIndex + itemsPerPage, filteredArtists.length);
 
   return (
+    <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -458,6 +459,7 @@ const ArtistDirectoryApp = () => {
           animation: fadeIn 0.5s ease-out;
         }
       `}</style>
+    </div>
     </div>
   );
 };

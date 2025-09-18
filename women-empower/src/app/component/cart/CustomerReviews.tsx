@@ -36,7 +36,7 @@ const CustomerReviews: React.FC = () => {
     stopAutoSlide();
     intervalRef.current = setInterval(() => {
       setCurrentPage((prev) => (prev + 1) % totalPages);
-    }, 5000);
+    }, 2000);
   };
 
   const stopAutoSlide = () => {

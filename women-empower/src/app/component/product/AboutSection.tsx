@@ -31,6 +31,7 @@ export default function AboutSection() {
   };
 
   return (
+     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
     <section className="py-12 px-6 md:px-12 bg-white text-[#5C452B] font-sans">
       {/* Heading */}
       <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">
@@ -73,5 +74,6 @@ export default function AboutSection() {
         </div>
       </div>
     </section>
+    </div>
   );
 }
