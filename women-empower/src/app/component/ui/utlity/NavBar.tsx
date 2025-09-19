@@ -96,6 +96,7 @@ const NavBar: React.FC = () => {
   ];
 
   const SearchBar = () => (
+    
     <div className="w-full animate-fadeIn">
       <div className="max-w-3xl mx-auto px-4 py-3 relative">
         <button
@@ -224,7 +225,7 @@ const NavBar: React.FC = () => {
               isMobileMenuOpen ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
             }`}
           >
-            <div className="px-4 py-3 border-t border-white/10">
+            <div className="px-4 py-3  border-t border-white/10">
               <SearchBar />
             </div>
 
