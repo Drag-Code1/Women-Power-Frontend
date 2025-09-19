@@ -12,6 +12,7 @@ import {
 } from "@mui/icons-material";
 import CartDrawer from "../modals/CartDrawer";
 import { usePathname, useRouter } from "next/navigation";
+import ProfilePopUp from "../modals/ProfilePopUp";
 
 interface CartItem {
   id: number;
@@ -31,6 +32,8 @@ const NavBar: React.FC = () => {
     { id: 1, name: "Abstract Canvas Art", price: 2999, quantity: 1, image: "/images/art1.jpg" },
     { id: 2, name: "Modern Sculpture", price: 5999, quantity: 2, image: "/images/art2.jpg" },
   ]);
+  const [showProfile, setShowProfile] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const suggestions = ["Modern Art", "Oil Paintings", "Sketch Artists", "Sculptures", "Digital Arts", "Photography"];
   const filteredSuggestions = suggestions.filter((s) =>
@@ -195,9 +198,24 @@ const NavBar: React.FC = () => {
                 <Search className="w-5 h-5" />
               </button>
 
-              <button className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg">
-                <Person className="w-5 h-5" />
-              </button>
+              <div className="relative">
+                <button
+                  className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
+                  onClick={() => setShowProfile((prev) => !prev)}
+                >
+                  <Person className="w-5 h-5" />
+                </button>
+                <ProfilePopUp
+                  isOpen={showProfile}
+                  onClose={() => setShowProfile(false)}
+                  isSignedIn={isSignedIn}
+                  mobileNumber="+91 9876543210"
+                  onLogout={() => {
+                    setIsSignedIn(false);
+                    setShowProfile(false);
+                  }}
+                />
+              </div>
 
               <div className="relative">
                 <button className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg">
