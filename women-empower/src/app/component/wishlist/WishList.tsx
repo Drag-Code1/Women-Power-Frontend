@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Heart, ShoppingCart, X, Star } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface WishListItem {
   id: string;
@@ -83,6 +84,8 @@ const WishList: React.FC<WishListProps> = ({ className = '' }) => {
     }
   ]);
 
+  const router = useRouter();
+
   const removeFromWishList = (id: string) => {
     setWishListItems(items => items.filter(item => item.id !== id));
   };
@@ -110,14 +113,14 @@ const WishList: React.FC<WishListProps> = ({ className = '' }) => {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                <h1 className="text-2xl font-bold text-gray-800">My Wishlist</h1>
+                <h1 className="text-2xl font-bold text-[#695846]">My Wishlist</h1>
                 <p className="mt-1 text-gray-600">
                     {wishListItems.length} item{wishListItems.length !== 1 ? 's' : ''} in your wishlist
                 </p>
                 </div>
               <button
                 onClick={removeAllItems}
-                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium transition-colors duration-200 text-sm"
+                className="bg-red-500 text-white hover:bg-transparent hover:text-red-500 border-1 px-4 py-2 rounded-md font-medium transition-colors duration-200 cursor-pointer"
               >
                 Remove All Items
               </button>
@@ -133,7 +136,7 @@ const WishList: React.FC<WishListProps> = ({ className = '' }) => {
             <Heart className="w-24 h-24 mx-auto text-gray-300 mb-6" />
             <h2 className="text-2xl font-semibold text-gray-600 mb-4">Your wishlist is empty</h2>
             <p className="text-gray-500 mb-8">Explore our beautiful rangoli collection and add items you love!</p>
-            <button className="bg-amber-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-all duration-300 transform hover:scale-105">
+            <button className="bg-[#695846] border-1 text-white px-6 py-2 rounded-lg font-medium hover:bg-transparent hover:text-[#695846] transition-all duration-300 transform hover:scale-105 cursor-pointer">
               Continue Shopping
             </button>
           </div>
@@ -172,9 +175,9 @@ const WishList: React.FC<WishListProps> = ({ className = '' }) => {
                     {/* Heart button - Red since it's in wishlist */}
                     <button
                       onClick={() => removeFromWishList(item.id)}
-                      className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm"
+                      className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1 shadow-sm cursor-pointer"
                     >
-                      <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+                      <Heart className="w-5 h-5 text-red-400 fill-rose-400 hover:fill-transparent" />
                     </button>
                   </div>
 
@@ -221,7 +224,7 @@ const WishList: React.FC<WishListProps> = ({ className = '' }) => {
                       </div>
                       <button 
                         onClick={() => moveToCart(item)}
-                        className="bg-[#695946] text-white px-3 py-2 rounded text-xs hover:bg-[#61503c] transition-colors"
+                        className="bg-[#695946] text-white px-3 py-2 rounded-md text-xs font-light border-1 hover:bg-transparent hover:text-[#695846] transition-all duration-300 cursor-pointer"
                       >
                         Add to Cart
                       </button>
@@ -237,8 +240,8 @@ const WishList: React.FC<WishListProps> = ({ className = '' }) => {
         {wishListItems.length > 0 && (
           <div className="text-center mt-12">
             <button
-             onClick={() => {}}
-             className="bg-transparent border-2 border-gray-400 text-gray-700 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all duration-300">
+             onClick={() => router.push('/')}
+             className="bg-[#695846] border-1 text-white px-6 py-2 rounded-lg font-medium hover:bg-transparent hover:text-[#695846] transition-all duration-300 transform hover:scale-105 cursor-pointer">
               Continue Shopping
             </button>
           </div>
