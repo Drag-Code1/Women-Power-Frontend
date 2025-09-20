@@ -218,7 +218,10 @@ const NavBar: React.FC = () => {
               </div>
 
               <div className="relative">
-                <button className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg">
+                <button
+                  onClick={() => handleNav("/wishlist")}
+                  className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
+                >
                   <FavoriteBorder className="w-5 h-5" />
                 </button>
                 <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
