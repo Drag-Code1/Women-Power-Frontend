@@ -1,329 +1,120 @@
 "use client";
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { Heart, Star } from "lucide-react";
-import { useRouter } from "next/navigation";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import React, { useState, useRef } from "react";
+import ProductCardNew, { Product } from "../cart/ProductCardNew"; // ✅ Use ProductCardNew
+import { allProducts } from "../../data/products";
 
-interface WishListItem {
-  id: string;
-  title: string;
-  description: string;
-  netPrice: number;
-  offerPrice?: number;
-  currency: string;
-  image: string;
-  category: string;
-  stock: boolean;
-  rating: number;
-  isTrending: boolean;
-  isPopular: boolean;
-}
+const ProductsGrid: React.FC = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-interface WishListProps {
-  className?: string;
-}
+  // ✅ Filter only popular products
+  const popularProducts = allProducts.filter((p) => p.isPopular);
 
-const WishList: React.FC<WishListProps> = ({ className = "" }) => {
-  const [wishListItems, setWishListItems] = useState<WishListItem[]>([
-    {
-      id: "1",
-      title: "Big Peacock Rangoli",
-      category: "RANGOLI",
-      netPrice: 500,
-      offerPrice: 450,
-      currency: "INR",
-      rating: 4.5,
-      image: "/images/demo4.jpg",
-      description: "Multicolour Rangoli",
-      stock: true,
-      isTrending: false,
-      isPopular: true,
-    },
-    {
-      id: "2",
-      title: "Elephant Rangoli",
-      category: "RANGOLI",
-      netPrice: 350,
-      offerPrice: 70,
-      currency: "INR",
-      rating: 4.2,
-      image: "/images/demo4.jpg",
-      description: "Exceptional Handmade Rangoli",
-      stock: true,
-      isTrending: true,
-      isPopular: false,
-    },
-    {
-      id: "3",
-      title: "Lotus Rangoli",
-      category: "RANGOLI",
-      netPrice: 600,
-      offerPrice: 550,
-      currency: "INR",
-      rating: 4.6,
-      image: "/images/demo4.jpg",
-      description: "Decorative Lotus Flower Rangoli",
-      stock: true,
-      isTrending: false,
-      isPopular: true,
-    },
-    {
-      id: "4",
-      title: "Diwali Peacock Rangoli",
-      category: "RANGOLI",
-      netPrice: 650,
-      offerPrice: 600,
-      currency: "INR",
-      rating: 4.8,
-      image: "/images/demo4.jpg",
-      description: "Colorful Diwali Rangoli Peacock Style",
-      stock: true,
-      isTrending: true,
-      isPopular: true,
-    },
-    {
-      id: "5",
-      title: "Traditional Mandala Rangoli",
-      category: "RANGOLI",
-      netPrice: 450,
-      offerPrice: 400,
-      currency: "INR",
-      rating: 4.3,
-      image: "/images/demo4.jpg",
-      description: "Beautiful Traditional Mandala Design",
-      stock: true,
-      isTrending: false,
-      isPopular: true,
-    },
-    {
-      id: "6",
-      title: "Floral Rangoli Design",
-      category: "RANGOLI",
-      netPrice: 520,
-      offerPrice: 480,
-      currency: "INR",
-      rating: 4.7,
-      image: "/images/demo4.jpg",
-      description: "Elegant Floral Pattern Rangoli",
-      stock: true,
-      isTrending: true,
-      isPopular: false,
-    },
-  ]);
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      const cardWidth =
+        scrollContainerRef.current.children[0]?.clientWidth || 0;
+      const gap = 24; // gap-6 (6 * 4px)
+      const scrollAmount = cardWidth + gap;
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15; // ✅ 3 rows × 5 columns = 15 items per page
-  const router = useRouter();
+      scrollContainerRef.current.scrollBy({
+        left: -scrollAmount,
+        behavior: "smooth",
+      });
 
-  const totalPages = Math.ceil(wishListItems.length / itemsPerPage);
-
-  const removeFromWishList = (id: string) => {
-    setWishListItems((items) => items.filter((item) => item.id !== id));
+      setCurrentIndex((prev) => Math.max(0, prev - 1));
+    }
   };
 
-  const removeAllItems = () => {
-    setWishListItems([]);
-  };
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      const cardWidth =
+        scrollContainerRef.current.children[0]?.clientWidth || 0;
+      const gap = 24;
+      const scrollAmount = cardWidth + gap;
 
-  const addToCart = (item: WishListItem) => {
-    console.log("Adding to cart:", item);
-  };
+      scrollContainerRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: "smooth",
+      });
 
-  const moveToCart = (item: WishListItem) => {
-    addToCart(item);
-    removeFromWishList(item.id);
+      setCurrentIndex((prev) =>
+        Math.min(popularProducts.length - 1, prev + 1)
+      );
+    }
   };
-
-  // ✅ Paginate items
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedItems = wishListItems.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
 
   return (
-    <div className={`min-h-screen px-4 bg-gray-50 ${className}`}>
-      {/* Header */}
-      {wishListItems.length > 0 && (
-        <div className="bg-white border-b border-gray-200 py-6">
-          <div className="container mx-auto px-4 flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-black">My Wishlist</h1>
-              <p className="text-gray-600">
-                {wishListItems.length} item
-                {wishListItems.length !== 1 ? "s" : ""} in your wishlist
-              </p>
-            </div>
-            <button
-              onClick={removeAllItems}
-              className="flex items-center space-x-2 px-4 py-2 bg-red-100 text-red-600 rounded-sm hover:bg-red-200 transition"
-            >
-              <DeleteOutlineIcon fontSize="small" />
-              <span>Remove All</span>
-            </button>
+    <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+    <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-white rounded-sm ">
+      <div className="mb-4 sm:mb-5 text-left">
+        <h3 className="text-black text-2xl sm:text-2xl">Best Sellers</h3>
+      </div>
+
+      <div className="relative">
+        {/* Left Navigation Icon */}
+        <button
+          onClick={scrollLeft}
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="15,18 9,12 15,6"></polyline>
+          </svg>
+        </button>
+
+        {/* Right Navigation Icon */}
+        <button
+          onClick={scrollRight}
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="9,18 15,12 9,6"></polyline>
+          </svg>
+        </button>
+
+        {/* Products Container */}
+        <div className="bg-white rounded-lg">
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+          >
+            {popularProducts.map((product: Product) => (
+              <div key={product.id} className="flex-shrink-0 w-64 sm:w-72">
+                <ProductCardNew product={product} />
+              </div>
+            ))}
           </div>
         </div>
-      )}
-
-      <div className="container mx-auto px-4 py-8">
-        {wishListItems.length === 0 ? (
-          <div className="text-center py-16">
-            <Heart className="w-24 h-24 mx-auto text-gray-300 mb-6" />
-            <h2 className="text-2xl font-semibold text-gray-600 mb-4">
-              Your wishlist is empty
-            </h2>
-            <p className="text-gray-500 mb-8">
-              Explore our beautiful rangoli collection and add items you love!
-            </p>
-            <button
-              className="bg-[#695846] text-white px-6 py-2 rounded-sm font-medium hover:scale-105 transition cursor-pointer"
-              onClick={() => router.push("/arts")}
-            >
-              Continue Shopping
-            </button>
-          </div>
-        ) : (
-          <>
-            {/* Grid (3 rows × 5 columns per page) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 transition-all duration-500">
-              {paginatedItems.map((item) => {
-                const discountPercentage =
-                  item.offerPrice && item.offerPrice < item.netPrice
-                    ? Math.round(
-                        ((item.netPrice - item.offerPrice) / item.netPrice) * 100
-                      )
-                    : 0;
-
-                return (
-                  <div
-                    key={item.id}
-                    className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200 overflow-hidden"
-                  >
-                    <div className="relative">
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={300}
-                        height={192}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-
-                      {discountPercentage > 0 && (
-                        <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs font-medium">
-                          {discountPercentage}% OFF
-                        </div>
-                      )}
-
-                      <button
-                        onClick={() => removeFromWishList(item.id)}
-                        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-sm cursor-pointer"
-                      >
-                        <Heart className="w-5 h-5 text-red-500 fill-rose-500 hover:fill-transparent" />
-                      </button>
-                    </div>
-
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-gray-500 uppercase">
-                          {item.category}
-                        </span>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-                          <span className="text-xs text-gray-600">
-                            {item.rating}
-                          </span>
-                        </div>
-                      </div>
-
-                      <h3 className="font-medium text-gray-900 mb-1 text-sm line-clamp-2">
-                        {item.title}
-                      </h3>
-
-                      <p className="text-gray-600 text-xs mb-3 line-clamp-1">
-                        {item.description}
-                      </p>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          {item.offerPrice && item.offerPrice < item.netPrice ? (
-                            <>
-                              <div className="text-lg font-semibold text-gray-900">
-                                ₹{item.offerPrice.toLocaleString()}
-                              </div>
-                              <div className="text-xs text-gray-500 line-through">
-                                ₹{item.netPrice.toLocaleString()}
-                              </div>
-                            </>
-                          ) : (
-                            <div className="text-lg font-semibold text-gray-900">
-                              ₹{item.netPrice.toLocaleString()}
-                            </div>
-                          )}
-                        </div>
-                        <button
-                          onClick={() => moveToCart(item)}
-                          className="bg-[#695946] text-white px-3 py-2 rounded-md text-xs hover:bg-transparent hover:text-[#695846] border border-[#695846] transition-all duration-300"
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* ✅ Pagination Controls */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center mt-8 gap-2">
-                <button
-                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                  disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === 1
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-gray-100 hover:bg-gray-200"
-                  }`}
-                >
-                  Prev
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <button
-                    key={i + 1}
-                    onClick={() => setCurrentPage(i + 1)}
-                    className={`px-3 py-1 rounded-md transition-all duration-300 ${
-                      currentPage === i + 1
-                        ? "bg-[#695846] text-white"
-                        : "bg-gray-100 hover:bg-gray-200"
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-
-                <button
-                  onClick={() =>
-                    setCurrentPage((p) => Math.min(totalPages, p + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === totalPages
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-gray-100 hover:bg-gray-200"
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </>
-        )}
       </div>
+
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </section>
     </div>
   );
 };
 
-export default WishList;
+export default ProductsGrid;
