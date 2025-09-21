@@ -24,7 +24,7 @@ interface Props {
 const ProductCardNew: React.FC<Props> = ({ product }) => {
   const [isLiked, setIsLiked] = useState(false);
 
-  // ✅ Calculate discount percentage
+  // Calculate discount percentage
   const discountPercentage =
     product.offerPrice && product.offerPrice < product.netPrice
       ? Math.round(((product.netPrice - product.offerPrice) / product.netPrice) * 100)
@@ -40,14 +40,14 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
 
-        {/* ✅ Show Discount Badge */}
+        {/* Show Discount Badge */}
         {discountPercentage > 0 && (
           <div className="absolute top-2 left-2 bg-yellow-500 text-white px-2 py-1 rounded text-xs font-medium">
             {discountPercentage}% OFF
           </div>
         )}
 
-        {/* ❤️ Like button */}
+        {/* Like button */}
         <button
           onClick={() => setIsLiked(!isLiked)}
           className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm"
