@@ -12,8 +12,6 @@ import {
 } from "@mui/icons-material";
 import CartDrawer from "../modals/CartDrawer";
 import { usePathname, useRouter } from "next/navigation";
-import ProfilePopUp from "../modals/ProfilePopUp";
- 
 interface CartItem {
   id: number;
   name: string;
@@ -206,16 +204,6 @@ const NavBar: React.FC = () => {
                 >
                   <Person className="w-5 h-5" />
                 </button>
-                <ProfilePopUp
-                  isOpen={showProfile}
-                  onClose={() => setShowProfile(false)}
-                  isSignedIn={isSignedIn}
-                  mobileNumber="+91 9876543210"
-                  onLogout={() => {
-                    setIsSignedIn(false);
-                    setShowProfile(false);
-                  }}
-                />
               </div>
  
               <div className="relative">
