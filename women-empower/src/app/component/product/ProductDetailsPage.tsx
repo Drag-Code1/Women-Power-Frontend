@@ -50,7 +50,7 @@ const ProductDetailsPage = () => {
   };
 
   return (
-    
+     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-6">
         
@@ -261,6 +261,7 @@ const ProductDetailsPage = () => {
         </div>
 
       </div>
+    </div>
     </div>
   );
 };
