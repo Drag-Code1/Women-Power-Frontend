@@ -133,7 +133,8 @@ const WishList: React.FC<WishListProps> = ({ className = "" }) => {
   };
 
   return (
-    <div className={`min-h-screen px-4 bg-gray-50 ${className}`}>
+    <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+    <div className={`min-h-screen px-0 bg-gray-50 ${className}`}>
       {/* Header - Only show when items exist */}
       {wishListItems.length > 0 && (
         <div className="bg-white border-b border-gray-200 py-6">
@@ -276,6 +277,7 @@ const WishList: React.FC<WishListProps> = ({ className = "" }) => {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };
