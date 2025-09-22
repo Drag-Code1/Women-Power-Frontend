@@ -7,6 +7,7 @@ import ReviewContainer from "./component/product/ReviewContainer";
 import CraftGiftHero from "./component/product/CraftGiftHero";
 import TopRatedArtists from "./component/product/TopRatedArtists";
 import PopularCourses from "./component/product/PopularCourses";
+import ProductCardNew from "./component/cart/ProductCardNew";
 
 
 export default function Home() {
@@ -15,6 +16,11 @@ export default function Home() {
       <ImageSlider />
       <TopCategories />
       <ProductsGrid />
+{/* <ProductsGrid >
+
+<ProductCardNew/>
+</ProductsGrid> */}
+
       <TopRatedArtists />
       <TrandingProducts />
       <PopularCourses />

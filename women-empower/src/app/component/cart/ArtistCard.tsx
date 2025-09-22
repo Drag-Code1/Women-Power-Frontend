@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 import React from "react";
 import { MessageCircle, Instagram, Linkedin } from "lucide-react";
 import { Artist } from "../../data/allArtists";

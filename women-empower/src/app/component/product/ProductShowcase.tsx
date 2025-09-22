@@ -1,38 +1,40 @@
-'use client';
-import React, { useState, useEffect } from 'react';
+// 'use client';
+// import React, { useState, useEffect } from 'react';
+import { ProductShowcaseImage } from '../product showcase/ProductShowcaseSlider';
+import { ViewMore } from '../ui/button/ViewMore';
 
-const productImages = [
-  {
-    id: 1,
-    src: "./images/showcase.webp",
-    alt: "Abstract Folded Pot Design 1"
-  },
-  {
-    id: 2,
-    src: "./images/showcase.webp",
-    alt: "Abstract Folded Pot Design 2"
-  },
-  {
-    id: 3,
-    src: "./images/showcase.webp",
-    alt: "Abstract Folded Pot Design 3"
-  }
-];
+// const productImages = [
+//   {
+//     id: 1,
+//     src: "./images/showcase.webp",
+//     alt: "Abstract Folded Pot Design 1"
+//   },
+//   {
+//     id: 2,
+//     src: "./images/showcase.webp",
+//     alt: "Abstract Folded Pot Design 2"
+//   },
+//   {
+//     id: 3,
+//     src: "./images/showcase.webp",
+//     alt: "Abstract Folded Pot Design 3"
+//   }
+// ];
 
 const ProductShowcase: React.FC = () => {
-  const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
+  // const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
-    }, 4000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentImageIndex((prev) => (prev + 1) % productImages.length);
+  //   }, 4000);
 
-    return () => clearInterval(interval);
-  }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
-  const goToImage = (index: number) => {
-    setCurrentImageIndex(index);
-  };
+  // const goToImage = (index: number) => {
+  //   setCurrentImageIndex(index);
+  // };
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -41,7 +43,7 @@ const ProductShowcase: React.FC = () => {
           <div className="bg-white rounded-lg overflow-hidden flex flex-col lg:flex-row items-center">
             
             {/* Image Section */}
-            <div className="lg:w-1/2 relative bg-white">
+            {/* <div className="lg:w-1/2 relative bg-white">
               <div className="relative max-w-md mx-auto">
                 <div className="relative overflow-hidden rounded-lg bg-white shadow-sm">
                   <div className="aspect-[4/3] relative">
@@ -53,7 +55,7 @@ const ProductShowcase: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Dots */}
+         
                 <div className="flex justify-center mt-3 space-x-2">
                   {productImages.map((_, index) => (
                     <button
@@ -68,7 +70,8 @@ const ProductShowcase: React.FC = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </div> */}
+            <ProductShowcaseImage/>
 
             {/* Text Section */}
             <div className="lg:w-1/2 p-6 flex flex-col justify-center">
@@ -84,9 +87,7 @@ const ProductShowcase: React.FC = () => {
                 </p>
                 
                 <div className="pt-3 flex justify-center lg:justify-start">
-                  <button className="bg-[#867259eb] hover:bg-[#61503c] text-white px-6 py-2.5 rounded-md font-medium transition-all duration-300 hover:scale-105">
-                    View More
-                  </button>
+                 <ViewMore />
                 </div>
               </div>
             </div>
@@ -95,7 +96,7 @@ const ProductShowcase: React.FC = () => {
       </div>
       
       {/* Zoom Animation */}
-      <style jsx>{`
+      {/* <style jsx>{`
         @keyframes zoom {
           0% {
             transform: scale(1);
@@ -110,7 +111,7 @@ const ProductShowcase: React.FC = () => {
         .animate-zoom {
           animation: zoom 8s ease-in-out infinite;
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 };

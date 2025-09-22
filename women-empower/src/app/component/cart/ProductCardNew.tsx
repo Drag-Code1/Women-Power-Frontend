@@ -1,6 +1,9 @@
-"use client";
-import React, { useState } from "react";
+// "use client";
+// import React, { useState } from "react";
 import { Star, Heart } from "lucide-react";
+import { AddToCart } from "../ui/button/AddToCart";
+import { AddToWIshlist } from "../ui/button/AddToWIshlist";
+import { useSearchParams } from 'next/navigation';
 
 export interface Product {
   id: number;
@@ -22,7 +25,7 @@ interface Props {
 }
 
 const ProductCardNew: React.FC<Props> = ({ product }) => {
-  const [isLiked, setIsLiked] = useState(false);
+  // const [isLiked, setIsLiked] = useState(false);
 
   // Calculate discount percentage
   const discountPercentage =
@@ -48,7 +51,7 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
         )}
 
         {/* Like button */}
-        <button
+        {/* <button
           onClick={() => setIsLiked(!isLiked)}
           className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm"
         >
@@ -57,7 +60,9 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
               isLiked ? "text-red-500 fill-red-500" : "text-gray-600"
             }`}
           />
-        </button>
+        </button> */}
+
+        <AddToWIshlist />
       </div>
 
       {/* Product Details */}
@@ -101,9 +106,10 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
               </div>
             )}
           </div>
-          <button className="bg-[#695946] text-white px-3 py-1.5 rounded text-xs hover:bg-[#61503c] transition-colors">
+          {/* <button className="bg-[#695946] text-white px-3 py-1.5 rounded text-xs hover:bg-[#61503c] transition-colors">
             Add to Cart
-          </button>
+          </button> */}
+          <AddToCart />
         </div>
       </div>
     </div>
