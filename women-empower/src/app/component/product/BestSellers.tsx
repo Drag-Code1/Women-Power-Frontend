@@ -1,17 +1,18 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import ProductCardNew, { Product } from "../cart/ProductCardNew";
+import ProductCardNew from "../cart/ProductCardNew";
+import { Product } from "@/app/types/product"; 
 import { allProducts } from "../../data/products";
 import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { TitleContainer } from "../title-headings/Title";
 
-// interface childrenProp{
+interface childrenProp{
 
-//   children:React.ReactElement
-// }
+  children:React.ReactElement
+}
 
-const ProductsGrid: React.FC = () => {
+const ProductsGrid: React.FC<childrenProp> = ({children}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -82,18 +83,20 @@ const ProductsGrid: React.FC = () => {
 
           {/* Products */}
           <div className="bg-white rounded-lg">
-         
+      
+   
             <div
               ref={scrollContainerRef}
               className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
-              {popularProducts.map((product: Product) => (
+                 {children}
+              {/* {popularProducts.map((product: Product) => (
                 <div key={product.id} className="flex-shrink-0 w-64 sm:w-72">
                   <ProductCardNew product={product} />
-                
+               
                 </div>
-              ))}
+              ))} */}
             </div>
           </div>
         </div>

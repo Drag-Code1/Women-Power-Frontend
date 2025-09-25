@@ -5,8 +5,10 @@ import ArtistCard from "../cart/ArtistCard";
 import { allArtists, Artist } from "../../data/allArtists";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material"; // ✅ MUI Icons
 import "@/app/globals.css"; // ✅ Import global CSS for scrollbar-hide
-
-const TopRatedArtists: React.FC = () => {
+interface childrenProps{
+  children:React.ReactNode
+}
+const TopRatedArtists: React.FC<childrenProps> = ({children}) => {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -71,14 +73,15 @@ const TopRatedArtists: React.FC = () => {
             ref={scrollContainerRef}
             className="flex gap-6 overflow-x-auto scroll-smooth scrollbar-hide"
           >
-            {topRatedArtists.map((artist) => (
+            {/* {topRatedArtists.map((artist) => (
               <div
                 key={artist.id}
                 className="flex-shrink-0 w-full sm:w-1/2 lg:w-1/3 max-w-sm"
               >
                 <ArtistCard artist={artist} />
               </div>
-            ))}
+            ))} */}
+            {children}
           </div>
         </div>
       </div>

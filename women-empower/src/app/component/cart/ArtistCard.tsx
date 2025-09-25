@@ -1,7 +1,7 @@
 // "use client";
 import React from "react";
 import { MessageCircle, Instagram, Linkedin } from "lucide-react";
-import { Artist } from "../../data/allArtists";
+import { Artist } from "@/app/types/artist";
 
 interface ArtistCardProps {
   artist: Artist;

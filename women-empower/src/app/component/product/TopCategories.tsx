@@ -15,6 +15,10 @@ interface CategoryCardProps {
   category: Category;
 }
 
+interface childrenProp{
+
+  children:React.ReactNode
+}
 // const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
 //   return (
 //     <div className="flex-shrink-0 w-28 sm:w-32 md:w-36 bg-white rounded-xl transition duration-300 overflow-hidden cursor-pointer relative">
@@ -34,7 +38,7 @@ interface CategoryCardProps {
 //   );
 // };
 
-const TopCategories: React.FC = () => {
+const TopCategories: React.FC<childrenProp> = ({children}) => {
   const categoriesMap: Record<string, Category> = {};
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -100,9 +104,12 @@ const TopCategories: React.FC = () => {
         {/* Scrollable Categories */}
         <div ref={scrollContainerRef} className="overflow-x-auto scroll-smooth scrollbar-hide">
           <div className="flex gap-4 sm:gap-5 md:gap-6 w-max">
-            {categories.map((category) => (
+            {/* {categories.map((category) => (
               <CategoryCard key={category.id} category={category} />
-            ))}
+            ))} */}
+
+
+            {children}
           </div>
         </div>
       </section>

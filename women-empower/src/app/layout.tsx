@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+
+
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import NavBar from "./component/ui/utlity/NavBar";
@@ -32,7 +35,7 @@ export default function RootLayout({
       >
       <NavBar />
       <ScrollToTopButton />
-        {children}
+        <NuqsAdapter>{children}</NuqsAdapter>
       <Footer />
       </body>
     </html>

@@ -3,28 +3,16 @@
 import { Star, Heart } from "lucide-react";
 import { AddToCart } from "../ui/button/AddToCart";
 import { AddToWIshlist } from "../ui/button/AddToWIshlist";
-import { useSearchParams } from 'next/navigation';
+// import { useSearchParams } from 'next/navigation';
+import { Product } from "@/app/types/product"; 
 
-export interface Product {
-  id: number;
-  title: string;
-  description: string;
-  netPrice: number;      // Original MRP
-  offerPrice?: number;   // Discounted price (optional)
-  currency: string;
-  image: string;
-  category: string;
-  stock: boolean;
-  rating: number;
-  isTrending: boolean;
-  isPopular: boolean;
-}
 
 interface Props {
-  product: Product;
+  product?: Product |null;
 }
 
 const ProductCardNew: React.FC<Props> = ({ product }) => {
+  if (!product) return null;
   // const [isLiked, setIsLiked] = useState(false);
 
   // Calculate discount percentage

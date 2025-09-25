@@ -1,11 +1,17 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import ProductCardNew, { Product } from "../cart/ProductCardNew"; // ✅ Use ProductCardNew
+import ProductCardNew from "../cart/ProductCardNew"; 
+import { Product } from "@/app/types/product";
+// ✅ Use ProductCardNew
 import { allProducts } from "../../data/products";
 import "@/app/globals.css"; // ✅ Import global CSS for scrollbar-hide
+interface childrenProp{
 
-const TrendingProducts: React.FC = () => {
+  children:React.ReactElement
+}
+
+const TrendingProducts: React.FC<childrenProp> = ({children}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -99,11 +105,15 @@ const TrendingProducts: React.FC = () => {
             className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
+          {children}
+          {/* 
+          
             {trendingProducts.map((product: Product) => (
               <div key={product.id} className="flex-shrink-0 w-64 sm:w-72">
                 <ProductCardNew product={product} />
               </div>
             ))}
+          */}
           </div>
         </div>
       </div>

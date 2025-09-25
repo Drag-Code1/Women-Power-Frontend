@@ -1,9 +1,5 @@
-interface Category {
-  id: number;
-  name: string;
-  count: number;
-}
 
+import { Category } from "@/app/types/category";
 interface CategoryCardProps {
   category: Category;
 }
