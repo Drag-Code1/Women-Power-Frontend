@@ -1,4 +1,6 @@
+"use client"
 import { Add, Check, Delete, Edit } from "@mui/icons-material"
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 interface DeliveryAddress {
   id: string;
@@ -13,6 +15,9 @@ interface DeliveryAddress {
 }
 
 export const DeliveryAddress:React.FC=()=>{
+    const searchParams=useSearchParams();
+    
+      const selectedStep = searchParams.get('step')
       const [selectedAddress, setSelectedAddress] = useState<string>('');
       const [isCheckingPincode, setIsCheckingPincode] = useState(false);
       const [pincodeServiceable, setPincodeServiceable] = useState<boolean | null>(null);
@@ -31,7 +36,7 @@ export const DeliveryAddress:React.FC=()=>{
     }
   ]);
     return(
-             <div className="bg-white rounded-lg shadow-sm p-6">
+             <div className={`bg-white rounded-lg shadow-sm p-6 `}>
                         <h2 className="text-xl font-bold text-gray-900 mb-6">SELECT DELIVERY ADDRESS</h2>
                         
                         <div className="space-y-4 mb-6">

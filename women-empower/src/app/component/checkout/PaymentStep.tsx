@@ -1,6 +1,62 @@
+"use client"
 import { useState } from "react";
-export const PaymentSteop:React.FC=()=>{
-  const [currentStep, setCurrentStep] = useState<'delivery' | 'payment' | 'confirmation'>('delivery');
+import {
+  LocalShipping,
+  Home,
+  Work,
+  Business,
+  Add,
+  Edit,
+  Delete,
+  CreditCard,
+  AccountBalance,
+  Payment,
+  AccountBalanceWallet,
+  QrCode,
+  Visibility,
+  VisibilityOff,
+  ArrowBack,
+  Check,
+  LocationOn,
+  Phone,
+  Person
+} from '@mui/icons-material';
+import { useSearchParams } from "next/navigation";
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
+export const PaymentStep:React.FC=()=>{
+  const searchParams=useSearchParams();
+  const currentStep=searchParams.get('step');
+  console.log("currentStep in payment",currentStep);
+    const cartItems: CartItem[] = [
+    {
+      id: '1',
+      name: 'Premium Headphones',
+      price: 3999,
+      quantity: 1,
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop'
+    }
+  ];
+    const validateUPI = () => {
+    return upiDetails.upiId.includes('@') && upiDetails.upiId.length > 5;
+  };
+    const proceedToPay = () => {
+  const url = new URL(window.location.href);
+                    url.searchParams.set('step', 'confirmation');
+                    history.pushState({}, "", url);
+  };
+
+  const [selectedDeliveryOption, setSelectedDeliveryOption] = useState('standard');
+
+  const totalMRP = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const deliveryFee = selectedDeliveryOption === 'express' ? 99 : 0;
+  const totalAmount = totalMRP + deliveryFee;
   const paymentMethods = [
     { id: 'card', name: 'Credit / Debit Card', icon: CreditCard },
     { id: 'netbanking', name: 'Netbanking', icon: AccountBalance },
@@ -8,7 +64,7 @@ export const PaymentSteop:React.FC=()=>{
     { id: 'wallet', name: 'Wallets', icon: AccountBalanceWallet }
   ];
 
-    const [selectedDeliveryOption, setSelectedDeliveryOption] = useState('standard');
+    // const [selectedDeliveryOption, setSelectedDeliveryOption] = useState('standard');
     const [selectedAddress, setSelectedAddress] = useState<string>('');
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
     const [showAddAddress, setShowAddAddress] = useState(false);
@@ -16,14 +72,58 @@ export const PaymentSteop:React.FC=()=>{
     const [showUpiForm, setShowUpiForm] = useState(false);
     const [pincodeServiceable, setPincodeServiceable] = useState<boolean | null>(null);
     const [isCheckingPincode, setIsCheckingPincode] = useState(false);
+      const [cardDetails, setCardDetails] = useState({
+        number: '',
+        name: '',
+        expiry: '',
+        cvv: ''
+      });
+    
+      const [upiDetails, setUpiDetails] = useState({
+        upiId: '',
+        showQr: false
+      });
+    
+  const generateQRCode = () => {
+    setUpiDetails(prev => ({ ...prev, showQr: true }));
+  };
 
+  const handleExpiryChange = (value: string) => {
+    // Remove non-digits and limit to 4
+    let cleaned = value.replace(/\D/g, '').slice(0, 4);
+    // Add slash after 2 digits
+    if (cleaned.length >= 2) {
+      cleaned = cleaned.slice(0, 2) + '/' + cleaned.slice(2);
+    }
+    setCardDetails(prev => ({ ...prev, expiry: cleaned }));
+  };
+
+  const validateCard = () => {
+    const { number, name, expiry, cvv } = cardDetails;
+    return number.replace(/\s/g, '').length === 16 && 
+           name.trim().length > 0 && 
+           expiry.length === 5 && 
+           cvv.length === 3;
+  };
+
+  const handleCardNumberChange = (value: string) => {
+    // Remove non-digits and limit to 16
+    const cleaned = value.replace(/\D/g, '').slice(0, 16);
+    // Add spaces every 4 digits
+    const formatted = cleaned.replace(/(.{4})/g, '$1 ').trim();
+    setCardDetails(prev => ({ ...prev, number: formatted }));
+  };
     return(
 
-         <div className="min-h-screen bg-white py-4 px-4 lg:px-8">
+         <div className={`min-h-screen bg-white py-4 px-4 lg:px-8 ${currentStep === 'payment' ? 'block' : 'hidden'}`}>
                 <div className="max-w-6xl mx-auto">
                   <div className="mb-4">
                     <button
-                      onClick={() => setCurrentStep('delivery')}
+                      onClick={() =>{
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('step', 'delivery');
+                        history.pushState({}, "", url);
+                      }}
                       className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
                     >
                       <ArrowBack className="w-5 h-5" />
