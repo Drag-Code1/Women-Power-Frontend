@@ -12,3 +12,11 @@ export interface Artist {
   completedWorks: number;
   topRated: boolean;
 }
+export interface ArtworkItem {
+  id: number;
+  title: string;
+  image: string;
+  rating: number;
+  likes: number;
+  category: string;
+}

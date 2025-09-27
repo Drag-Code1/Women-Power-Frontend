@@ -17,6 +17,8 @@ import { Pagination } from "../component/arts/Pagination";
 import { ClearFilter } from "../component/arts/ClearFilter";
 import { ProductContainer } from "../component/arts/ProductsContainer";
 import { ViewMode } from "../component/arts/ViewMode";
+import { MobileView } from "../component/arts/MobileView";
+import { MobileViewFilter } from "../component/arts/MobileViewFilter";
 async function getArts(searched:string) {
   console.log(searched);
   
@@ -53,12 +55,14 @@ const ProductFilterApp = async({ searchParams }: { searchParams: { search?: stri
              
 
               {/* Mobile filter button */}
-              <button
+              {/* <button
                 className="md:hidden flex items-center gap-2 border border-gray-300 px-3 py-2 rounded-md text-sm hover:bg-gray-50 transition-all duration-200"
                 // onClick={() => setShowFilters(true)}
               >
                 <SlidersHorizontal className="w-4 h-4" /> Filters
-              </button>
+              </button> */}
+
+              <MobileView />
             </div>
           </div>
 
@@ -75,37 +79,8 @@ const ProductFilterApp = async({ searchParams }: { searchParams: { search?: stri
           </div>
 
           {/* Mobile Filters Modal */}
-          <Dialog
-            open={false}
-            // onClose={() => setShowFilters(false)}
-            fullWidth
-            maxWidth="sm"
-            PaperProps={{
-              style: {
-                height: "auto",
-                maxHeight: "90vh",
-              },
-            }}
-          >
-            <DialogTitle className="flex justify-between items-center">
-              Filters
-              {/* <IconButton onClick={() => setShowFilters(false)}>
-                <CloseIcon />
-              </IconButton> */}
-            </DialogTitle>
-            <DialogContent
-              dividers
-              sx={{
-                padding: 2,
-                maxHeight: "70vh",
-              }}
-            >
-              <Filters
-               
-              />
-            </DialogContent>
-          </Dialog>
-
+     
+<MobileViewFilter />
           {/* Main Content Area */}
       
           <ProductContainer currentProducts={arts} totalPages={2} viewMode={'grid'} />

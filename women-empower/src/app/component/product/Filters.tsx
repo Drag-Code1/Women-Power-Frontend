@@ -11,7 +11,7 @@ const searchParams = useSearchParams();
   const params = new URLSearchParams(searchParams.toString());
   const allParams = params.getAll('category');
  const searchParam = searchParams.get("search");
-
+console.log(allParams,"allParams");
 type CategoryObj = { categoryName: string; isChecked: boolean };
 const [categoriesData, setCategoriesData] = useState<CategoryObj[]>([]);
 
@@ -24,7 +24,7 @@ async function fetchData() {
       const res = await fetch('http://localhost:5000/api/category');
       const categoriesData_ = await res.json();
       console.log(categoriesData_);
-     const categoryObject= categoriesData_.map((cat: { name: string }) => ({ categoryName: cat, isChecked: false }))
+     const categoryObject= categoriesData_.map((cat:  string ) => ({ categoryName: cat, isChecked:allParams.includes(cat)? true:false }))
 setCategoriesData(categoryObject);
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -139,4 +139,4 @@ setCategoriesData(categoriesData.map(cat => ({ ...cat, isChecked: false })));
   );
 };
 
-export default Filters;
+export default React.memo(Filters);
