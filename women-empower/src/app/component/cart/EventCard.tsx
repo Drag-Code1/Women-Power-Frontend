@@ -5,11 +5,31 @@ import { Event } from '../../data/eventsData';
 
 interface EventCardProps {
   event: Event;
-  formatDate: (date: string) => string;
-  getStatusColor: (status: string) => string;
+  // formatDate: (date: string) => string;
+  // getStatusColor: (status: string) => string;
 }
 
-const EventCard: React.FC<EventCardProps> = ({ event, formatDate, getStatusColor }) => {
+const EventCard: React.FC<EventCardProps> = ({ event }) => {
+  const getStatusColor = (status: string) => {
+      switch (status) {
+        case "upcoming":
+          return "bg-blue-50 text-blue-600 border-blue-200";
+        case "ongoing":
+          return "bg-green-50 text-green-600 border-green-200";
+        case "completed":
+          return "bg-gray-50 text-gray-500 border-gray-200";
+        default:
+          return "bg-gray-50 text-gray-500 border-gray-200";
+      }
+    };
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    return d.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
   return (
   <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 border border-gray-100 group flex flex-col">
   <div className="relative">

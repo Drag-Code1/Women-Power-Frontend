@@ -1,4 +1,4 @@
-
+"use client";
 import { useSearchParams, useRouter } from "next/navigation";
 interface FAQItem {
   id: number;
@@ -16,10 +16,13 @@ const params = new URLSearchParams(searchParams.toString());
     return    <button
                 onClick={() => {
 
+const url= new URL(window.location.href);
+url.searchParams.set('faqid', faq.id.toString());
+history.pushState(null, '', url.toString());
 
-
-params.set('faqid', faq.id.toString());
-router.replace(`?${params.toString()}`, { scroll: false });        }}
+// params.set('faqid', faq.id.toString());
+// router.replace(`?${params.toString()}`, { scroll: false }); 
+       }}
                 className="w-full px-6 py-5 text-left flex items-center justify-between bg-gray-50 focus:outline-none"
                 // aria-expanded={isOpen(faq.id)}
                 aria-controls={`faq-answer-${faq.id}`}

@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 
 interface FiltersProps {
   searchTerm: string;
@@ -12,16 +12,37 @@ interface FiltersProps {
   setSelectedStatus: (value: string) => void;
   categories: string[];
   types: string[];
-  statuses: string[];
+  // statuses: string[];
 }
 
 const EventFilters: React.FC<FiltersProps> = ({
-  searchTerm, setSearchTerm,
-  selectedCategory, setSelectedCategory,
-  selectedType, setSelectedType,
-  selectedStatus, setSelectedStatus,
-  categories, types, statuses
+  // searchTerm, setSearchTerm,
+  // selectedCategory, setSelectedCategory,
+  // selectedType, setSelectedType,
+  // selectedStatus, setSelectedStatus,
+  // categories, types, 
+  // statuses
 }) => {
+  
+    const [searchTerm, setSearchTerm] = useState("");
+      const [selectedCategory, setSelectedCategory] = useState("All");
+      const [selectedType, setSelectedType] = useState("All");
+      const [selectedStatus, setSelectedStatus] = useState("All");
+    const statuses = ["All", "upcoming", "ongoing", "completed"];
+    
+
+  const categories = [
+    "All",
+    "Rangoli",
+    "Spiritual",
+    "Resin",
+    "Shubh Labh",
+    "Lapdesk",
+    "Diya & Thali",
+    "Decor",
+    "Gift",
+  ];
+  const types = ["All", "festival", "workshop", "celebration", "craft-session"];
   return (
     <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

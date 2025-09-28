@@ -1,5 +1,5 @@
-"use client";
-import React, { useState } from "react";
+// "use client";
+import React, {  } from "react";
 import faqsData from "@/app/data/faqsData";
 import { FaqItem } from "../../Faq/FaqItem";
 
@@ -18,13 +18,7 @@ const FAQ: React.FC<FAQProps> = ({
   title = "Frequently Asked Questions",
   items = faqsData, // default data
 }) => {
-  const [openItem, setOpenItem] = useState<number>(items[0]?.id || 0);
-
-  // const toggleItem = (id: number) => {
-  //   setOpenItem((prev) => (prev === id ? 0 : id));
-  // };
-
-  // const isOpen = (id: number) => openItem === id;
+ 
 
   return (
     <section className="py-16">
@@ -43,11 +37,6 @@ const FAQ: React.FC<FAQProps> = ({
              <FaqItem faq={faq} />
           ))}
 
-
-
-  {/* {items.map((faq) => (
-       <FaqItem faq={faq} />
-          ))} */}
 
         </div>
 

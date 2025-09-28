@@ -43,7 +43,7 @@ const ProductFilterApp = async({ searchParams }: { searchParams: { search?: stri
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-900">
               New Items 
-              {/* ({filteredProducts.length}) */}
+              ({arts.length})
             </h1>
 
             <div className="flex flex-wrap items-center gap-3">

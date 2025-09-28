@@ -5,12 +5,20 @@ import { Event } from '../../data/eventsData';
 
 interface FeaturedEventsSliderProps {
   featuredEvents: Event[];
-  formatDate: (date: string) => string;
+  // formatDate: (date: string) => string;
 }
 
-const FeaturedEventsSlider: React.FC<FeaturedEventsSliderProps> = ({ featuredEvents, formatDate }) => {
+const FeaturedEventsSlider: React.FC<FeaturedEventsSliderProps> = ({ featuredEvents }) => {
   const [currentBanner, setCurrentBanner] = useState(0);
 
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    return d.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  };
   // Auto-slide
   useEffect(() => {
     if (featuredEvents.length > 1) {
