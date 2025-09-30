@@ -7,7 +7,9 @@ import "./globals.css";
 import NavBar from "./component/ui/utlity/NavBar";
 import Footer from "./component/ui/utlity/Footer";
 import ScrollToTopButton from "./component/ui/utlity/ScrollToTopButton";
-
+import { Provider } from 'react-redux';
+import { store } from '@/state-management/store';
+import ReduxProvider from "./ReduxProvider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,10 +35,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-      <NavBar />
+     <ReduxProvider>  <NavBar />
       <ScrollToTopButton />
-        <NuqsAdapter>{children}</NuqsAdapter>
+         {children}
       <Footer />
+      </ReduxProvider>
       </body>
     </html>
   );

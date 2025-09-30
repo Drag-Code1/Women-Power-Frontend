@@ -18,3 +18,50 @@ export const fetchEvents = async () => {
   return data;
 }
 
+export const fetchCartItems = async () => {
+  
+  try {
+    const response = await fetch('http://localhost:5000/api/cart');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    } 
+    const data = await response.json();
+    return data; 
+  }
+  catch (error) {
+    console.error('Error fetching cart items:', error);
+    return []; 
+  }
+};
+
+export const fetchWishListItems = async () => {
+  
+  try {
+    const response = await fetch('http://localhost:5000/api/wishlist');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    } 
+    const data = await response.json();
+    return data; 
+  }
+  catch (error) {
+    console.error('Error fetching cart items:', error);
+    return []; 
+  }
+};
+
+export const clearWishlist = async () => {
+  
+  try {
+    const response = await fetch('http://localhost:5000/api/wishlist');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    } 
+    const data = await response.json();
+    return data; 
+  }
+  catch (error) {
+    console.error('Error fetching cart items:', error);
+    return []; 
+  }
+};

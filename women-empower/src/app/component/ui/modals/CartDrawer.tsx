@@ -10,6 +10,7 @@ import {
   ArrowForward,
 } from "@mui/icons-material";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAppSelector } from "@/state-management/hooks";
 
 interface CartItem {
   id: number;
@@ -37,6 +38,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
   removeItem,
   getTotalPrice,
 }) => {
+
+const selector = useAppSelector(state => (state.cart as { items: CartItem[] }).items);
+
   const shipping = 299;
   const discount = 500;
   const subtotal = getTotalPrice();
@@ -85,7 +89,7 @@ history.pushState(null, '', `?${params.toString()}`);
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 py-3">
-            {cartItems.length === 0 ? (
+            {selector.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center px-4">
                 <div className="p-5 bg-gray-100 rounded-full mb-4">
                   <ShoppingCartOutlined className="w-10 h-10 text-gray-400" />
@@ -108,7 +112,7 @@ history.pushState(null, '', `?${params.toString()}`);
               </div>
             ) : (
               <div className="space-y-3">
-                {cartItems.map((item) => (
+                {selector.map((item) => (
                   <div
                     key={item.id}
                     className="group bg-white p-3 rounded-lg border border-gray-100 shadow-sm hover:shadow-md transition"
@@ -130,14 +134,14 @@ history.pushState(null, '', `?${params.toString()}`);
                           {item.name}
                         </h3>
                         <p className="text-xs text-gray-500 mb-1">
-                          Category: Digital Art
+                          Category: {item.category}
                         </p>
                         <div className="flex items-center space-x-1">
                           <span className="text-base font-bold text-[#61503c]">
                             ₹{item.price}
                           </span>
                           <span className="text-xs text-gray-400 line-through">
-                            ₹{Math.floor(item.price * 1.2)}
+                            ₹{item.offerPrice}
                           </span>
                         </div>
                       </div>

@@ -1,20 +1,29 @@
 'use client';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { JSX } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart } from "lucide-react";
-
+import { useAppDispatch, useAppSelector } from "@/state-management/hooks";
+import { addToCheckout, CheckoutItem } from "@/state-management/slices/checkoutSlice";    
 const ProductDetailsPage = () => {
+  const dispatch=useAppDispatch()
+  
+       const selector = useAppSelector(state => (state.checkout as { items: CheckoutItem[] }).items);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+useEffect(() => {
+  console.log('xx',selector)
 
+}, [selector])
   const productData = {
+    id:1,
     title: "Traditional Shubh Labh",
     subtitle: "Handcrafted Decorative Piece",
     price: 700,
     originalPrice: 950,
     rating: 4.6,
     reviews: 124,
+    quantity: quantity,
   };
 
   const productImages = [
@@ -159,9 +168,12 @@ const ProductDetailsPage = () => {
                 </button>
                 
                 <div className="flex gap-3">
-                  <button className="flex-1 border border-gray-200 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                  <button
+                  onClick={()=>{ selector.find(Item=>Item.id!==productData.id) && dispatch(addToCheckout(productData))}}
+                  
+                  className="flex-1 border border-gray-200 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
                     <ShoppingCart size={18} />
-                    Buy Now
+                    Buy Nnow
                   </button>
                   
                   <button

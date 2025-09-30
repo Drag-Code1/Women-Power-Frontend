@@ -1,0 +1,41 @@
+"use client";
+import { Product } from "@/app/data/products";
+import { useAppSelector } from "@/state-management/hooks";
+import ProductCardNew from "../cart/ProductCardNew";
+import { ContinueShopping } from "../ui/button/COntinewSHopping";
+import { Heart } from "lucide-react";
+
+export const WishListContainer=()=>{
+
+      const wishListItems = useAppSelector(state => (state.wishlist as { items: Product[] }).items);
+
+    return(
+
+         <div className="container mx-auto px-4 py-8">
+                {wishListItems.length === 0 ? (
+                  // Empty Wishlist State
+                  <div className="text-center py-16">
+                    <Heart className="w-24 h-24 mx-auto text-gray-300 mb-6" />
+                    <h2 className="text-2xl font-semibold text-gray-600 mb-4">
+                      Your wishlist is empty
+                    </h2>
+                    <p className="text-gray-500 mb-8">
+                      Explore our beautiful rangoli collection and add items you love!
+                    </p>
+                  <ContinueShopping />
+                  </div>
+                ) : (
+                  // Wishlist Items Grid - Fixed to show exactly 5 cards per row on larger screens
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-none">
+                    {wishListItems.map((item) => {
+                    
+        
+                      return (
+                                             <ProductCardNew product={item}/>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+    )
+}

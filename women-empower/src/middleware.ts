@@ -1,6 +1,10 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
- 
+// import { NextResponse } from 'next/server'
+// import type { NextRequest } from 'next/server'
+ export default function middleware() {
+console.log("middleware ran.")
+
+
+ }
 // This function can be marked `async` if using `await` inside
 // export function middleware(request: NextRequest) {
 // const loggedIn=true;

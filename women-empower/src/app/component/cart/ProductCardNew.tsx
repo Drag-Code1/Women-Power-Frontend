@@ -50,7 +50,7 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
           />
         </button> */}
 
-        <AddToWIshlist />
+        <AddToWIshlist id_={product.id} />
       </div>
 
       {/* Product Details */}
@@ -97,7 +97,7 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
           {/* <button className="bg-[#695946] text-white px-3 py-1.5 rounded text-xs hover:bg-[#61503c] transition-colors">
             Add to Cart
           </button> */}
-          <AddToCart />
+          <AddToCart id={product.id} />
         </div>
       </div>
     </div>

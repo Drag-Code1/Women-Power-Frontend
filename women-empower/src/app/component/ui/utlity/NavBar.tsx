@@ -17,6 +17,9 @@ import { ViewCart } from "../button/ViewCart";
 import { ViewSearchBar } from "../button/ViewSearchBar";
 import { NavSearchBar } from "./NavSearchBar";
 import Link from "next/link";
+import { useAppDispatch,useAppSelector } from "@/state-management/hooks";
+import { RootState } from "@/state-management/store";
+import { ViewWishlist } from "../button/ViewWishlist";
 
 interface CartItem {
   id: number;
@@ -35,6 +38,8 @@ interface ProfilePopUpProps {
 }
 
 const NavBar: React.FC = () => {
+  const count = useAppSelector((state: RootState) => (state.counter as { value: number }).value)
+ console.log(count,"count");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -76,7 +81,7 @@ const NavBar: React.FC = () => {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    // window.addEventListener("scroll", handleScroll);
 
     const handleResize = () => {
       if (window.innerWidth < 1024 && isSearchOpen) {
@@ -265,7 +270,7 @@ const NavBar: React.FC = () => {
                 )}
               </div>
 
-              <div className="relative">
+              {/* <div className="relative">
                 <button
                   onClick={() => handleNav("/wishlist")}
                   className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
@@ -275,9 +280,9 @@ const NavBar: React.FC = () => {
                 <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                   0
                 </span>
-              </div>
-
-              <div className="relative">
+              </div> */}
+<ViewWishlist />
+              {/* <div className="relative">
                 <button
                   onClick={toggleCart}
                   className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
@@ -287,7 +292,7 @@ const NavBar: React.FC = () => {
                 <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                   {cartItems.reduce((total, item) => total + item.quantity, 0)}
                 </span>
-              </div>
+              </div> */}
               <ViewCart/>
             </div>
           </div>
