@@ -12,11 +12,6 @@ import DashboardSidebar from "@/app/component/ui/utlity/DashboardSidebar";
 
 const ProductDashboard: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const userInfo = {
-    name: "vishal lodhe",
-    email: "lodhe.vishal@company.com",
-    avatar: "",
-  };
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
@@ -175,7 +170,6 @@ const ProductDashboard: React.FC = () => {
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <DashboardNavbar
-        userInfo={userInfo}
         onMenuToggle={toggleMobileMenu}
         isMobileMenuOpen={isMobileMenuOpen}
       />

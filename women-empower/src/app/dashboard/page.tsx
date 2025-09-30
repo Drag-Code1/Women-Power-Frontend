@@ -9,19 +9,12 @@ import MainContent from "@/app/component/dashboard/dashboardtab/MainContent";
 const Dashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const userInfo = {
-    name: "vishal lodhe",
-    email: "lodhe.vishal@company.com",
-    avatar: "",
-  };
-
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       <DashboardNavbar
-        userInfo={userInfo}
         onMenuToggle={toggleMobileMenu}
         isMobileMenuOpen={isMobileMenuOpen}
       />

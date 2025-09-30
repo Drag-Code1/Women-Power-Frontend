@@ -11,7 +11,7 @@ interface UserInfo {
 }
 
 const DashboardNavbar = ({
-  userInfo = { name: "", email: "", avatar: "" },
+  userInfo = { name: "vishal lodhe", email: "lodhe.vishal@company.com", avatar: "" },
   onMenuToggle = () => {},
   isMobileMenuOpen = false,
 }: {
