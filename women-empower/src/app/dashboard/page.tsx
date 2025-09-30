@@ -2,8 +2,10 @@
 import React, { useState } from "react";
 import DashboardNavbar from "@/app/component/ui/utlity/DashboardNavbar";
 import DashboardSidebar from "@/app/component/ui/utlity/DashboardSidebar";
-import MainContent from "../component/dashboard/dashboardtab/MainContent";
-import ProductDashboard from "../component/dashboard/allproducts/ProductDashboard";
+import MainContent from "@/app/component/dashboard/dashboardtab/MainContent";
+import ProductDashboard from "@/app/allproducttab/page";  
+
+
 
 const Dashboard = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,6 +30,7 @@ const Dashboard = () => {
         <DashboardSidebar isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
         {/* <MainContent /> */}
         <ProductDashboard />
+
       </div>
     </div>
   );
