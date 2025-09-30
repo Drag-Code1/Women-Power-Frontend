@@ -9,7 +9,7 @@ import {
   Delete,
   ArrowForward,
 } from "@mui/icons-material";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface CartItem {
   id: number;
@@ -42,17 +42,19 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
   const subtotal = getTotalPrice();
   const finalTotal = Math.max(0, subtotal + shipping - discount);
   const router = useRouter();
-
+const searchParams=useSearchParams();
+const isCartOpen_=searchParams.get('cart');
+const params=new URLSearchParams(searchParams.toString());
   return (
     <>
       <div
-        className={`fixed inset-0 backdrop-blur-sm bg-black/20 z-40 transition-all duration-300 ${isCartOpen ? "opacity-100 visible" : "opacity-0 invisible"
+        className={`fixed inset-0 backdrop-blur-sm bg-black/20 z-40 transition-all duration-300 ${isCartOpen_ ? "opacity-100 visible" : "opacity-0 invisible"
           }`}
         onClick={toggleCart}
       />
 
       <div
-        className={`fixed top-0 right-0 h-full w-[100%] sm:w-[28rem] bg-white shadow-2xl z-50 transform transition-all duration-500 ease-out ${isCartOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 h-full w-[100%] sm:w-[28rem] bg-white shadow-2xl z-50 transform transition-all duration-500 ease-out ${isCartOpen_ ? "translate-x-0" : "translate-x-full"
           }`}
       >
         <div className="flex flex-col h-full bg-gradient-to-b from-white to-gray-50">
@@ -71,7 +73,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
               </div>
             </div>
             <button
-              onClick={toggleCart}
+              onClick={()=>{
+params.delete('cart');
+history.pushState(null, '', `?${params.toString()}`);
+
+              }}
               className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             >
               <Close className="w-5 h-5 text-gray-600" />
@@ -91,7 +97,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                   Discover amazing art pieces and add them
                 </p>
                 <button
-                  onClick={toggleCart}
+                  onClick={()=>{
+params.delete('cart');
+history.pushState(null, '', `?${params.toString()}`);
+                  }}
                   className="px-5 py-2.5 bg-[#61503c] text-white rounded-lg hover:bg-[#61503c]/90 text-sm"
                 >
                   Continue Shopping

@@ -1,121 +1,59 @@
 // "use Server";
 import React  from "react";
-import { eventsData } from "../data/eventsData";
+// import { eventsData } from "../data/eventsData";
 import EventCard from "../component/cart/EventCard";
 import EventFilters from "../component/product/EventFilters";
 import FeaturedEventsSlider from "../component/product/FeaturedEventsSlider";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import { fetchEvents, fetchFeaturedEvents } from "../lib/api";
+import { Event }  from "../data/eventsData";
 // ✅ Memoize EventCard so it doesn’t re-render unnecessarily
 const MemoizedEventCard = React.memo(EventCard);
 
-const EventsSection: React.FC = () => {
-  // const [searchTerm, setSearchTerm] = useState("");
-  // const [selectedCategory, setSelectedCategory] = useState("All");
-  // const [selectedType, setSelectedType] = useState("All");
-  // const [selectedStatus, setSelectedStatus] = useState("All");
-  // const [currentPage, setCurrentPage] = useState(1);
-  // const [isTransitioning, setIsTransitioning] = useState(false);
-
-  const eventsPerPage = 12;
-
-  // const categories = [
-  //   "All",
-  //   "Rangoli",
-  //   "Spiritual",
-  //   "Resin",
-  //   "Shubh Labh",
-  //   "Lapdesk",
-  //   "Diya & Thali",
-  //   "Decor",
-  //   "Gift",
-  // ];
-  // const types = ["All", "festival", "workshop", "celebration", "craft-session"];
-
-  // ✅ Filtered events (memoized)
-  // const filteredEvents = useMemo(() => {
-  //   return eventsData.filter((event) => {
-  //     const matchesSearch =
-  //       event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //       event.description.toLowerCase().includes(searchTerm.toLowerCase());
-  //     const matchesCategory =
-  //       selectedCategory === "All" || event.category === selectedCategory;
-  //     const matchesType = selectedType === "All" || event.type === selectedType;
-  //     const matchesStatus =
-  //       selectedStatus === "All" || event.status === selectedStatus;
-
-  //     return matchesSearch && matchesCategory && matchesType && matchesStatus;
-  //   });
-  // }, [searchTerm, selectedCategory, selectedType, selectedStatus]);
-
-  // const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
-
-  // ✅ Paginated events (memoized)
-  // const paginatedEvents = useMemo(() => {
-  //   const startIndex = (currentPage - 1) * eventsPerPage;
-  //   return filteredEvents.slice(startIndex, startIndex + eventsPerPage);
-  // }, [filteredEvents, currentPage]);
-
-  // ✅ Smooth scroll + instant page change
-  // const goToPage = useCallback(
-  //   (page: number) => {
-  //     if (page === currentPage || isTransitioning || page < 1 || page > totalPages) return;
-  //     setIsTransitioning(true);
-  //     setCurrentPage(page);
-
-  //     window.scrollTo({ top: 0, behavior: "smooth" });
-  //     setTimeout(() => setIsTransitioning(false), 400);
-  //   },
-  //   [currentPage, isTransitioning, totalPages]
-  // );
-
-  // const goToPrevPage = useCallback(() => {
-  //   if (currentPage > 1) goToPage(currentPage - 1);
-  // }, [currentPage, goToPage]);
-
-  // const goToNextPage = useCallback(() => {
-  //   if (currentPage < totalPages) goToPage(currentPage + 1);
-  // }, [currentPage, totalPages, goToPage]);
-
-  // const getPageNumbers = useCallback(() => {
-  //   const maxVisible = 5;
-  //   let pages: (number | string)[] = [];
-
-  //   if (totalPages <= maxVisible) {
-  //     pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  //   } else {
-  //     if (currentPage <= 3) {
-  //       pages = [1, 2, 3, 4, "...", totalPages];
-  //     } else if (currentPage >= totalPages - 2) {
-  //       pages = [
-  //         1,
-  //         "...",
-  //         totalPages - 3,
-  //         totalPages - 2,
-  //         totalPages - 1,
-  //         totalPages,
-  //       ];
-  //     } else {
-  //       pages = [
-  //         1,
-  //         "...",
-  //         currentPage - 1,
-  //         currentPage,
-  //         currentPage + 1,
-  //         "...",
-  //         totalPages,
-  //       ];
-  //     }
-  //   }
-  //   return pages;
-  // }, [currentPage, totalPages]);
 
 
-  
 
-  const featuredEvents = eventsData.filter(
-    (e) => e.featured && e.status !== "completed"
-  );
+const EventsSection = async({ searchParams }: { searchParams: { 'event-category'?: string,'event-type':string,'event-status':string } }) => {
+  const featuredEvents= fetchFeaturedEvents();
+  let events= fetchEvents();
+  //
+  const[featuredEventData,eventData] = await Promise.allSettled([featuredEvents,events]);
+const featuredEventsArr = featuredEventData.status === "fulfilled" ? featuredEventData.value : [];
+let eventsArr = eventData.status === "fulfilled" ? eventData.value : [];
+
+   const eventCategory = searchParams['event-category'] || 'All';
+  const eventType = searchParams['event-type'] || 'All';
+  const eventStatus = searchParams['event-status'] || 'All';
+// console.log(eventCategory,eventType,eventStatus,"searchParams");
+
+function filterEvents(eventCategory:string,eventType:string,eventStatus:string,events:Event[]){
+return events=events.filter(event=>{if(eventCategory==="All"){
+ return event
+
+ }else{
+
+ return event.category===eventCategory
+ }}).filter(event=>{if(eventType==="All"){
+ return event
+ }  
+  else{
+  return  event.type===eventType
+  }
+}).filter(event=>{if(eventStatus==="All"){
+ return event
+ }
+  else{
+ return   event.status===eventStatus
+  }
+})
+ 
+}
+
+  eventsArr=filterEvents(eventCategory,eventType,eventStatus,eventsArr);
+
+
+
+// console.log(featuredEventsArr, eventsArr);
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -123,18 +61,18 @@ const EventsSection: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 py-4">
           {/* ✅ Featured Slider */}
           <FeaturedEventsSlider
-            featuredEvents={featuredEvents}
-            // formatDate={formatDate}
+            featuredEvents={featuredEventsArr}
+          
           />
 
           {/* ✅ Filters */}
           <EventFilters/>
 
           <h2 className="text-2xl font-bold mb-6">
-            All Events & Workshops ({eventsData.length})
+            All Events & Workshops ({eventData.status === "fulfilled" ? eventData.value.length : 0})
           </h2>
 
-          {/* ✅ Fast rendering grid */}
+          {/* ✅ Event  grid */}
           <div
             className={`transition-opacity duration-200 `
             //   ${
@@ -144,7 +82,9 @@ const EventsSection: React.FC = () => {
           }
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {eventsData.map((event) => (
+              {
+              eventData.status === "fulfilled" &&  
+              eventsArr.map((event:Event) => (
                 <div key={event.id} className="animate-fadeIn">
                   <MemoizedEventCard
                     event={event}
@@ -160,6 +100,12 @@ const EventsSection: React.FC = () => {
         <h3>Pagination goes here</h3>
         </div>
       </section>
+
+    </div>
+  );
+};
+
+export default EventsSection;
 
       {/* ✅ Simple fadeIn for fast render */}
       {/* <style jsx>{`
@@ -177,8 +123,3 @@ const EventsSection: React.FC = () => {
           animation: fadeIn 0.3s ease-out;
         }
       `}</style> */}
-    </div>
-  );
-};
-
-export default EventsSection;

@@ -13,6 +13,10 @@ import {
 import CartDrawer from "../modals/CartDrawer";
 import { usePathname, useRouter } from "next/navigation";
 import ProfilePopUp from "../modals/ProfilePopUp"; // ✅ Already imported
+import { ViewCart } from "../button/ViewCart";
+import { ViewSearchBar } from "../button/ViewSearchBar";
+import { NavSearchBar } from "./NavSearchBar";
+import Link from "next/link";
 
 interface CartItem {
   id: number;
@@ -236,13 +240,13 @@ const NavBar: React.FC = () => {
             </div>
 
             <div className="flex items-center space-x-3">
-              <button
+              {/* <button
                 onClick={toggleSearch}
                 className="hidden lg:block p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
               >
                 <Search className="w-5 h-5" />
-              </button>
-
+              </button> */}
+<ViewSearchBar/>
               <div className="relative">
                 <button
                   className="p-2 text-white hover:text-yellow-400 hover:bg-white/10 rounded-lg"
@@ -284,11 +288,12 @@ const NavBar: React.FC = () => {
                   {cartItems.reduce((total, item) => total + item.quantity, 0)}
                 </span>
               </div>
+              <ViewCart/>
             </div>
           </div>
 
-          {isSearchOpen && <SearchBar />}
-
+          {/* {isSearchOpen && <SearchBar />} */}
+<NavSearchBar />
           <div
             className={`lg:hidden transition-all duration-500 ease-in-out ${
               isMobileMenuOpen
@@ -302,10 +307,11 @@ const NavBar: React.FC = () => {
 
             <div className="px-4 sm:px-6 lg:px-8 pb-4 space-y-2 border-t border-white/10">
               {navItems.map((item, i) => (
+                <Link href={item.href} key={i}>
                 <button
                   key={i}
                   type="button"
-                  onClick={() => handleNav(item.href)}
+                  // onClick={() => handleNav(item.href)}
                   className={`w-full block text-left p-3 rounded-lg transition-all duration-300 mt-2 bg-transparent ${
                     pathname === item.href
                       ? "bg-yellow-400/20 text-yellow-100"
@@ -314,6 +320,7 @@ const NavBar: React.FC = () => {
                 >
                   <span className="font-medium tracking-wide">{item.name}</span>
                 </button>
+                </Link>
               ))}
             </div>
           </div>
