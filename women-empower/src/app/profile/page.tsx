@@ -66,10 +66,13 @@ interface Order {
 const ProfileSection: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
-  const [showMobileLogin, setShowMobileLogin] = useState(false);
+  const [loginMethod, setLoginMethod] = useState<'mobile' | 'email'>('mobile');
   const [showOtpVerification, setShowOtpVerification] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [mobileNumber, setMobileNumber] = useState('');
+  const [emailAddress, setEmailAddress] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   
   // Address management states
@@ -229,10 +232,18 @@ const ProfileSection: React.FC = () => {
 
   const handleMobileLogin = () => {
     if (mobileNumber.length === 10) {
-      setShowMobileLogin(false);
       setShowOtpVerification(true);
     } else {
       alert('Please enter valid mobile number');
+    }
+  };
+
+  const handleEmailLogin = () => {
+    if (emailAddress && password) {
+      setIsLoggedIn(true);
+      setUser(prev => ({ ...prev, email: emailAddress }));
+    } else {
+      alert('Please enter email and password');
     }
   };
 
@@ -296,39 +307,134 @@ const ProfileSection: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-xl p-10">
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-[#61503c] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Phone className="w-8 h-8 text-white" />
+                  {loginMethod === 'mobile' ? (
+                    <Phone className="w-8 h-8 text-white" />
+                  ) : (
+                    <Email className="w-8 h-8 text-white" />
+                  )}
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back!</h1>
-                <p className="text-gray-600">Enter your mobile number to continue</p>
+                <p className="text-gray-600">
+                  {loginMethod === 'mobile' 
+                    ? 'Enter your mobile number to continue'
+                    : 'Enter your email and password to continue'
+                  }
+                </p>
+              </div>
+
+              {/* Login Method Toggle */}
+              <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+                <button
+                  onClick={() => setLoginMethod('mobile')}
+                  className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-all ${
+                    loginMethod === 'mobile'
+                      ? 'bg-[#61503c] text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <Phone className="w-4 h-4" />
+                  <span>Mobile</span>
+                </button>
+                <button
+                  onClick={() => setLoginMethod('email')}
+                  className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-all ${
+                    loginMethod === 'email'
+                      ? 'bg-[#61503c] text-white shadow-sm'
+                      : 'text-gray-600 hover:text-gray-800'
+                  }`}
+                >
+                  <Email className="w-4 h-4" />
+                  <span>Email</span>
+                </button>
               </div>
 
               <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Mobile Number
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                      <span className="text-gray-500 text-sm">+91</span>
+                {loginMethod === 'mobile' ? (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Mobile Number
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                        <span className="text-gray-500 text-sm">+91</span>
+                      </div>
+                      <input
+                        type="tel"
+                        value={mobileNumber}
+                        onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
+                        placeholder="Enter 10-digit mobile number"
+                        maxLength={10}
+                      />
                     </div>
-                    <input
-                      type="tel"
-                      value={mobileNumber}
-                      onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                      className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="Enter 10-digit mobile number"
-                      maxLength={10}
-                    />
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address
+                      </label>
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                          <Email className="w-5 h-5 text-gray-400" />
+                        </div>
+                        <input
+                          type="email"
+                          value={emailAddress}
+                          onChange={(e) => setEmailAddress(e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
+                          placeholder="Enter your email address"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
+                          placeholder="Enter your password"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        >
+                          {showPassword ? (
+                            <VisibilityOff className="w-5 h-5 text-gray-400" />
+                          ) : (
+                            <Visibility className="w-5 h-5 text-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <button
-                  onClick={handleMobileLogin}
-                  disabled={mobileNumber.length !== 10}
+                  onClick={loginMethod === 'mobile' ? handleMobileLogin : handleEmailLogin}
+                  disabled={
+                    loginMethod === 'mobile' 
+                      ? mobileNumber.length !== 10 
+                      : !emailAddress || !password
+                  }
                   className="w-full bg-[#61503c] text-white py-3 px-4 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  Send OTP
+                  {loginMethod === 'mobile' ? 'Send OTP' : 'Login'}
                 </button>
+
+                {loginMethod === 'email' && (
+                  <div className="text-center">
+                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                      Forgot Password?
+                    </button>
+                  </div>
+                )}
 
                 <div className="text-center">
                   <p className="text-xs text-gray-500">

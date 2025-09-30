@@ -12,7 +12,7 @@ import {
 } from "@mui/icons-material";
 import CartDrawer from "../modals/CartDrawer";
 import { usePathname, useRouter } from "next/navigation";
-import ProfilePopUp from "../modals/ProfilePopUp"; // ✅ Already imported
+import ProfilePopUp from "../modals/ProfilePopUp";
 
 interface CartItem {
   id: number;

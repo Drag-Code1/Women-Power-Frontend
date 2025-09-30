@@ -150,7 +150,7 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ workImages = [] }) => {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl sm:text-3xl text-black mb-2">
-            Artist&apos;s Work
+            Artist Work's
           </h2>
         </div>
 

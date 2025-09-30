@@ -141,13 +141,11 @@ const EventsSection: React.FC = () => {
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
       <section className="min-h-screen bg-white rounded-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          {/* ✅ Featured Slider */}
           <FeaturedEventsSlider
             featuredEvents={featuredEvents}
             formatDate={formatDate}
           />
 
-          {/* ✅ Filters */}
           <EventFilters
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}
@@ -166,7 +164,6 @@ const EventsSection: React.FC = () => {
             All Events & Workshops ({filteredEvents.length})
           </h2>
 
-          {/* ✅ Fast rendering grid */}
           <div
             className={`transition-opacity duration-200 ${
               isTransitioning ? "opacity-50" : "opacity-100"
@@ -185,7 +182,7 @@ const EventsSection: React.FC = () => {
             </div>
           </div>
 
-          {/* ✅ Pagination */}
+          
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
               <div className="text-sm text-gray-600">
