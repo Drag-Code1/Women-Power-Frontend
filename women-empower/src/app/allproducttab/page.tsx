@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState } from "react";
 import { Package } from "lucide-react";
 import { Product, ProductFormData, DrawerMode } from "@/app/types/types";
@@ -7,8 +7,18 @@ import { filterProducts, getUniqueArtists } from "@/app/component/dashboard/allp
 import SearchFilter from "@/app/component/dashboard/allproducts/SearchFilter";
 import ProductCard from "../component/dashboard/allproducts/ProductCard";
 import Drawer from "../component/dashboard/allproducts/Drawer";
+import DashboardNavbar from "@/app/component/ui/utlity/DashboardNavbar";
+import DashboardSidebar from "@/app/component/ui/utlity/DashboardSidebar";
 
 const ProductDashboard: React.FC = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const userInfo = {
+    name: "vishal lodhe",
+    email: "lodhe.vishal@company.com",
+    avatar: "",
+  };
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
   const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -163,7 +173,15 @@ const ProductDashboard: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 p-6 bg-gray-100 overflow-y-auto">
+    <div className="h-screen flex flex-col bg-gray-50">
+      <DashboardNavbar
+        userInfo={userInfo}
+        onMenuToggle={toggleMobileMenu}
+        isMobileMenuOpen={isMobileMenuOpen}
+      />
+      <div className="flex flex-1 overflow-hidden">
+        <DashboardSidebar isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
+        <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
       <div className="max-w-7xl mx-auto">
         <SearchFilter
           searchTerm={searchTerm}
@@ -231,6 +249,8 @@ const ProductDashboard: React.FC = () => {
         onRemoveImage={removeImage}
         setCurrentImageIndex={setCurrentImageIndex}
       />
+        </main>
+      </div>
     </div>
   );
 };

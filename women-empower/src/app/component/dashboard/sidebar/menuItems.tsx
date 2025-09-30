@@ -10,12 +10,12 @@ import {
 import { MenuItem } from "@/app/types/types";
 
 export const menuItems: MenuItem[] = [
-  { name: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, href: "/" },
+  { name: "Dashboard", icon: <LayoutDashboard className="w-5 h-5" />, href: "/dashboard" },
   {
     name: "Products",
     icon: <Package className="w-5 h-5" />,
     subItems: [
-      { name: "All Products", href: "/ProductDashboard" },
+      { name: "All Products", href: "/allproducttab" },
       { name: "Category", href: "/products/category" },
     ],
   },

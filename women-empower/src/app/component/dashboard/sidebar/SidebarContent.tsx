@@ -1,16 +1,44 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { menuItems } from "@/app/component/dashboard/sidebar/menuItems";
 import { MenuItem } from "@/app/types/types";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface SidebarContentProps {
   onClose?: () => void;
 }
 
 const SidebarContent: React.FC<SidebarContentProps> = ({ onClose = () => {} }) => {
-  const [expandedItems, setExpandedItems] = useState<string[]>(["All Products"]);
+  const pathname = usePathname();
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [activeItem, setActiveItem] = useState<string>("Dashboard");
+
+  const activeFromPath = useMemo(() => {
+    // Try to match subItems first
+    for (const item of menuItems) {
+      if (item.subItems) {
+        const match = item.subItems.find((s) => s.href === pathname);
+        if (match) return match.name;
+      } else if (item.href === pathname) {
+        return item.name;
+      }
+    }
+    return "Dashboard";
+  }, [pathname]);
+
+  useEffect(() => {
+    setActiveItem(activeFromPath);
+    // Expand any parent whose child matches the current path
+    const parentsToExpand: string[] = [];
+    for (const item of menuItems) {
+      if (item.subItems && item.subItems.some((s) => s.href === pathname)) {
+        parentsToExpand.push(item.name);
+      }
+    }
+    setExpandedItems(parentsToExpand);
+  }, [activeFromPath, pathname]);
 
   const toggleExpanded = (itemName: string) => {
     setExpandedItems((prev) =>
@@ -81,7 +109,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ onClose = () => {} }) =
                 {expandedItems.includes(item.name) && (
                   <div className="ml-4 mt-2 space-y-1">
                     {item.subItems.map((subItem) => (
-                      <a
+                      <Link
                         key={subItem.name}
                         href={subItem.href}
                         onClick={() => handleSubItemClick(subItem.name)}
@@ -99,14 +127,14 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ onClose = () => {} }) =
                           }`}
                         ></div>
                         {subItem.name}
-                      </a>
+                      </Link>
                     ))}
                   </div>
                 )}
               </div>
             ) : (
-              <a
-                href={item.href}
+              <Link
+                href={item.href!}
                 onClick={() => handleItemClick(item)}
                 className={`flex items-center px-4 py-3 rounded-xl transition-all ${
                   activeItem === item.name
@@ -127,7 +155,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ onClose = () => {} }) =
                 {activeItem === item.name && (
                   <div className="ml-auto w-2 h-2 bg-blue-500 rounded-full"></div>
                 )}
-              </a>
+              </Link>
             )}
           </div>
         ))}

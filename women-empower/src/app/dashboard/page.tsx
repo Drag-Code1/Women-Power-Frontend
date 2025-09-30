@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import DashboardNavbar from "@/app/component/ui/utlity/DashboardNavbar";
 import DashboardSidebar from "@/app/component/ui/utlity/DashboardSidebar";
 import MainContent from "@/app/component/dashboard/dashboardtab/MainContent";
-import ProductDashboard from "@/app/allproducttab/page";  
 
 
 
@@ -28,8 +27,7 @@ const Dashboard = () => {
       />
       <div className="flex flex-1 overflow-hidden">
         <DashboardSidebar isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
-        {/* <MainContent /> */}
-        <ProductDashboard />
+        <MainContent />
 
       </div>
     </div>
