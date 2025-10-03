@@ -5,7 +5,11 @@ import ProductCardNew, { Product } from "../cart/ProductCardNew"; // ✅ Use Pro
 import { allProducts } from "../../data/products";
 import "@/app/globals.css"; // ✅ Import global CSS for scrollbar-hide
 
-const RelatedProducts: React.FC = () => {
+interface relatedProductsProps{
+
+  children:React.ReactNode
+}
+const RelatedProducts: React.FC<relatedProductsProps> = ({children}) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -99,11 +103,12 @@ const RelatedProducts: React.FC = () => {
             className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {trendingProducts.map((product: Product) => (
+            {children}
+            {/* {trendingProducts.map((product: Product) => (
               <div key={product.id} className="flex-shrink-0 w-64 sm:w-72">
                 <ProductCardNew product={product} />
               </div>
-            ))}
+            ))} */}
           </div>
         </div>
       </div>

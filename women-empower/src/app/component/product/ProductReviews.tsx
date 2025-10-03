@@ -1,6 +1,9 @@
-'use client';
-import React, { useState } from 'react';
+// 'use client';
+import React from 'react';
 import { Star, StarBorder, Sort, FilterList } from '@mui/icons-material';
+import ReviewForm from '../ui/forms/AddProductReviewForm';
+import { submitReviewAction } from '@/app/services/productDetailsService';
+import { WriteReview } from '../ui/button/WriteReview';
 
 interface Review {
   id: number;
@@ -12,16 +15,16 @@ interface Review {
 }
 
 const ProductReviews: React.FC = () => {
-  const [sortBy, setSortBy] = useState('Relevance');
-  const [filterBy, setFilterBy] = useState('All Star');
-  const [showWriteReview, setShowWriteReview] = useState(false);
-  const [newReviewRating, setNewReviewRating] = useState(0);
-  const [newReviewTitle, setNewReviewTitle] = useState('');
-  const [newReviewDescription, setNewReviewDescription] = useState('');
-  const [displayCount, setDisplayCount] = useState(4);
+  // const [sortBy, setSortBy] = useState('Relevance');
+  // const [filterBy, setFilterBy] = useState('All Star');
+  // const [showWriteReview, setShowWriteReview] = useState(false);
+  // const [newReviewRating, setNewReviewRating] = useState(0);
+  // const [newReviewTitle, setNewReviewTitle] = useState('');
+  // const [newReviewDescription, setNewReviewDescription] = useState('');
+  // const [displayCount, setDisplayCount] = useState(4);
 
   // Sample reviews data - using state to allow adding new reviews
-  const [reviews, setReviews] = useState<Review[]>([
+const reviewData=[
     {
       id: 1,
       rating: 5,
@@ -53,60 +56,60 @@ const ProductReviews: React.FC = () => {
       timeAgo: "1 month ago",
       verified: true
     }
-  ]);
+  ]
 
   // Function to handle adding new review
-  const handleSubmitReview = () => {
-    if (newReviewRating > 0 && newReviewTitle.trim() && newReviewDescription.trim()) {
-      const newReview: Review = {
-        id: Math.max(...reviews.map(r => r.id)) + 1,
-        rating: newReviewRating,
-        title: newReviewTitle.trim(),
-        description: newReviewDescription.trim(),
-        timeAgo: "Just now",
-        verified: true
-      };
+  // const handleSubmitReview = () => {
+  //   if (newReviewRating > 0 && newReviewTitle.trim() && newReviewDescription.trim()) {
+  //     const newReview: Review = {
+  //       id: Math.max(...reviews.map(r => r.id)) + 1,
+  //       rating: newReviewRating,
+  //       title: newReviewTitle.trim(),
+  //       description: newReviewDescription.trim(),
+  //       timeAgo: "Just now",
+  //       verified: true
+  //     };
       
-      // Add new review to the beginning of the array
-      setReviews([newReview, ...reviews]);
+  //     // Add new review to the beginning of the array
+  //     setReviews([newReview, ...reviews]);
       
-      // Reset form
-      setNewReviewRating(0);
-      setNewReviewTitle('');
-      setNewReviewDescription('');
-      setShowWriteReview(false);
+  //     // Reset form
+  //     setNewReviewRating(0);
+  //     setNewReviewTitle('');
+  //     setNewReviewDescription('');
+  //     setShowWriteReview(false);
       
-      // Reset display count to show all reviews including the new one
-      setDisplayCount(4);
-    }
-  };
+  //     // Reset display count to show all reviews including the new one
+  //     setDisplayCount(4);
+  //   }
+  // };
 
-  // Filter reviews based on selected filter
-  const filteredReviews = reviews.filter(review => {
-    if (filterBy === 'All Star') return true;
-    const starRating = parseInt(filterBy.split(' ')[0]);
-    return review.rating === starRating;
-  });
+  // // Filter reviews based on selected filter
+  // const filteredReviews = reviews.filter(review => {
+  //   if (filterBy === 'All Star') return true;
+  //   const starRating = parseInt(filterBy.split(' ')[0]);
+  //   return review.rating === starRating;
+  // });
 
   // Sort filtered reviews
-  const sortedReviews = [...filteredReviews].sort((a, b) => {
-    switch (sortBy) {
-      case 'Newest':
-        return b.id - a.id; // Assuming higher ID means newer
-      case 'Oldest':
-        return a.id - b.id;
-      case 'Highest Rating':
-        return b.rating - a.rating;
-      case 'Lowest Rating':
-        return a.rating - b.rating;
-      default:
-        return 0; // Relevance - keep original order
-    }
-  });
+  // const sortedReviews = [...filteredReviews].sort((a, b) => {
+  //   switch (sortBy) {
+  //     case 'Newest':
+  //       return b.id - a.id; // Assuming higher ID means newer
+  //     case 'Oldest':
+  //       return a.id - b.id;
+  //     case 'Highest Rating':
+  //       return b.rating - a.rating;
+  //     case 'Lowest Rating':
+  //       return a.rating - b.rating;
+  //     default:
+  //       return 0; // Relevance - keep original order
+  //   }
+  // });
 
-  // Get reviews to display (limited by displayCount)
-  const displayedReviews = sortedReviews.slice(0, displayCount);
-  const hasMoreReviews = sortedReviews.length > displayCount;
+  // // Get reviews to display (limited by displayCount)
+  // const displayedReviews = sortedReviews.slice(0, displayCount);
+  // const hasMoreReviews = sortedReviews.length > displayCount;
 
   const ratingDistribution = [
     { stars: 5, count: 43, percentage: 97.7 },
@@ -124,7 +127,7 @@ const ProductReviews: React.FC = () => {
           <button 
             key={star} 
             className={`${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : 'cursor-default'} ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
-            onClick={() => interactive && setNewReviewRating(star)}
+            // onClick={() => interactive && setNewReviewRating(star)}
           >
             {star <= rating ? <Star fontSize="inherit" /> : <StarBorder fontSize="inherit" />}
           </button>
@@ -133,7 +136,7 @@ const ProductReviews: React.FC = () => {
     );
   };
 
-  const averageRating = (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
+  // const averageRating = (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -149,12 +152,14 @@ const ProductReviews: React.FC = () => {
                   Product Reviews
                 </h1>
               </div>
-              <button 
-                onClick={() => setShowWriteReview(!showWriteReview)}
+              {/* <button 
+
+                // onClick={() => setShowWriteReview(!showWriteReview)}
                 className="bg-[#685845] hover:bg-[#61503c] text-white px-6 py-2.5 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base"
               >
                 Write a Review
-              </button>
+              </button> */}
+              <WriteReview />
             </div>
           </div>
 
@@ -165,13 +170,16 @@ const ProductReviews: React.FC = () => {
               {/* Overall Rating */}
               <div className="text-center lg:text-left">
                 <div className="flex flex-col sm:flex-row sm:items-end sm:justify-center lg:justify-start gap-4">
-                  <div className="text-6xl font-bold text-gray-900">{averageRating}</div>
+                  <div className="text-6xl font-bold text-gray-900">
+                    {/* {averageRating}  */}
+                    90
+                  </div>
                   <div className="flex flex-col items-center sm:items-start mb-2">
                     <div className="mb-2">
-                      {renderStars(Math.round(parseFloat(averageRating)))}
+                      {/* {renderStars(Math.round(parseFloat(averageRating)))} */}
                     </div>
                     <p className="text-gray-600 text-sm">
-                      Based on {reviews.length} reviews
+                      Based on {reviewData.length} reviews
                     </p>
                   </div>
                 </div>
@@ -201,7 +209,7 @@ const ProductReviews: React.FC = () => {
           </div>
 
           {/* Write Review Form */}
-          {showWriteReview && (
+          {/* {showWriteReview && (
             <div className="px-6 sm:px-8 py-6 bg-blue-50 border-b border-gray-200">
               <div className="max-w-2xl">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Write Your Review</h3>
@@ -261,13 +269,15 @@ const ProductReviews: React.FC = () => {
                 </div>
               </div>
             </div>
-          )}
+          )} */}
+{/* form here */}
+<ReviewForm submitReview={submitReviewAction} />
 
           {/* Filters and Sort Section */}
           <div className="px-6 sm:px-8 py-4 bg-white border-b border-gray-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                Customer Reviews ({sortedReviews.length})
+                Customer Reviews ({76})
               </h3>
               
               <div className="flex items-center gap-4">
@@ -275,8 +285,8 @@ const ProductReviews: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <Sort className="text-gray-400" fontSize="small" />
                   <select 
-                    value={sortBy}
-                    onChange={(e) => setSortBy(e.target.value)}
+                    // value={sortBy}
+                    // onChange={(e) => setSortBy(e.target.value)}
                     className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="Relevance">Most Relevant</option>
@@ -291,8 +301,8 @@ const ProductReviews: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <FilterList className="text-gray-400" fontSize="small" />
                   <select 
-                    value={filterBy}
-                    onChange={(e) => setFilterBy(e.target.value)}
+                    // value={filterBy}
+                    // onChange={(e) => setFilterBy(e.target.value)}
                     className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="All Star">All Ratings</option>
@@ -309,10 +319,10 @@ const ProductReviews: React.FC = () => {
 
           {/* Reviews List */}
           <div className="px-6 sm:px-8 py-6">
-            {displayedReviews.length > 0 ? (
+            {reviewData.length > 0 ? (
               <div className="space-y-6">
-                {displayedReviews.map((review, index) => (
-                  <div key={review.id} className={`${index !== displayedReviews.length - 1 ? 'border-b border-gray-200' : ''} pb-6`}>
+                {reviewData.map((review, index) => (
+                  <div key={review.id} className={`${index !== reviewData.length - 1 ? 'border-b border-gray-200' : ''} pb-6`}>
                     <div className="flex flex-col gap-3">
                       
                       {/* Rating and Verification */}
@@ -352,16 +362,16 @@ const ProductReviews: React.FC = () => {
             )}
 
             {/* Load More Button */}
-            {hasMoreReviews && (
+            {/* {hasMoreReviews && ( */}
               <div className="text-center mt-8 pt-6 border-t border-gray-200">
                 <button 
-                  onClick={() => setDisplayCount(displayCount + 4)}
+                  // onClick={() => setDisplayCount(displayCount + 4)}
                   className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-lg font-medium transition-colors"
                 >
                   Load More Reviews
                 </button>
               </div>
-            )}
+            {/* )} */}
           </div>
         </div>
       </div>

@@ -8,7 +8,7 @@ import { Product } from "@/app/types/product";
 
 
 interface Props {
-  product?: Product |null;
+  product: Product
 }
 
 const ProductCardNew: React.FC<Props> = ({ product }) => {

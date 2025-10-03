@@ -1,20 +1,17 @@
-'use client';
-import React, { useEffect, useState } from "react";
+// 'use client';
+import React  from "react";
 import type { JSX } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/state-management/hooks";
 import { addToCheckout, CheckoutItem } from "@/state-management/slices/checkoutSlice";    
+import { ProductMainImage } from "../product-details/productMainImage";
+import { ProductThumbnailImage } from "../product-details/ThumbnailImage";
+import { ProductAddToCart } from "../product-details/ProductAddToCart";
+import { ProductAddToWishList } from "../product-details/ProductAddToWishlist";
+import { ProductBuyNow } from "../product-details/ProductBuyNow";
+import { ProductQuantityContainer } from "../product-details/ProductQuantityContainer";
 const ProductDetailsPage = () => {
-  const dispatch=useAppDispatch()
   
-       const selector = useAppSelector(state => (state.checkout as { items: CheckoutItem[] }).items);
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
-useEffect(() => {
-  console.log('xx',selector)
-
-}, [selector])
   const productData = {
     id:1,
     title: "Traditional Shubh Labh",
@@ -23,12 +20,12 @@ useEffect(() => {
     originalPrice: 950,
     rating: 4.6,
     reviews: 124,
-    quantity: quantity,
+    quantity: 8,
   };
 
   const productImages = [
     "/images/product-details.png",
-    "/images/product-details.png",
+    "/images/rangoli1.jpg",
     "/images/product-details.png",
     "/images/product-details.png",
   ];
@@ -71,31 +68,37 @@ useEffect(() => {
             <div className="p-6 lg:p-8">
               {/* Main Image */}
               <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border border-gray-100 mb-4">
-                <img
+          {/* client */}
+                {/* <img
                   src={productImages[selectedImage]}
                   alt={productData.title}
                   className="w-full h-full object-cover"
-                />
+                /> */}
+
+                <ProductMainImage productImages={productImages} />
               </div>
               
               {/* Thumbnail Images */}
               <div className="grid grid-cols-4 gap-3">
+                       {/* client */}
                 {productImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square rounded-lg overflow-hidden border transition-all duration-200 ${
-                      selectedImage === index 
-                        ? "border-[#695946] border-2 ring-2 ring-[#695946]/20" 
-                        : "border-gray-200 hover:border-[#695946]"
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`View ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
+                  // <button
+                  //   key={index}
+                  //   onClick={() => setSelectedImage(index)}
+                  //   className={`aspect-square rounded-lg overflow-hidden border transition-all duration-200 ${
+                  //     selectedImage === index 
+                  //       ? "border-[#695946] border-2 ring-2 ring-[#695946]/20" 
+                  //       : "border-gray-200 hover:border-[#695946]"
+                  //   }`}
+                  // >
+                  //   <img
+                  //     src={image}
+                  //     alt={`View ${index + 1}`}
+                  //     className="w-full h-full object-cover"
+                  //   />
+                  // </button>
+<ProductThumbnailImage image={image} index={index} />
+                  
                 ))}
               </div>
             </div>
@@ -138,7 +141,8 @@ useEffect(() => {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-900 mb-3">Quantity</label>
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center border border-gray-200 rounded-lg">
+                         {/* client */}
+                  {/* <div className="flex items-center border border-gray-200 rounded-lg">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="p-3 hover:bg-gray-50 transition-colors border-r border-gray-200"
@@ -154,7 +158,8 @@ useEffect(() => {
                     >
                       <Plus size={16} />
                     </button>
-                  </div>
+                  </div> */}
+                  <ProductQuantityContainer />
                   <span className="bg-green-50 text-green-700 text-sm px-3 py-1 rounded-full font-medium">
                     ✓ In Stock
                   </span>
@@ -163,20 +168,24 @@ useEffect(() => {
 
               {/* Action Buttons */}
               <div className="space-y-3 mb-8">
-                <button className="w-full bg-[#695946] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#5a4a3a] transition-colors shadow-sm">
+                       {/* client */}
+                {/* <button className="w-full bg-[#695946] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#5a4a3a] transition-colors shadow-sm">
                   Add to Cart
-                </button>
-                
+                </button> */}
+                <ProductAddToCart />
                 <div className="flex gap-3">
-                  <button
+                         {/* client */}
+                  {/* <button
                   onClick={()=>{ selector.find(Item=>Item.id!==productData.id) && dispatch(addToCheckout(productData))}}
                   
                   className="flex-1 border border-gray-200 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
                     <ShoppingCart size={18} />
                     Buy Nnow
-                  </button>
-                  
-                  <button
+                  </button> */}
+<ProductBuyNow />
+               
+                         {/* client */}
+                  {/* <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
                     className={`px-4 py-3 rounded-lg border transition-all duration-200 ${
                       isWishlisted
@@ -185,7 +194,8 @@ useEffect(() => {
                     }`}
                   >
                     <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
-                  </button>
+                  </button> */}
+                     <ProductAddToWishList />
                 </div>
               </div>
 
