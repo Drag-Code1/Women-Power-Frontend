@@ -36,15 +36,15 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
   cartItems,
   updateQuantity,
   removeItem,
-  getTotalPrice,
+  // getTotalPrice,
 }) => {
 
 const selector = useAppSelector(state => (state.cart as { items: CartItem[] }).items);
 
   const shipping = 299;
   const discount = 500;
-  const subtotal = getTotalPrice();
-  const finalTotal = Math.max(0, subtotal + shipping - discount);
+  // const subtotal = getTotalPrice();
+  // const finalTotal = Math.max(0, subtotal + shipping - discount);
   const router = useRouter();
 const searchParams=useSearchParams();
 const isCartOpen_=searchParams.get('cart');
@@ -72,7 +72,7 @@ const params=new URLSearchParams(searchParams.toString());
                   Shopping Cart
                 </h2>
                 <p className="text-xs text-gray-500">
-                  {cartItems.length} items
+                  {selector.length} items
                 </p>
               </div>
             </div>
@@ -148,7 +148,7 @@ history.pushState(null, '', `?${params.toString()}`);
 
                       <div className="flex flex-col items-end space-y-1">
                         <button
-                          onClick={() => removeItem(item.id)}
+                          // onClick={() => removeItem(item.id)}
                           className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
                         >
                           <Delete className="w-4 h-4" />
@@ -156,7 +156,7 @@ history.pushState(null, '', `?${params.toString()}`);
 
                         <div className="flex items-center bg-gray-100 rounded-md">
                           <button
-                            onClick={() => updateQuantity(item.id, -1)}
+                            // onClick={() => updateQuantity(item.id, -1)}
                             className="px-2 py-1 hover:bg-gray-200 rounded-l-md"
                           >
                             <Remove className="w-4 h-4 text-gray-600" />
@@ -165,7 +165,7 @@ history.pushState(null, '', `?${params.toString()}`);
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.id, 1)}
+                            // onClick={() => updateQuantity(item.id, 1)}
                             className="px-2 py-1 hover:bg-gray-200 rounded-r-md"
                           >
                             <Add className="w-4 h-4 text-gray-600" />
@@ -179,13 +179,13 @@ history.pushState(null, '', `?${params.toString()}`);
             )}
           </div>
 
-          {cartItems.length > 0 && (
+          {selector.length > 0 && (
             <div className="border-t border-gray-100 bg-white flex-shrink-0">
               <div className="p-4 space-y-3">
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-gray-600">
                     <span>Subtotal</span>
-                    <span>₹{subtotal}</span>
+                    <span>₹{899}</span>
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Shipping</span>
@@ -201,7 +201,7 @@ history.pushState(null, '', `?${params.toString()}`);
                         Total
                       </span>
                       <span className="text-xl font-bold text-[#61503c]">
-                        ₹{finalTotal}
+                        {/* ₹{finalTotal} */} 67666
                       </span>
                     </div>
                   </div>

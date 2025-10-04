@@ -1,12 +1,13 @@
 "use client"
 import { Close, SearchOutlined } from "@mui/icons-material";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+  
 
- export const NavSearchBar = () =>{
-    
-        const searchParams=useSearchParams();
-        const params=new URLSearchParams(searchParams.toString());
-     const suggestions = [
+ export const NavMobileSearchBar = () => {
+
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+  const suggestions = [
     "Modern Art",
     "Oil Paintings",
     "Sketch Artists",
@@ -14,26 +15,19 @@ import { useSearchParams } from "next/navigation";
     "Digital Arts",
     "Photography",
   ];
-  const filteredSuggestions = suggestions.filter((s) =>s.toLowerCase().includes((params.get('searchQuery') || '').toLowerCase())
+  const filteredSuggestions = suggestions.filter((s) =>
+    s.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  
+   const toggleSearch = () => {
+    setIsSearchOpen(!isSearchOpen);
+    setSearchQuery("");
+   }
     return(
-   params.get('nav-search') ?
-     <div className="w-full animate-fadeIn">
+    <div className="w-full animate-fadeIn">
       <div className="max-w-3xl mx-auto px-4 py-3 relative">
         <button
-          onClick={
-
-()=>{
-
- params.delete('nav-search')
- params.delete('searchQuery')
-                   history.pushState(null, '', `?${params.toString()}`);
-
-
-}
-
-          }
+          onClick={toggleSearch}
           className="absolute right-6 top-5 text-gray-300 hover:text-white lg:block hidden"
         >
           <Close className="w-6 h-6" />
@@ -45,18 +39,13 @@ import { useSearchParams } from "next/navigation";
             type="text"
             placeholder="Search for products, artists..."
             className="flex-1 bg-transparent outline-none text-white placeholder-gray-300 text-sm"
-            // value={searchQuery}
-            onChange={(e) =>{
- params.set('searchQuery',e.target.value)
-                   history.pushState(null, '', `?${params.toString()}`);
-
-            }
-            }
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             autoFocus
           />
         </div>
 
-        {params.get('searchQuery') && (
+        {searchQuery && (
           <div className="mt-2 bg-white border border-gray-200 rounded-lg shadow-md max-h-60 overflow-y-auto">
             {filteredSuggestions.length > 0 ? (
               filteredSuggestions.map((s, i) => (
@@ -75,7 +64,6 @@ import { useSearchParams } from "next/navigation";
           </div>
         )}
       </div>
-    </div> 
-    : null
-  )
-}
+    </div>
+    )
+};

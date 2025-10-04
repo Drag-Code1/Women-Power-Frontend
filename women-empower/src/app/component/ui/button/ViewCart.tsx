@@ -1,4 +1,5 @@
 
+"use client"
 import { useAppDispatch } from "@/state-management/hooks";
 import { ShoppingCartOutlined } from "@mui/icons-material"
 import { useSearchParams } from "next/navigation";

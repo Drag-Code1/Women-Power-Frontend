@@ -4,49 +4,54 @@ import React, { useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut, User } from "lucide-react";
+import { useSearchParams } from "next/navigation";
  
 interface ProfilePopUpProps {
   isOpen: boolean;
   onClose: () => void;
-  isSignedIn: boolean;
+  // isSignedIn: boolean;
   userName?: string;
   mobileNumber?: string;
   onLogout?: () => void;
 }
  
 const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
-  isOpen,
-  onClose,
-  isSignedIn,
+  // isOpen,
+  // onClose,
+  // isSignedIn,
   mobileNumber,
   onLogout,
 }) => {
   const popupRef = useRef<HTMLDivElement>(null);
- 
+       const searchParams=useSearchParams();
+       const url=new URLSearchParams(searchParams.toString());
   // Close popup when clicking outside
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    }
+  // useEffect(() => {
+  //   function handleClickOutside(e: MouseEvent) {
+  //     if (popupRef.current && !popupRef.current.contains(e.target as Node)) {
+  //       onClose();
+  //       url.delete('user-profile')
+  //        history.pushState(null, '', `?${url.toString()}`)
+  //     }
+  //   }
  
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen, onClose]);
+  //   if (isOpen) {
+  //     document.addEventListener("mousedown", handleClickOutside);
+  //   }
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [isOpen, onClose]);
  
-  if (!isOpen) return null;
- 
+  // if (!isOpen) return null;
+ console.log( searchParams.get('user-profile'),'ss')
   return (
-    <div
+ searchParams.get('user-profile') =='true'?
+   <div
       ref={popupRef}
       className="absolute top-14 right-0 w-60 bg-white shadow-md rounded-xl p-2 border-0 z-50"
     >
-      {isSignedIn ? (
+      {true ? (
         <>
           {/* Header with Avatar + Name + Mobile */}
           <div className="flex items-center space-x-3 pb-4 border-b border-gray-200">
@@ -106,7 +111,7 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
  
         <Link
   href="/profile"
-  onClick={onClose}   // ✅ yaha add kar diya
+  // onClick={onClose}   // ✅ yaha add kar diya
   className="block w-full text-center bg-[#efb200] text-white font-medium py-2 rounded-md mt-5 hover:bg-[#cf9f00] transition"
 >
   Sign Up
@@ -114,7 +119,7 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
 
         </>
       )}
-    </div>
+    </div> :null
   );
 };
  

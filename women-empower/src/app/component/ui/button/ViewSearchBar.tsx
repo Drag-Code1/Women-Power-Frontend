@@ -1,3 +1,5 @@
+
+"use client"
 import { Search } from "@mui/icons-material";
 import { useSearchParams } from "next/navigation";
 
@@ -9,7 +11,7 @@ import { useSearchParams } from "next/navigation";
     return(
               <button
                 onClick={()=>{
-                   params.has('search') ? params.delete('search','true') : params.set('search','true')
+                   params.has('nav-search') ? params.delete('nav-search','true') : params.set('nav-search','true')
                    history.pushState(null, '', `?${params.toString()}`);
 
 
