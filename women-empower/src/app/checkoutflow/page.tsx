@@ -1,5 +1,4 @@
-
-import React, { } from 'react';
+import React from "react";
 import {
   LocalShipping,
   Home,
@@ -20,56 +19,49 @@ import {
   LocationOn,
   Phone,
   Person,
-  ContactlessOutlined
-} from '@mui/icons-material';
-import { PriceSummary } from '../component/checkout/PriceSummary';
-import { DeliveryOptionContainer } from '../component/checkout/DeliveryOption';
-import { DeliveryAddress } from '../component/checkout/DeliveryAddress';
-import { AddNewAddressForm } from '../component/ui/forms/AddNewAddress';
-import { PaymentStep } from '../component/checkout/PaymentStep';
-import { ConfirmationStep } from '../component/checkout/ConfirmationStep';
-import { DeliveryStepContainer } from '../component/checkout/DeliveryStepContainer';
+  ContactlessOutlined,
+} from "@mui/icons-material";
+import { PriceSummary } from "../component/checkout/PriceSummary";
+import { DeliveryOptionContainer } from "../component/checkout/DeliveryOption";
+import { DeliveryAddress } from "../component/checkout/DeliveryAddress";
+import { AddNewAddressForm } from "../component/ui/forms/AddNewAddress";
+import { PaymentStep } from "../component/checkout/PaymentStep";
+import { ConfirmationStep } from "../component/checkout/ConfirmationStep";
+import { DeliveryStepContainer } from "../component/checkout/DeliveryStepContainer";
 
 interface CheckoutProps {
-  searchParams: { [key: string]: string | string[] | undefined |null};
+  searchParams: { [key: string]: string | string[] | undefined | null };
 }
 
-
 export default async function CheckoutFlow({ searchParams }: CheckoutProps) {
+  const currentStep = searchParams.step;
+  console.log("currentStep in checkoutflow", currentStep);
+  const address = searchParams.address;
 
-  const currentStep = searchParams.step; 
-console.log("currentStep in checkoutflow",currentStep);
-  const address = searchParams.address; 
-
-    return (
+  return (
     <>
-  {/* {currentStep===undefined && */}
-  <DeliveryStepContainer>
-                
-<DeliveryOptionContainer />
-  <DeliveryAddress/>
-  <PriceSummary  />
-  <AddNewAddressForm />
-    </DeliveryStepContainer> 
-  {/* }  */}
- 
+      {/* {currentStep===undefined && */}
+      <DeliveryStepContainer>
+        <DeliveryOptionContainer />
+        <DeliveryAddress />
+        <PriceSummary />
+        <AddNewAddressForm />
+      </DeliveryStepContainer>
+      {/* }  */}
+
       <PaymentStep />
-         <ConfirmationStep />
-    </>  
-    );
-  }
-
- 
-
-
+      <ConfirmationStep />
+    </>
+  );
+}
 
 //
 
 // export default async function CheckoutFlow({ searchParams }: CheckoutProps) {
 
-//   const currentStep = searchParams.step; 
+//   const currentStep = searchParams.step;
 
-//   const address = searchParams.address; 
+//   const address = searchParams.address;
 //   if (currentStep === 'delivery') {
 //     return (
 //       <div className="min-h-screen bg-white py-4 px-4 lg:px-8">
@@ -77,10 +69,10 @@ console.log("currentStep in checkoutflow",currentStep);
 //           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 //             {/* Main Content */}
 //             <div className="lg:col-span-2 space-y-6">
-            
+
 // <DeliveryOptionContainer />
 //               {/* Address Selection */}
-             
+
 //               <DeliveryAddress/>
 
 //             </div>

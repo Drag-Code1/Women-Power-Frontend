@@ -48,7 +48,7 @@ const ArtistProfile = () => {
             />
 
             <div className="text-center md:text-left space-y-3">
-              <h2 className="text-3xl font-bold text-gray-800">{artist.name}</h2>
+              <h2 className="text-3xl md:text-3xl text-gray-900">{artist.name}</h2>
               <p className="text-gray-600 italic">{artist.speciality}</p>
 
               <div className="flex justify-center md:justify-start items-center gap-2 text-gray-700">

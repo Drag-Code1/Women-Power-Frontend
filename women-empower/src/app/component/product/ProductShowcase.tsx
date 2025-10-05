@@ -76,7 +76,7 @@ const ProductShowcase: React.FC = () => {
             {/* Text Section */}
             <div className="lg:w-1/2 p-6 flex flex-col justify-center">
               <div className="space-y-4">
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 leading-tight">
+                <h1 className="text-2xl lg:text-3xl md:text-3xl text-gray-900 leading-tight">
                   Crafting dreams into reality
                 </h1>
                 
