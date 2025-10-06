@@ -21,11 +21,11 @@ useEffect(() => {
 }, []);
 async function fetchData() {
     try {
-      const res = await fetch('http://localhost:5000/api/category');
-      const categoriesData_ = await res.json();
-      console.log(categoriesData_);
-     const categoryObject= categoriesData_.map((cat:  string ) => ({ categoryName: cat, isChecked:allParams.includes(cat)? true:false }))
-setCategoriesData(categoryObject);
+      const res = await fetch('http://localhost:5000/v1/category/');
+      const categoriesResponse = await res.json();
+      const names = (categoriesResponse?.data || []).map((cat: { name: string }) => cat.name);
+      const categoryObject = names.map((cat: string) => ({ categoryName: cat, isChecked: allParams.includes(cat) ? true : false }));
+      setCategoriesData(categoryObject);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -57,6 +57,19 @@ const toggleCategory = useCallback((category: string, e: React.ChangeEvent<HTMLI
     tempCategoryStatus[index].isChecked = !tempCategoryStatus[index].isChecked;
     setCategoriesData(tempCategoryStatus);
 }, [searchParams, categoriesData]);
+
+  const togglePriceRange = useCallback((rangeLabel: string) => {
+    const alreadySelected = selectedPriceRanges.includes(rangeLabel);
+    const next = alreadySelected
+      ? selectedPriceRanges.filter((r) => r !== rangeLabel)
+      : [...selectedPriceRanges, rangeLabel];
+    setSelectedPriceRanges(next);
+    params.delete('search');
+    // sync to URL as repeated price params
+    params.delete('price');
+    next.forEach((r) => params.append('price', r));
+    router.replace(`?${params.toString()}`, { scroll: false });
+  }, [selectedPriceRanges, searchParams]);
 
   const clearFilters = useCallback(() => {
 //       if (searchParam) {

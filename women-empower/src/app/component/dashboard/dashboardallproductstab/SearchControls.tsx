@@ -1,9 +1,9 @@
 // components/SearchControls.tsx
 'use client';
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Search, Filter, Plus } from "lucide-react";
-import { CATEGORIES } from "@/app/data/dashboardproductdata";
 import { formatCategoryName } from "@/app/lib/utils/dashboardproduct-utils";
+import { getArtistsApi, getCategoriesApi } from "@/app/lib/api";
 
 interface SearchControlsProps {
   searchTerm: string;
@@ -26,6 +26,12 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
   onArtistChange,
   onAddProduct,
 }) => {
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    getCategoriesApi().then((cats) => {
+      setCategories(Array.isArray(cats) ? [{ id: "all", name: "all" }, ...cats] : [{ id: "all", name: "all" }]);
+    }).catch(() => setCategories([{ id: "all", name: "all" }]));
+  }, []);
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
@@ -48,9 +54,9 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
               value={selectedCategory}
               onChange={(e) => onCategoryChange(e.target.value)}
             >
-              {CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {formatCategoryName(cat)}
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {formatCategoryName(cat.name)}
                 </option>
               ))}
             </select>

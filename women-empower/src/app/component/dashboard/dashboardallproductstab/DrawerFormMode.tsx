@@ -1,9 +1,9 @@
 // components/DrawerFormMode.tsx
 'use client';
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ImagePlus, X } from "lucide-react";
 import { ProductFormData } from "@/app/types/dashboardproduct";
-import { CATEGORIES, ARTISTS } from "@/app/data/dashboardproductdata";
+import { getArtistsApi, getCategoriesApi } from "@/app/lib/api";
 import { calculateDiscountedPrice, formatCategoryName } from "@/app/lib/utils/dashboardproduct-utils";
 
 interface DrawerFormModeProps {
@@ -31,6 +31,22 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
   onRemoveThumbnail,
   onRemoveImage,
 }) => {
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [artists, setArtists] = useState<{ id: string; artist_Name: string }[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [cats, arts] = await Promise.all([getCategoriesApi(), getArtistsApi()]);
+        setCategories(Array.isArray(cats) ? cats : []);
+        setArtists(Array.isArray(arts) ? arts : []);
+      } catch {
+        setCategories([]);
+        setArtists([]);
+      }
+    };
+    load();
+  }, []);
   return (
     <div className="space-y-6">
       {/* Thumbnail Upload Section */}
@@ -172,9 +188,9 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
             required
           >
             <option value="">Select artist</option>
-            {ARTISTS.map((artist) => (
-              <option key={artist} value={artist}>
-                {artist}
+            {artists.map((artist) => (
+              <option key={artist.id} value={artist.id}>
+                {artist.artist_Name}
               </option>
             ))}
           </select>
@@ -193,9 +209,9 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
             required
           >
             <option value="">Select category</option>
-            {CATEGORIES.slice(1).map((cat) => (
-              <option key={cat} value={cat}>
-                {formatCategoryName(cat)}
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {formatCategoryName(cat.name.toLowerCase())}
               </option>
             ))}
           </select>

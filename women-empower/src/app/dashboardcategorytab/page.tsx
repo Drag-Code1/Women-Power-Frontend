@@ -1,19 +1,19 @@
 import { Suspense } from 'react';
 import CategoryList from '@/app/component/dashboard/dashboardcategorytab/CategoryList';
-import { INITIAL_CATEGORIES } from '@/app/data/dashboardcategoriesdata';
-// import { getCategories } from '../services/categoryActions';
 
 export const metadata = {
   title: 'Category Management',
   description: 'Manage your product categories',
 };
 
+async function fetchCategories() {
+  const res = await fetch('http://localhost:5000/v1/category/', { cache: 'no-store' });
+  const body = await res.json();
+  return body.data;
+}
+
 export default async function CategoriesPage() {
-  // Server-side data fetching
-  // const categories = await getCategories();
-  
-  // Abhi ke liye initial categories use kar rahe hain
-  const categories = INITIAL_CATEGORIES;
+  const categories = await fetchCategories();
 
   return (
     <Suspense fallback={<LoadingSkeleton />}>

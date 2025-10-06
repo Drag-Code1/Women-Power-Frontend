@@ -1,15 +1,21 @@
 // app/events/page.tsx (Server Component)
 import { EventDashboardClient } from '../component/dashboard/dashboardeventstab/EventDashboardClient';
-import { INITIAL_EVENTS } from '@/app/data/dashboardeventsdata';
+import { getEventsV1, getCategoriesApi } from '@/app/lib/api';
 
 // This is a Server Component by default in Next.js App Router
 export default async function EventsPage() {
-  // In a real application, you would fetch data here from your API/Database
-  // Example:
-  // const events = await fetchEventsFromAPI();
-  
-  // For now, we're using the initial mock data
-  const events = INITIAL_EVENTS;
+  const [eventsRaw, categories] = await Promise.all([
+    getEventsV1(),
+    getCategoriesApi()
+  ]);
+  const categoryIdToName: Record<string, string> = {};
+  (categories || []).forEach((c: { id: string; name: string }) => {
+    categoryIdToName[c.id] = c.name;
+  });
+  const events = (eventsRaw || []).map((e: any) => ({
+    ...e,
+    category: categoryIdToName[e.category] || e.category
+  }));
 
   return <EventDashboardClient initialEvents={events} />;
 }

@@ -51,10 +51,7 @@ export default function ArtistDetailView({ artist }: ArtistDetailViewProps) {
         <p className="text-base text-gray-800">{artist.experience}</p>
       </div>
 
-      <div>
-        <p className="text-sm text-gray-600 mb-1">Artist Review ID</p>
-        <p className="text-base text-gray-800">{artist.artist_review_id}</p>
-      </div>
+      
     </div>
   );
 }

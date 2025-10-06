@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { generateEventId, readImageAsDataURL } from '../lib/utils/dashboardevent-utils';
 import type { Event, EventFormData } from '../types/dashboardeventtab'; 
+import { updateEventV1, createEventV1, getCategoriesApi } from '../lib/api';
+import { useEffect } from 'react';
 
 type ModalMode = 'add' | 'edit';
 
@@ -23,6 +25,18 @@ export const useEventManager = (initialEvents: Event[]) => {
     keywords: [],
     banner: ''
   });
+  const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const cats = await getCategoriesApi();
+        setCategoryOptions(Array.isArray(cats) ? cats : []);
+      } catch (e) {
+        console.error('Failed to load categories', e);
+      }
+    })();
+  }, []);
 
   const resetForm = () => {
     setFormData({
@@ -81,30 +95,74 @@ export const useEventManager = (initialEvents: Event[]) => {
     }
   };
 
-  const handleAdd = () => {
-    const newEvent: Event = {
-      id: generateEventId(),
-      thumbnail: formData.thumbnail || '',
-      category: formData.category || '',
-      title: formData.title || '',
-      description: formData.description || '',
-      dateTime: formData.dateTime || '',
-      status: formData.status || 'upcoming',
-      keywords: formData.keywords || [],
-      banner: formData.banner
-    };
-    setEvents([...events, newEvent]);
-    closeModal();
+  const handleAdd = async () => {
+    try {
+      const payload = {
+        e_image: String(formData.thumbnail || ''),
+        category_id: String(formData.category || ''),
+        title: String(formData.title || ''),
+        description: String(formData.description || ''),
+        date_time: String(formData.dateTime || ''),
+        status: String(formData.status || 'upcoming'),
+        keywords: Array.isArray(formData.keywords) ? formData.keywords.join(',') : String((formData as any).keywords || ''),
+        banner: String(formData.banner || ''),
+      };
+      const created = await createEventV1(payload);
+      const categoryName = categoryOptions.find(c => c.id === (created.category_id || payload.category_id))?.name || (created.category_id || payload.category_id);
+      const newEvent: Event = {
+        id: created.id || generateEventId(),
+        thumbnail: created.e_image || payload.e_image,
+        category: categoryName,
+        title: created.title || payload.title,
+        description: created.description || payload.description,
+        dateTime: created.date_time || payload.date_time,
+        status: created.status || payload.status,
+        keywords: typeof created.keywords === 'string' ? created.keywords.split(',').map((k: string) => k.trim()).filter(Boolean) : Array.isArray(created.keywords) ? created.keywords : (Array.isArray(formData.keywords) ? formData.keywords : []),
+        banner: created.banner || payload.banner,
+      };
+      setEvents([...events, newEvent]);
+      closeModal();
+    } catch (err) {
+      console.error('Failed to create event', err);
+      alert((err as any)?.message || 'Failed to create event');
+    }
   };
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
     if (selectedEvent) {
-      setEvents(
-        events.map((e) =>
-          e.id === selectedEvent.id ? ({ ...formData, id: selectedEvent.id } as Event) : e
-        )
-      );
-      closeModal();
+      try {
+        // Map dashboard form to API payload
+        const payload = {
+          e_image: formData.thumbnail || '',
+          category_id: formData.category || '',
+          title: formData.title || '',
+          description: formData.description || '',
+          date_time: formData.dateTime || '',
+          status: formData.status || 'upcoming',
+          keywords: Array.isArray(formData.keywords) ? formData.keywords.join(',') : (formData.keywords as any) || '',
+          banner: formData.banner || '',
+        };
+        const updated = await updateEventV1(selectedEvent.id, payload);
+        const categoryName = categoryOptions.find(c => c.id === (updated.category_id || payload.category_id))?.name || (updated.category_id || payload.category_id);
+        const normalized: Event = {
+          id: updated.id || selectedEvent.id,
+          thumbnail: updated.e_image || payload.e_image,
+          category: categoryName,
+          title: updated.title || payload.title,
+          description: updated.description || payload.description,
+          dateTime: updated.date_time || payload.date_time,
+          status: updated.status || payload.status,
+          keywords: typeof updated.keywords === 'string' ? updated.keywords.split(',').map((k: string) => k.trim()).filter(Boolean) : Array.isArray(updated.keywords) ? updated.keywords : (Array.isArray(formData.keywords) ? formData.keywords : []),
+          banner: updated.banner || payload.banner,
+        };
+        setEvents(
+          events.map((e) => (e.id === selectedEvent.id ? normalized : e))
+        );
+        closeModal();
+      } catch (err) {
+        console.error('Failed to update event', err);
+        alert((err as any)?.message || 'Failed to update event');
+      }
     }
   };
 
@@ -140,6 +198,7 @@ export const useEventManager = (initialEvents: Event[]) => {
     closeModal,
     handleImageUpload,
     handleSubmit,
-    handleDelete
+    handleDelete,
+    categoryOptions
   };
 };

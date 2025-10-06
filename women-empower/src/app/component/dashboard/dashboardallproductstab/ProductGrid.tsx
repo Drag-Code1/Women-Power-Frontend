@@ -13,7 +13,7 @@ interface ProductGridProps {
   onToggleTrending: (id: string) => void;
   onDelete: (id: string) => void;
   onViewDetails: (id: string) => void;
-
+  artistNameMap?: Record<string, string>;
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({
@@ -24,6 +24,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onToggleTrending,
   onDelete,
   onViewDetails,
+  artistNameMap,
 }) => {
   if (products.length === 0) {
     return (
@@ -52,6 +53,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             onToggleTrending={onToggleTrending}
             onDelete={onDelete}
             onViewDetails={onViewDetails}
+            artistNameMap={artistNameMap}
           />
         ))}
       </div>

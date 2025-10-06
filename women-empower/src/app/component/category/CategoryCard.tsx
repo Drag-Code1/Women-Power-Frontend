@@ -8,7 +8,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
     <div className="flex-shrink-0 w-28 sm:w-32 md:w-36 bg-white rounded-xl transition duration-300 overflow-hidden cursor-pointer relative">
       <div className="relative w-full h-24 sm:h-28 md:h-32 overflow-hidden flex items-center justify-center">
         <img
-          src="/images/tedee.png"
+          src={category.image || "/images/tedee.png"}
           alt={category.name}
           className="w-20 h-20 object-cover hover:scale-105 transition-transform duration-300"
         />

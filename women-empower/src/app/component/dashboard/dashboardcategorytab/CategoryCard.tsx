@@ -9,7 +9,7 @@ interface CategoryCardProps {
   category: Category;
   onView: (category: Category) => void;
   onEdit: (category: Category) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string) => void;
 }
 
 export default function CategoryCard({ category, onView, onEdit, onDelete }: CategoryCardProps) {
@@ -23,7 +23,7 @@ export default function CategoryCard({ category, onView, onEdit, onDelete }: Cat
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition relative">
+    <div className="bg-white rounded-lg shadow-md overflow-visible hover:shadow-lg transition relative">
       <div className="relative h-48">
         <img
           src={category.image}

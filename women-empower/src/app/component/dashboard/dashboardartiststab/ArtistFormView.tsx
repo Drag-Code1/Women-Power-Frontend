@@ -1,19 +1,21 @@
 // components/artist/ArtistFormView.tsx
 import { Upload, User } from 'lucide-react';
-import { ArtistFormData, CATEGORIES } from '@/app/types/dashboard-artist-tab';
+import { ArtistFormData } from '@/app/types/dashboard-artist-tab';
 
 interface ArtistFormViewProps {
   formData: ArtistFormData;
   imagePreview: string;
   onFormChange: (data: Partial<ArtistFormData>) => void;
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  categoryOptions: Array<{ id: string; name: string }>;
 }
 
 export default function ArtistFormView({
   formData,
   imagePreview,
   onFormChange,
-  onImageUpload
+  onImageUpload,
+  categoryOptions
 }: ArtistFormViewProps) {
   return (
     <div className="space-y-6">
@@ -68,13 +70,17 @@ export default function ArtistFormView({
           Category <span className="text-red-500">*</span>
         </label>
         <select
-          value={formData.category}
-          onChange={(e) => onFormChange({ category: e.target.value })}
+          value={formData.category_id || ''}
+          onChange={(e) => {
+            const selectedId = e.target.value;
+            const found = categoryOptions.find((c) => c.id === selectedId);
+            onFormChange({ category_id: selectedId, category: found?.name || '' });
+          }}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           <option value="">Select category</option>
-          {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>{cat}</option>
+          {categoryOptions.map((cat) => (
+            <option key={cat.id} value={cat.id}>{cat.name}</option>
           ))}
         </select>
       </div>
@@ -117,18 +123,7 @@ export default function ArtistFormView({
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Artist Review ID <span className="text-red-500">*</span>
-        </label>
-        <input
-          type="text"
-          value={formData.artist_review_id}
-          onChange={(e) => onFormChange({ artist_review_id: e.target.value })}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="e.g., AR001"
-        />
-      </div>
+      
     </div>
   );
 }

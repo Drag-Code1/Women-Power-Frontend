@@ -12,9 +12,12 @@ import { SearchControls } from "../component/dashboard/dashboardallproductstab/S
 import { ProductGrid } from "../component/dashboard/dashboardallproductstab/ProductGrid";
 import { ProductDrawer } from "../component/dashboard/dashboardallproductstab/ProductDrawer";
 import { productService } from "@/app/lib/productapi";
+import { getArtistsApi, getCategoriesApi } from "@/app/lib/api";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [artistNameMap, setArtistNameMap] = useState<Record<string, string>>({});
+  const [categoryNameMap, setCategoryNameMap] = useState<Record<string, string>>({});
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedArtist, setSelectedArtist] = useState<string>("all");
@@ -56,7 +59,21 @@ export default function ProductsPage() {
       setIsLoading(true);
       setError("");
       try {
-        const apiProducts = await productService.getAllProducts();
+        const [apiProducts, artists, categories] = await Promise.all([
+          productService.getAllProducts(),
+          getArtistsApi().catch(() => []),
+          getCategoriesApi().catch(() => []),
+        ]);
+        const map: Record<string, string> = {};
+        (artists as any[]).forEach((a) => {
+          if (a && a.id) map[a.id] = a.artist_Name || a.name || a.id;
+        });
+        setArtistNameMap(map);
+        const cmap: Record<string, string> = {};
+        (categories as any[]).forEach((c) => {
+          if (c && c.id) cmap[c.id] = c.name || c.id;
+        });
+        setCategoryNameMap(cmap);
         setProducts(apiProducts);
       } catch (err) {
         console.error("Failed to load products:", err);
@@ -149,6 +166,16 @@ export default function ProductsPage() {
           description: formData.description || "",
           specification: formData.specification || "",
         };
+
+        // Guard invalid foreign keys to avoid FK constraint error
+        if (!updatedData.artist_id || updatedData.artist_id === "all") {
+          alert("Please select a valid artist");
+          return;
+        }
+        if (!updatedData.category_id || updatedData.category_id === "all") {
+          alert("Please select a valid category");
+          return;
+        }
 
         const updated = await productService.updateProduct(
           selectedProduct.id,
@@ -313,6 +340,7 @@ export default function ProductsPage() {
             onToggleTrending={handleToggleTrending}
             onDelete={handleDeleteProduct}
             onViewDetails={handleProductDetails}
+            artistNameMap={artistNameMap}
           />
         )}
       </div>

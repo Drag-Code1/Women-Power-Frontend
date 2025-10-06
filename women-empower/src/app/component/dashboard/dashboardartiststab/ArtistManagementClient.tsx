@@ -20,6 +20,7 @@ export default function ArtistManagementClient({ initialArtists }: ArtistManagem
     imagePreview,
     openDropdownId,
     isFormValid,
+    categoryOptions,
     openModal,
     closeModal,
     handleImageUpload,
@@ -63,6 +64,7 @@ export default function ArtistManagementClient({ initialArtists }: ArtistManagem
           onImageUpload={handleImageUpload}
           onSubmit={handleSubmit}
           isFormValid={isFormValid}
+          categoryOptions={categoryOptions}
         />
       </div>
     </div>

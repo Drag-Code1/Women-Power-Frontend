@@ -4,6 +4,7 @@ import { X } from 'lucide-react';
 import { Artist, ModalType, ArtistFormData } from '@/app/types/dashboard-artist-tab';
 import ArtistFormView from './ArtistFormView';
 import ArtistDetailView from './ArtistDetailView';
+interface CategoryOption { id: string; name: string }
 
 interface ArtistModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ interface ArtistModalProps {
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
   isFormValid: boolean;
+  categoryOptions: CategoryOption[];
 }
 
 export default function ArtistModal({
@@ -28,7 +30,8 @@ export default function ArtistModal({
   onFormChange,
   onImageUpload,
   onSubmit,
-  isFormValid
+  isFormValid,
+  categoryOptions
 }: ArtistModalProps) {
   if (!isOpen) return null;
 
@@ -62,6 +65,7 @@ export default function ArtistModal({
               imagePreview={imagePreview}
               onFormChange={onFormChange}
               onImageUpload={onImageUpload}
+              categoryOptions={categoryOptions}
             />
           )}
 

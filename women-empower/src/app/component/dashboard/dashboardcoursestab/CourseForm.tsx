@@ -2,7 +2,7 @@
 'use client';
 import React from 'react';
 import { X } from 'lucide-react';
-import { Course, ModalMode, CATEGORIES } from '@/app/types/dashboardcoursetab';
+import { Course, ModalMode } from '@/app/types/dashboardcoursetab';
 
 interface CourseFormProps {
   formData: Course;
@@ -13,6 +13,7 @@ interface CourseFormProps {
   onImageRemove: () => void;
   onSave: () => void;
   onCancel: () => void;
+  categoryOptions: Array<{ id: string; name: string }>;
 }
 
 const CourseForm: React.FC<CourseFormProps> = ({
@@ -23,7 +24,8 @@ const CourseForm: React.FC<CourseFormProps> = ({
   onImageChange,
   onImageRemove,
   onSave,
-  onCancel
+  onCancel,
+  categoryOptions
 }) => {
   return (
     <div className="space-y-6">
@@ -96,11 +98,17 @@ const CourseForm: React.FC<CourseFormProps> = ({
           <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
           <select
             value={formData.category}
-            onChange={(e) => onFormChange({...formData, category: e.target.value})}
+            onChange={(e) => {
+              const selectedId = e.target.value;
+              const found = categoryOptions.find(c => c.id === selectedId);
+              const next = { ...formData, category: found?.name || '' };
+              // We store only label in Course, backend id is resolved in handleSave
+              onFormChange(next);
+            }}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select Category</option>
-            {CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            {categoryOptions.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
           </select>
         </div>
 

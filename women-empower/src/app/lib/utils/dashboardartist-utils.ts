@@ -23,8 +23,7 @@ export function validateFormData(formData: ArtistFormData): boolean {
     formData.category &&
     formData.intro &&
     formData.joining_date &&
-    formData.experience &&
-    formData.artist_review_id
+    formData.experience
   );
 }
 

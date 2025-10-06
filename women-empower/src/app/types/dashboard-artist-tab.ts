@@ -1,12 +1,12 @@
 // types/artist.ts
 export interface Artist {
-  id: number;
+  id: string;
   artist_name: string;
   category: string;
+  category_id?: string;
   intro: string;
   joining_date: string;
-  experience: string;
-  artist_review_id: string;
+  experience: number | string;
   image?: string;
 }
 
@@ -17,9 +17,9 @@ export interface ArtistFormData {
   category: string;
   intro: string;
   joining_date: string;
-  experience: string;
-  artist_review_id: string;
+  experience: string | number;
   image: string;
+  category_id?: string;
 }
 
 export const CATEGORIES = [

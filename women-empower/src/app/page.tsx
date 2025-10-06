@@ -18,10 +18,11 @@ import { Artist } from "./types/artist";
 const CURRENT_ROLE = "admin"; // "admin" or "user"
 
 async function getCategories() {
-  const res = await fetch(`http://localhost:5000/api/category`, {
+  const res = await fetch(`http://localhost:5000/v1/category/`, {
     cache: "force-cache",
   });
-  return res.json();
+  const body = await res.json();
+  return body.data;
 }
 async function getProducts() {
   const res = await fetch(`http://localhost:5000/api/best-products`, {

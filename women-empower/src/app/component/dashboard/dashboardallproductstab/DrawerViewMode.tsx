@@ -13,6 +13,8 @@ interface DrawerViewModeProps {
   onPrevImage: () => void;
   onSetImageIndex: (index: number) => void;
   onViewDetails: (id: string) => void;
+  categoryNameMap?: Record<string, string>;
+  artistNameMap?: Record<string, string>;
 }
 
 export const DrawerViewMode: React.FC<DrawerViewModeProps> = ({
@@ -22,6 +24,8 @@ export const DrawerViewMode: React.FC<DrawerViewModeProps> = ({
   onPrevImage,
   onSetImageIndex,
   onViewDetails,
+  categoryNameMap,
+  artistNameMap,
 }) => {
   if (!selectedProduct) return null;
 
@@ -85,13 +89,11 @@ export const DrawerViewMode: React.FC<DrawerViewModeProps> = ({
         </div>
         <div>
           <label className="text-sm font-medium text-gray-700">Artist Name</label>
-          <p className="text-gray-900 mt-1 font-medium">{selectedProduct.artist_id}</p>
+          <p className="text-gray-900 mt-1 font-medium">{artistNameMap?.[selectedProduct.artist_id] || selectedProduct.artist_id}</p>
         </div>
         <div>
           <label className="text-sm font-medium text-gray-700">Category</label>
-          <p className="text-gray-900 mt-1 capitalize">
-            {selectedProduct.category_id?.replace("_", " ")}
-          </p>
+          <p className="text-gray-900 mt-1 capitalize">{categoryNameMap?.[selectedProduct.category_id] || selectedProduct.category_id?.replace("_", " ")}</p>
         </div>
         <div>
           <label className="text-sm font-medium text-gray-700">Original Price</label>

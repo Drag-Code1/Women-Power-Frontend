@@ -5,13 +5,16 @@ const API_BASE_URL =
 
 // ✅ Utility: normalize raw API product into Product
 const normalizeProduct = (raw: any): Product => {
+  const resolvedId = raw.id || raw.product_id || raw._id || "";
+  const resolvedCategoryId = raw.category_id || raw.categoryId || raw.category?.id || "";
+  const resolvedArtistId = raw.artist_id || raw.artistId || raw.artist?.id || "";
   return {
-    id: raw.id || crypto.randomUUID(),
+    id: resolvedId,
     p_Name: raw.p_Name || "",
     thumbnail: raw.thumbnail || "",
     p_images: Array.isArray(raw.p_images) ? raw.p_images : [],
-    category_id: raw.category_id || "uncategorized",
-    artist_id: raw.artist_id || "unknown",
+    category_id: resolvedCategoryId,
+    artist_id: resolvedArtistId,
     price: Number(raw.price) || 0,
     discount: Number(raw.discount) || 0,
     review_id: raw.review_id || "",
@@ -26,7 +29,7 @@ export const productService = {
   // 🔹 Get all products
   getAllProducts: async (): Promise<Product[]> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/product`, {
+      const response = await fetch(`${API_BASE_URL}/product/`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         cache: "no-store",
@@ -76,7 +79,7 @@ export const productService = {
       }
 
       // Handle case where data is directly the product
-      if (data.id) {
+      if (data.id || data.product_id || data._id) {
         return normalizeProduct(data);
       }
 
@@ -106,7 +109,7 @@ export const productService = {
         isTrending: productData.isTrending || false,
       };
 
-      const response = await fetch(`${API_BASE_URL}/product`, {
+      const response = await fetch(`${API_BASE_URL}/product/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(cleanData),
@@ -163,19 +166,23 @@ export const productService = {
 
       const response = await fetch(`${API_BASE_URL}/product/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify(cleanData),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error(
-          `Failed to update product: ${response.status}`,
-          errorData
-        );
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
+        let errorPayload: any = {};
+        const contentType = response.headers.get("content-type") || "";
+        try {
+          if (contentType.includes("application/json")) {
+            errorPayload = await response.json();
+          } else {
+            const text = await response.text();
+            errorPayload = { message: text };
+          }
+        } catch {}
+        console.error(`Failed to update product: ${response.status}`, errorPayload);
+        throw new Error(errorPayload?.message || `HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();

@@ -5,6 +5,8 @@ import { Plus } from 'lucide-react';
 import { Category, ModalType, CategoryFormData } from '@/app/types/dashboardcategory';
 import CategoryCard from './CategoryCard';
 import CategoryModal from './CategoryModal';
+import { updateCategory } from '@/app/lib/api';
+import { deleteCategory } from '@/app/lib/api';
 
 interface CategoryListProps {
   initialCategories: Category[];
@@ -27,27 +29,39 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
     setSelectedCategory(null);
   };
 
-  const handleSubmit = (data: CategoryFormData) => {
+  const handleSubmit = async (data: CategoryFormData) => {
     if (modalType === 'create') {
       const newCategory: Category = {
-        id: Date.now(),
+        id: String(Date.now()),
         name: data.name,
         image: data.image,
       };
       setCategories([...categories, newCategory]);
     } else if (modalType === 'edit' && selectedCategory) {
-      setCategories(
-        categories.map((cat) =>
-          cat.id === selectedCategory.id
-            ? { ...cat, name: data.name, image: data.image }
-            : cat
-        )
-      );
+      try {
+        const updated = await updateCategory(selectedCategory.id, { name: data.name, image: data.image });
+        setCategories(
+          categories.map((cat) => (cat.id === selectedCategory.id ? updated : cat))
+        );
+      } catch (e) {
+        console.error('Failed to update category', e);
+        // fallback to local update if server fails
+        setCategories(
+          categories.map((cat) =>
+            cat.id === selectedCategory.id ? { ...cat, name: data.name, image: data.image } : cat
+          )
+        );
+      }
     }
   };
 
-  const handleDelete = (id: number) => {
-    setCategories(categories.filter((cat) => cat.id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteCategory(id);
+      setCategories(categories.filter((cat) => cat.id !== id));
+    } catch (e) {
+      console.error('Failed to delete category', e);
+    }
   };
 
   return (

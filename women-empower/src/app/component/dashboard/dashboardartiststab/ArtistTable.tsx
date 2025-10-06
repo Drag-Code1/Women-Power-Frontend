@@ -8,9 +8,9 @@ interface ArtistTableProps {
   artists: Artist[];
   onView: (artist: Artist) => void;
   onEdit: (artist: Artist) => void;
-  onDelete: (id: number) => void;
+  onDelete: (id: string | number) => void;
   openDropdownId: number | null;
-  onToggleDropdown: (id: number) => void;
+  onToggleDropdown: (id: string | number) => void;
 }
 
 export default function ArtistTable({
@@ -38,9 +38,6 @@ export default function ArtistTable({
               </th>
               <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden md:table-cell">
                 Experience
-              </th>
-              <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider hidden xl:table-cell">
-                Review ID
               </th>
               <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Actions
@@ -84,9 +81,6 @@ export default function ArtistTable({
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">
                   {artist.experience}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-600 hidden xl:table-cell">
-                  {artist.artist_review_id}
                 </td>
                 <td className="px-6 py-4 text-center">
                   <div className="relative inline-block">

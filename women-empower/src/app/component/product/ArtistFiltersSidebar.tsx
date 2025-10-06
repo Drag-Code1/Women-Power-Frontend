@@ -38,11 +38,11 @@ useEffect(() => {
 }, []);
 async function fetchData() {
     try {
-      const res = await fetch('http://localhost:5000/api/category');
-      const categoriesData_ = await res.json();
-      console.log(categoriesData_);
-     const categoryObject= categoriesData_.map((cat:  string ) => ({ categoryName: cat, isChecked:allParams.includes(cat)? true:false }))
-setCategoriesData(categoryObject);
+      const res = await fetch('http://localhost:5000/v1/category/');
+      const categoriesResponse = await res.json();
+      const names = (categoriesResponse?.data || []).map((cat: { name: string }) => cat.name);
+      const categoryObject = names.map((cat: string) => ({ categoryName: cat, isChecked: allParams.includes(cat) ? true : false }))
+      setCategoriesData(categoryObject);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }

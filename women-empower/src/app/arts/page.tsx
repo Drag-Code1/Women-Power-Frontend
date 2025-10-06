@@ -30,9 +30,17 @@ async function getArts(searched:string) {
 
   return res.json()
 }
-const ProductFilterApp = async({ searchParams }: { searchParams: { search?: string } }) => {
+const ProductFilterApp = async({ searchParams }: { searchParams: { search?: string, page?: string } }) => {
   const searched = searchParams.search;
+  const page = Number(searchParams.page) > 0 ? Number(searchParams.page) : 1;
+  const pageSize = 16; // items per page
   const arts = await getArts(searched);
+
+  const totalItems = Array.isArray(arts) ? arts.length : 0;
+  const totalPages = totalItems > 0 ? Math.ceil(totalItems / pageSize) : 1;
+  const startIndex = (page - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const currentProducts = Array.isArray(arts) ? arts.slice(startIndex, endIndex) : [];
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
     <div className="min-h-screen bg-white">
@@ -43,7 +51,7 @@ const ProductFilterApp = async({ searchParams }: { searchParams: { search?: stri
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-900">
               New Items 
-              ({arts.length})
+              ({totalItems})
             </h1>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -83,7 +91,7 @@ const ProductFilterApp = async({ searchParams }: { searchParams: { search?: stri
 <MobileViewFilter />
           {/* Main Content Area */}
       
-          <ProductContainer currentProducts={arts} totalPages={2} viewMode={'grid'} />
+          <ProductContainer currentProducts={currentProducts} totalPages={totalPages} viewMode={'grid'} />
         </div>
       </div>
 

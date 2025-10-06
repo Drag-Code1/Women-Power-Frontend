@@ -28,7 +28,8 @@ export const EventDashboardClient: React.FC<EventDashboardClientProps> = ({ init
     closeModal,
     handleImageUpload,
     handleSubmit,
-    handleDelete
+    handleDelete,
+    categoryOptions
   } = useEventManager(initialEvents) as {
     events: Event[];
     isModalOpen: boolean;
@@ -47,6 +48,7 @@ export const EventDashboardClient: React.FC<EventDashboardClientProps> = ({ init
     handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'thumbnail' | 'banner') => void;
     handleSubmit: () => void;
     handleDelete: (id: string) => void;
+    categoryOptions: Array<{ id: string; name: string }>;
   };
 
   return (
@@ -99,6 +101,7 @@ export const EventDashboardClient: React.FC<EventDashboardClientProps> = ({ init
           onImageUpload={handleImageUpload}
           onSubmit={handleSubmit}
           onClose={closeModal}
+          categoryOptions={categoryOptions}
         />
       </div>
     </div>

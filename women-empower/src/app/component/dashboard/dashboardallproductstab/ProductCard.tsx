@@ -14,6 +14,7 @@ interface ProductCardProps {
   onToggleTrending: (id: string) => void;
   onDelete: (id: string) => void;
   onViewDetails: (id: string) => void;
+  artistNameMap?: Record<string, string>;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -23,6 +24,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onOpenDrawer,
   onToggleTrending,
   onDelete,
+  onViewDetails,
+  artistNameMap,
 }) => {
   return (
     <div
@@ -65,7 +68,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2 h-10">
             {product.p_Name}
           </h3>
-          <p className="text-xs text-gray-600 mb-2">by {product.artist_id}</p>
+          <p className="text-xs text-gray-600 mb-2">by {artistNameMap?.[product.artist_id] || product.artist_id}</p>
         </div>
 
         <div className="flex items-center gap-1 flex-wrap">
@@ -96,7 +99,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={() => onOpenDrawer("view", product)}
+            onClick={() => (onViewDetails ? onViewDetails(product.id) : onOpenDrawer("view", product))}
             className="w-full text-left px-4 py-2.5 hover:bg-blue-50 flex items-center gap-3 text-sm text-gray-700 transition-colors"
           >
             <Eye className="w-4 h-4 text-blue-600" />

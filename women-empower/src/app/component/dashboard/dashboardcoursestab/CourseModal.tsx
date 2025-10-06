@@ -2,7 +2,7 @@
 'use client';
 import React from 'react';
 import { X } from 'lucide-react';
-import { Course, ModalMode, CATEGORIES } from '@/app/types/dashboardcoursetab';
+import { Course, ModalMode } from '@/app/types/dashboardcoursetab';
 import CourseForm from './CourseForm';
 import CourseView from './CourseView';
 
@@ -16,6 +16,7 @@ interface CourseModalProps {
   onFormChange: (data: Course) => void;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onImageRemove: () => void;
+  categoryOptions: Array<{ id: string; name: string }>;
 }
 
 const CourseModal: React.FC<CourseModalProps> = ({
@@ -27,7 +28,8 @@ const CourseModal: React.FC<CourseModalProps> = ({
   onSave,
   onFormChange,
   onImageChange,
-  onImageRemove
+  onImageRemove,
+  categoryOptions
 }) => {
   if (!isOpen) return null;
 
@@ -62,6 +64,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
               onImageRemove={onImageRemove}
               onSave={onSave}
               onCancel={onClose}
+              categoryOptions={categoryOptions}
             />
           )}
         </div>
