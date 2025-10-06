@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { generateEventId, readImageAsDataURL } from '../lib/utils/dashboardevent-utils';
 import type { Event, EventFormData } from '../types/dashboardeventtab'; 
-import { updateEventV1, createEventV1, getCategoriesApi } from '../lib/api';
+import { updateEventV1, createEventV1, getCategoriesApi, deleteEventV1 } from '../lib/api';
 import { useEffect } from 'react';
 
 type ModalMode = 'add' | 'edit';
@@ -166,10 +166,16 @@ export const useEventManager = (initialEvents: Event[]) => {
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this event?')) {
-      setEvents(events.filter((e) => e.id !== id));
-      setActiveDropdown(null);
+      try {
+        await deleteEventV1(id);
+        setEvents(events.filter((e) => e.id !== id));
+        setActiveDropdown(null);
+      } catch (err) {
+        console.error('Failed to delete event', err);
+        alert((err as any)?.message || 'Failed to delete event');
+      }
     }
   };
 

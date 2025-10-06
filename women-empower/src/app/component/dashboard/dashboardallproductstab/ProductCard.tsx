@@ -68,7 +68,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2 h-10">
             {product.p_Name}
           </h3>
-          <p className="text-xs text-gray-600 mb-2">by {artistNameMap?.[product.artist_id] || product.artist_id}</p>
+          { (artistNameMap?.[product.artist_id] || product.artist_id) ? (
+            <p className="text-xs text-gray-600 mb-2">by {artistNameMap?.[product.artist_id] || product.artist_id}</p>
+          ) : null }
         </div>
 
         <div className="flex items-center gap-1 flex-wrap">

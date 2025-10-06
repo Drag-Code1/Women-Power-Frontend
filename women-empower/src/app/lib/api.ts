@@ -329,6 +329,22 @@ export const updateEventV1 = async (
   return parsed?.data ?? parsed;
 };
 
+export const deleteEventV1 = async (id: string) => {
+  const res = await fetch(`http://localhost:5000/v1/event/${id}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) {
+    let parsed: any = {};
+    try {
+      const contentType = res.headers.get('content-type') || '';
+      parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+    } catch {}
+    const msg = parsed?.message || parsed?.error || `Failed to delete event (status ${res.status})`;
+    throw new Error(msg);
+  }
+  return true;
+};
+
 export const fetchCartItems = async () => {
   
   try {

@@ -133,10 +133,6 @@ export const DrawerViewMode: React.FC<DrawerViewModeProps> = ({
             <span className="text-gray-900 font-medium">{selectedProduct.review_id}</span>
           </div>
         </div>
-        <div>
-          <label className="text-sm font-medium text-gray-700">Sold</label>
-          <p className="text-gray-900 mt-1 font-medium">{selectedProduct.sell_count} units</p>
-        </div>
       </div>
       <div>
         <label className="text-sm font-medium text-gray-700">Description</label>

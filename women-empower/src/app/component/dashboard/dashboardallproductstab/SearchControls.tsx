@@ -62,20 +62,22 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
             </select>
           </div>
 
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <select
-              className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white min-w-[150px]"
-              value={selectedArtist}
-              onChange={(e) => onArtistChange(e.target.value)}
-            >
-              {uniqueArtists.map((artist) => (
-                <option key={artist} value={artist}>
-                  {artist === "all" ? "All Artists" : artist}
-                </option>
-              ))}
-            </select>
-          </div>
+          {false && (
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <select
+                className="pl-10 pr-8 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white min-w-[150px]"
+                value={selectedArtist}
+                onChange={(e) => onArtistChange(e.target.value)}
+              >
+                {uniqueArtists.map((artist) => (
+                  <option key={artist} value={artist}>
+                    {artist === "all" ? "All Artists" : artist}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         <button
