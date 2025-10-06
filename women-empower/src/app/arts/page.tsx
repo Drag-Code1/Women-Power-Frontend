@@ -24,7 +24,7 @@ async function getArts(searched:string) {
   
   // const query = searched ? `?search=${encodeURIComponent(searched)}` : "";
   const query = searched ? `?search=${encodeURIComponent(searched)}` : "";
-  const res = await fetch(`http://localhost:5000/api/products${query}`, {
+  const res = await fetch(`http://localhost:7000/v1/product/${query}`, {
     cache: "no-store", // better for live searching
   });
 
@@ -33,6 +33,7 @@ async function getArts(searched:string) {
 const ProductFilterApp = async({ searchParams }: { searchParams: { search?: string } }) => {
   const searched = searchParams.search;
   const arts = await getArts(searched);
+  console.log(arts);
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
     <div className="min-h-screen bg-white">
@@ -43,7 +44,7 @@ const ProductFilterApp = async({ searchParams }: { searchParams: { search?: stri
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-900">
               New Items 
-              ({arts.length})
+              ({arts.data.length})
             </h1>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -83,7 +84,7 @@ const ProductFilterApp = async({ searchParams }: { searchParams: { search?: stri
 <MobileViewFilter />
           {/* Main Content Area */}
       
-          <ProductContainer currentProducts={arts} totalPages={2} viewMode={'grid'} />
+          <ProductContainer currentProducts={arts.data} totalPages={2} viewMode={'grid'} />
         </div>
       </div>
 

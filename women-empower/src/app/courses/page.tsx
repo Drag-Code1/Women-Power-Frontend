@@ -13,8 +13,11 @@ import { CourseFilter } from "../component/ui/button/CourseFilter";
 import { CourseMobileSidebarFilter } from "../component/courses/CoursesMobileSidebar";
 import { CoursesContainer } from "../component/courses/CoursesContainer";
 import { CoursesSearchBar, CouserSearchBar } from "../component/courses/CoursesSearchBar";
+import { fetchCourses } from "../lib/api";
 
-const CoursesDirectoryApp = () => {
+const CoursesDirectoryApp = async() => {
+
+  const coursesData=await fetchCourses();
   // const [searchTerm, setSearchTerm] = useState("");
   // const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   // const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
@@ -248,7 +251,7 @@ const CoursesDirectoryApp = () => {
           </Dialog> */}
 <CourseMobileSidebarFilter />
           <div className="flex-1 p-6">
-            {allCourses.length > 0 ? (
+            {coursesData.data.length > 0 ? (
               <>
                 {/* <div className={`transition-opacity duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
                   <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -263,7 +266,7 @@ const CoursesDirectoryApp = () => {
                     ))}
                   </div>
                 </div> */}
-                <CoursesContainer courses={allCourses} />
+                <CoursesContainer courses={coursesData.data} />
 <h3>pagination goes here</h3>
                
                    

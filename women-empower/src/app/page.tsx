@@ -19,7 +19,7 @@ import ArtistCard from "./component/cart/ArtistCard";
 import { Artist } from "./types/artist";
 
 async function getCategories() {
-  const res = await fetch(`http://localhost:5000/api/category`, {
+  const res = await fetch(`http://localhost:7000/v1/category/`, {
     cache: "force-cache",
   })
   return res.json()
@@ -81,7 +81,7 @@ export default async function Home() {
       <ImageSlider />
       <TopCategories>
 
-        {categories.map((category:Category)=>(
+        {categories.data.map((category:Category)=>(
 <CategoryCard  category={category} />
 
         ))}

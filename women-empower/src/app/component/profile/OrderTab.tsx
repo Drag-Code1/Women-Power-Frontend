@@ -1,3 +1,5 @@
+"use client"
+import { useSearchParams } from "next/navigation";
 import React from "react";
 interface Order {
   id: string;
@@ -8,6 +10,9 @@ interface Order {
   image: string;
 }
 export const OrderTab:React.FC=()=>{
+  
+  const params=useSearchParams();
+  const url=new URLSearchParams(params.toString());
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'delivered': return 'text-green-600 bg-green-100';
@@ -45,7 +50,10 @@ export const OrderTab:React.FC=()=>{
     }
   ];
 
-    return  <div>
+    return(
+      
+      
+    params.get('active-tab')=='orders' && <div>
                   <h2 className="text-2xl text-gray-900 mb-6">Order History</h2>
                   <div className="space-y-4">
                     {orders.map((order) => (
@@ -83,4 +91,5 @@ export const OrderTab:React.FC=()=>{
                     ))}
                   </div>
                 </div>
+    )
 }

@@ -47,7 +47,7 @@ let allArtists =[];
           {/* Header: Title + Buttons */}
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
             <h1 className="text-2xl font-bold text-gray-900">
-              Artists ({allArtists.length})
+              Artists ({allArtists.data.length})
             </h1>
 
             {/* Mobile: Filters + Sort together */}
@@ -79,7 +79,7 @@ let allArtists =[];
 <ArtistMobileViewFilter />
           {/* Main Content */}
           <div className="flex-1 p-6">
-            {allArtists.length > 0 ? (
+            {allArtists.data.length > 0 ? (
               <>
                 {/* Artists Grid with fade transition */}
                 <div
@@ -91,7 +91,7 @@ let allArtists =[];
                   }
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {allArtists.map((artist:Artist) => (
+                    {allArtists.data.map((artist:Artist) => (
                       <div
                         key={artist.id}
                         className="animate-fadeIn"

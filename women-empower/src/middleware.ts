@@ -1,10 +1,31 @@
 // import { NextResponse } from 'next/server'
 // import type { NextRequest } from 'next/server'
- export default function middleware() {
-console.log("middleware ran.")
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
+export function middleware(request: NextRequest) {
+  console.log("Middleware ran ✅");
 
- }
+  // 🔹 Access cookies
+  const token = request.cookies.get("auth_token")?.value;
+  const userId = request.cookies.get("user_id")?.value;
+
+  console.log("Auth Token:", token);
+  console.log("User ID:", userId);
+
+  // Example: Redirect if not logged in
+  if (!token) {
+    return NextResponse.redirect(new URL("/auth", request.url));
+  }
+
+  return NextResponse.next();
+}
+
+// 🔹 Apply to selected routes
+export const config = {
+  matcher: ["/arts"],
+};
+
 // This function can be marked `async` if using `await` inside
 // export function middleware(request: NextRequest) {
 // const loggedIn=true;

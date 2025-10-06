@@ -51,7 +51,7 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
       ref={popupRef}
       className="absolute top-14 right-0 w-60 bg-white shadow-md rounded-xl p-2 border-0 z-50"
     >
-      {true ? (
+      {false ? (
         <>
           {/* Header with Avatar + Name + Mobile */}
           <div className="flex items-center space-x-3 pb-4 border-b border-gray-200">
