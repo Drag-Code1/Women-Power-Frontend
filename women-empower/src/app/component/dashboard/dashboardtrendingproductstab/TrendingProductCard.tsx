@@ -1,7 +1,7 @@
 // components/TrendingProductCard.tsx
 'use client';
 import React from "react";
-import { Star, TrendingUp, MoreVertical, Eye, X } from "lucide-react";
+import { Star, TrendingUp, MoreVertical, Eye, X, Tag } from "lucide-react";
 import { TrendingProduct, TrendingDrawerMode } from "@/app/types/dashboardtrendingtab";
 import { calculateDiscountedPrice } from "@/app/lib/utils/dashboardtrending-utils";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
@@ -12,6 +12,7 @@ interface TrendingProductCardProps {
   onToggleDropdown: (id: string | null) => void;
   onOpenDrawer: (mode: TrendingDrawerMode, product: TrendingProduct) => void;
   onRemoveFromTrending: (id: string) => void;
+  categoryNameMap?: Record<string, string>;
 }
 
 export const TrendingProductCard: React.FC<TrendingProductCardProps> = ({
@@ -20,64 +21,91 @@ export const TrendingProductCard: React.FC<TrendingProductCardProps> = ({
   onToggleDropdown,
   onOpenDrawer,
   onRemoveFromTrending,
+  categoryNameMap,
 }) => {
   return (
     <div
-      className="bg-white rounded-md shadow-sm hover:shadow-md transition-all duration-200 group h-[300px] flex flex-col"
+      className="bg-white rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden border border-gray-100"
       data-product-id={product.id}
     >
-      <div className="relative">
+      {/* Image Section */}
+      <div className="relative overflow-hidden">
         <img
           src={product.p_thumbnail || DEFAULT_THUMBNAIL}
           alt={product.p_Name}
-          className="w-full h-40 object-cover rounded-t-md"
+          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
         />
+        
+        {/* Discount Badge */}
         {product.discount > 0 && (
-          <div className="absolute top-2 left-2 bg-red-500 text-white px-1.5 py-0.5 rounded text-xs font-medium">
-            -{product.discount}%
+          <div className="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-2.5 py-1 rounded-md text-xs font-bold shadow-lg">
+            -{product.discount}% OFF
           </div>
         )}
-        <div className="absolute bottom-2 left-2 bg-orange-500 text-white px-2 py-1 rounded flex items-center gap-1 text-xs font-medium">
-          <TrendingUp className="w-3 h-3" />
+        
+        {/* Trending Badge */}
+        <div className="absolute top-3 right-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-2.5 py-1 rounded-md flex items-center gap-1 text-xs font-bold shadow-lg animate-pulse">
+          <TrendingUp className="w-3.5 h-3.5" />
           Trending
         </div>
 
-        <div className="absolute top-2 right-2 z-30">
+        {/* Category Badge */}
+        {product.category_id && (
+          <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-gray-700 px-2.5 py-1 rounded-md flex items-center gap-1.5 text-xs font-medium shadow-md">
+            <Tag className="w-3 h-3 text-blue-600" />
+            <span>{categoryNameMap?.[product.category_id] || product.category_id}</span>
+          </div>
+        )}
+
+        {/* Three Dots Menu */}
+        <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={(e) => {
               e.stopPropagation();
               onToggleDropdown(showDropdown === product.id ? null : product.id);
             }}
-            className="bg-white hover:bg-gray-50 text-gray-700 p-1.5 rounded-full shadow-md transition-all duration-150 hover:shadow-lg"
+            className="bg-white/95 backdrop-blur-sm hover:bg-white text-gray-700 p-2 rounded-full shadow-lg transition-all duration-150 hover:shadow-xl hover:scale-110"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </div>
 
-      <div className="p-3 flex-1 flex flex-col">
-        <div>
-          <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2 h-10">
-            {product.p_Name}
-          </h3>
-          <p className="text-xs text-gray-600 mb-2">by {product.artist_name}</p> 
-        </div>
+      {/* Content Section */}
+      <div className="p-4">
+        {/* Product Name */}
+        <h3 className="font-semibold text-gray-900 text-base mb-4 line-clamp-2 min-h-[3rem] group-hover:text-blue-600 transition-colors">
+          {product.p_Name}
+        </h3>
 
-        <div className="flex items-center gap-1 flex-wrap">
-          <span className="text-base font-bold text-gray-900">
-            ₹{calculateDiscountedPrice(product.price, product.discount).toLocaleString()}
-          </span>
-          {product.discount > 0 && (
-            <span className="text-xs text-gray-500 line-through">
-              ₹{product.price.toLocaleString()}
+        {/* Price Section */}
+        <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+          <div className="flex items-baseline gap-2">
+            <span className="text-xl font-bold text-gray-900">
+              ₹{calculateDiscountedPrice(product.price, product.discount).toLocaleString()}
             </span>
-          )}
+            {product.discount > 0 && (
+              <span className="text-sm text-gray-400 line-through">
+                ₹{product.price.toLocaleString()}
+              </span>
+            )}
+          </div>
+          
+          {/* Rating */}
+          <div className="flex items-center gap-1 text-yellow-500">
+            <Star className="w-4 h-4 fill-current" />
+            <span className="text-sm font-medium text-gray-700">4.5</span>
+          </div>
         </div>
       </div>
 
+      {/* Dropdown Menu */}
       {showDropdown === product.id && (
         <div
-          className="fixed z-50 w-52 bg-white rounded-lg shadow-2xl border border-gray-200 py-2"
+          className="fixed z-50 w-56 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 animate-in fade-in slide-in-from-top-2 duration-200"
           style={{
             top: `${
               (document.querySelector(`[data-product-id="${product.id}"]`) as HTMLElement)
@@ -85,25 +113,31 @@ export const TrendingProductCard: React.FC<TrendingProductCardProps> = ({
             }px`,
             left: `${
               ((document.querySelector(`[data-product-id="${product.id}"]`) as HTMLElement)
-                ?.getBoundingClientRect().right || 0) - 208
+                ?.getBoundingClientRect().right || 0) - 224
             }px`,
           }}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={() => onOpenDrawer("view", product)}
-            className="w-full text-left px-4 py-2.5 hover:bg-blue-50 flex items-center gap-3 text-sm text-gray-700 transition-colors"
+            className="w-full text-left px-4 py-2.5 hover:bg-blue-50 flex items-center gap-3 text-sm text-gray-700 transition-colors rounded-lg mx-1"
           >
-            <Eye className="w-4 h-4 text-blue-600" />
-            <span>View Details</span>
+            <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+              <Eye className="w-4 h-4 text-blue-600" />
+            </div>
+            <span className="font-medium">View Details</span>
           </button>
-          <div className="border-t border-gray-200 my-1"></div>
+          
+          <div className="border-t border-gray-200 my-2 mx-2"></div>
+          
           <button
             onClick={() => onRemoveFromTrending(product.id)}
-            className="w-full text-left px-4 py-2.5 hover:bg-red-50 flex items-center gap-3 text-sm text-red-600 transition-colors"
+            className="w-full text-left px-4 py-2.5 hover:bg-red-50 flex items-center gap-3 text-sm text-red-600 transition-colors rounded-lg mx-1"
           >
-            <X className="w-4 h-4" />
-            <span>Remove from Trending</span>
+            <div className="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center">
+              <X className="w-4 h-4 text-red-600" />
+            </div>
+            <span className="font-medium">Remove from Trending</span>
           </button>
         </div>
       )}
