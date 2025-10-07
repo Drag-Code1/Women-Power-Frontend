@@ -5,16 +5,37 @@ import ReviewForm from '../ui/forms/AddProductReviewForm';
 import { submitReviewAction } from '@/app/services/productDetailsService';
 import { WriteReview } from '../ui/button/WriteReview';
 
-interface Review {
-  id: number;
+export interface ProductReview {
+  id: string;
+  product_id: string;
+  user_id: string;
   rating: number;
-  title: string;
-  description: string;
-  timeAgo: string;
-  verified?: boolean;
+  rating_description: string;
+  date: string; // could also be Date if you plan to parse it
 }
 
-const ProductReviews: React.FC = () => {
+async function getProductsReviews(productID: string) {
+  try {
+    const res = await fetch(`http://localhost:7000/v1/product-review/${productID}`, {
+      cache: "force-cache",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch product details");
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("❌ Error fetching product:", error);
+    return null;
+  }
+}
+
+
+const ProductReviews: React.FC = async() => {
+    const productReviewData=await getProductsReviews('10c451d5-1134-47b4-81a4-832d3b73d715');
+  console.log('productReviewData',productReviewData);
   // const [sortBy, setSortBy] = useState('Relevance');
   // const [filterBy, setFilterBy] = useState('All Star');
   // const [showWriteReview, setShowWriteReview] = useState(false);
@@ -179,7 +200,7 @@ const reviewData=[
                       {/* {renderStars(Math.round(parseFloat(averageRating)))} */}
                     </div>
                     <p className="text-gray-600 text-sm">
-                      Based on {reviewData.length} reviews
+                      Based on {productReviewData.data.length} reviews
                     </p>
                   </div>
                 </div>
@@ -319,36 +340,36 @@ const reviewData=[
 
           {/* Reviews List */}
           <div className="px-6 sm:px-8 py-6">
-            {reviewData.length > 0 ? (
+            {productReviewData.data.length > 0 ? (
               <div className="space-y-6">
-                {reviewData.map((review, index) => (
-                  <div key={review.id} className={`${index !== reviewData.length - 1 ? 'border-b border-gray-200' : ''} pb-6`}>
+                {productReviewData.data.map((review:ProductReview, index:number) => (
+                  <div key={review.id} className={`${index !== productReviewData.data.length - 1 ? 'border-b border-gray-200' : ''} pb-6`}>
                     <div className="flex flex-col gap-3">
                       
                       {/* Rating and Verification */}
                       <div className="flex items-center gap-3">
                         {renderStars(review.rating, 'small')}
-                        {review.verified && (
+                        {/* {review.verified && ( */}
                           <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
                             ✓ Verified Purchase
                           </span>
-                        )}
+                        {/* )} */}
                       </div>
 
                       {/* Review Title */}
                       <h4 className="font-semibold text-gray-900 text-lg">
-                        {review.title}
+                        {review.rating_description}
                       </h4>
 
                       {/* Review Description */}
                       <p className="text-gray-700 leading-relaxed">
-                        {review.description}
+                        {review.rating_description}
                       </p>
 
                       {/* Review Footer */}
                       <div className="flex items-center justify-between pt-2">
                         <span className="text-sm text-gray-500">
-                          {review.timeAgo}
+                          {review.date }
                         </span>
                       </div>
                     </div>

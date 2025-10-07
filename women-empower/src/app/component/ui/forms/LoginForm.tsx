@@ -63,21 +63,25 @@ setShowOtpVerification(state.success)
   // };
 
   const handleOtpVerification = async() => {
-const otpJoined=otp.join('');
+const otpJoined=Number(otp.join(',').replaceAll(',',''));
     const data=await validateOTP(emailAddress,otpJoined);
+    
+    console.log(data,'otp verification')
     if(data.data==true)
     {
-    router.replace('http://localhost:3000/profile');
+    router.replace('http://localhost:3000/');
+    
+    // console.log(data,'otp verification')
     }
     else{
   setInvalidOTP(true);
     }
+    setOtp(['', '', '', '', '', '']);
 //     {
 //     "success": true,
 //     "message": "OTP verified successfully!",
 //     "data": true
 // }
-    console.log(data,'otp verification')
     // const otpValue = otp.join('')
     // if (otpValue.length === 6) {
     //   setShowOtpVerification(false);

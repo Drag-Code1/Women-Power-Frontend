@@ -10,8 +10,31 @@ import { ProductAddToCart } from "../product-details/ProductAddToCart";
 import { ProductAddToWishList } from "../product-details/ProductAddToWishlist";
 import { ProductBuyNow } from "../product-details/ProductBuyNow";
 import { ProductQuantityContainer } from "../product-details/ProductQuantityContainer";
-const ProductDetailsPage = () => {
-  
+import { error } from "console";
+
+// 
+
+async function getTrendingProducts(productID: string) {
+  try {
+    const res = await fetch(`http://localhost:7000/v1/product/${productID}`, {
+      cache: "force-cache",
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch product details");
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("❌ Error fetching product:", error);
+    return null;
+  }
+}
+
+const ProductDetailsPage = async() => {
+  const pData=await getTrendingProducts('10c451d5-1134-47b4-81a4-832d3b73d715');
+  console.log('nn',pData);
   const productData = {
     id:1,
     title: "Traditional Shubh Labh",
@@ -75,13 +98,13 @@ const ProductDetailsPage = () => {
                   className="w-full h-full object-cover"
                 /> */}
 
-                <ProductMainImage productImages={productImages} />
+                <ProductMainImage productImages={pData.data.p_images} />
               </div>
               
               {/* Thumbnail Images */}
               <div className="grid grid-cols-4 gap-3">
                        {/* client */}
-                {productImages.map((image, index) => (
+      {pData.data.p_images?.map((image: string, index: number) => (
                   // <button
                   //   key={index}
                   //   onClick={() => setSelectedImage(index)}
@@ -109,7 +132,7 @@ const ProductDetailsPage = () => {
               {/* Title & Rating */}
               <div className="mb-6">
                 <h1 className="text-2xl lg:text-3xl  text-gray-900 mb-2">
-                  {productData.title}
+                  {pData.data.p_Name}
                 </h1>
                 <p className="text-gray-600 mb-3">{productData.subtitle}</p>
                 
@@ -125,13 +148,13 @@ const ProductDetailsPage = () => {
               <div className="mb-6">
                 <div className="flex items-baseline gap-3 mb-1">
                   <span className="text-3xl  text-gray-900">
-                    ₹{productData.price.toLocaleString()}
+                    ₹{pData.data.price}
                   </span>
                   <span className="text-lg text-gray-400 line-through">
                     ₹{productData.originalPrice.toLocaleString()}
                   </span>
                   <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">
-                    {Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100)}% OFF
+                    {pData.data.discount}% OFF
                   </span>
                 </div>
                 <p className="text-sm text-green-600 font-medium">Free shipping above ₹500</p>
@@ -200,7 +223,7 @@ const ProductDetailsPage = () => {
               </div>
 
               {/* Quick Features */}
-              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
+              {/* <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Key Features</h3>
                   <ul className="space-y-1 text-sm text-gray-600">
@@ -218,7 +241,7 @@ const ProductDetailsPage = () => {
                     <li>• Keep in dry place</li>
                   </ul>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -231,16 +254,10 @@ const ProductDetailsPage = () => {
           
           <div className="text-gray-600 leading-relaxed">
             <p className="mb-4">
-              This Traditional Shubh Labh decorative piece brings divine blessings and 
-              positive energy to your home. Meticulously handcrafted with premium materials, 
-              it features authentic traditional designs that have been passed down through 
-              generations.
+             {pData.data.description}
             </p>
 
-            <p className="mb-6">
-              Perfect for festivals, special occasions, or as a permanent addition to your 
-              spiritual space, this piece combines spiritual significance with aesthetic beauty.
-            </p>
+           
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
@@ -264,18 +281,11 @@ const ProductDetailsPage = () => {
               <div>
                 <h4 className="font-medium text-gray-900 mb-3">Specifications</h4>
                 <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Material: Premium quality
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Finish: Hand-painted
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Mounting: Wall hanging
-                  </li>
+
+               {pData.data.specification.split(',').map((item: string, index: number) => {
+  return <li key={index} className="flex items-start gap-2"> 
+                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>{item}</li>;
+})}
                 </ul>
               </div>
             </div>

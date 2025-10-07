@@ -10,7 +10,7 @@ import { MobileViewFilter } from "../component/arts/MobileViewFilter";
 import { MobileView } from "../component/arts/MobileView";
 import { ArtistMobileViewFilter } from "../component/artist/ArtistMobileViewFilter";
 import { Artist } from "../types/artist";
-import { fetchArtists } from "../lib/api";
+import { fetchArtists, fetchFilteredArtists } from "../lib/api";
 
 // const fetchArtists = async () => {
 //   const res = await fetch('http://localhost:5000/api/artist', { cache: 'no-store' });
@@ -18,19 +18,25 @@ import { fetchArtists } from "../lib/api";
 //   return data;
 // }
 
-const ArtistDirectoryApp = async({ searchParams }: { searchParams: { 'artist-search'?: string ,'artist-category':string} }) => {
+const ArtistDirectoryApp = async({ searchParams }: { searchParams: { 'artist-search'?: string ,'artist-category':string,'min'?: string ,'max':string} }) => {
     const searched = searchParams['artist-search'];
         const category = searchParams['artist-category'];
-
+ const min = searchParams['min'];
+        const max = searchParams['max'];
         // console.log("Search Params:", searchParams);
         // console.log("Searched Value:", searched);
-        // console.log("Category Value:", category);
-let allArtists =[];
-        if(category){
-          console.log("Category Filter Applied:");
-   allArtists = await fetchArtists();
+         
+   const categoryValues=category ? Array.isArray(category)
+      ? category
+      : [category]
+    : [];
 
-        }
+  console.log("✅ Normalized Category Value:", categoryValues);
+let allArtists =[];
+       if (categoryValues.length > 0 || min || max) {
+    // allArtists = await fetchFilteredArtists(categoryValues, min, max);
+       allArtists = await fetchArtists();
+  }
         else{
           console.log("No Category Filter:");
    allArtists = await fetchArtists();

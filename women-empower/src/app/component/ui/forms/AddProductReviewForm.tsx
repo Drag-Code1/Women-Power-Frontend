@@ -30,6 +30,9 @@ const url=new URLSearchParams(searchParams.toString())
   });
 
   const onSubmit = async (data: ReviewFormData) => {
+
+
+    console.log(data,'data')
     await submitReview({ ...data, rating });
     setRating(0);
   };

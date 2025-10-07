@@ -67,7 +67,7 @@ export const clearWishlist = async () => {
   }
 };
 
-export const validateOTP = async (email: string, otp: string) => {
+export const validateOTP = async (email: string, otp: number) => {
   console.log(email,otp)
   try {
     const response = await fetch("http://localhost:7000/v1/login/otp", {
@@ -227,6 +227,82 @@ export const addAddress = async (userID:string,document:Address) => {
    
   }
 };
+export async function fetchFilteredArtists(
+  categories: string[],
+  min?: string,
+  max?: string
+) {
+  const filters = {
+    categories: categories,
+    priceRange: {
+      min: min ? Number(min) : undefined,
+      max: max ? Number(max) : undefined,
+    },
+  };
+
+  console.log("🔹 Filters to send:", filters);
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/artists/filter`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(filters),
+        cache: "no-store", // important for SSR to always fetch fresh
+      }
+    );
+
+    if (!response.ok) {
+      console.error("❌ Filter API failed:", response.status);
+      return [];
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("❌ Filter API error:", error);
+    return [];
+  }
+}
+
+
+export async function fetchFilteredArts(
+  categories: string[],
+  min?: string,
+  max?: string
+) {
+  const filters = {
+    categories: categories,
+    priceRange: {
+      min: min ? Number(min) : undefined,
+      max: max ? Number(max) : undefined,
+    },
+  };
+
+  console.log("🔹 Filters to send:", filters);
+
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/artists/filter`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(filters),
+        cache: "no-store", // important for SSR to always fetch fresh
+      }
+    );
+
+    if (!response.ok) {
+      console.error("❌ Filter API failed:", response.status);
+      return [];
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("❌ Filter API error:", error);
+    return [];
+  }
+}
 
 
 

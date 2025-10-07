@@ -11,7 +11,7 @@ export const SearchBar: React.FC = () => {
 useEffect(() => {
 
   const params = new URLSearchParams(searchParams.toString());
-  if(params.get("category")) {
+  if(params.get("category") || params.get("min-pr")|| params.get("max-pr")) {
     setSearchTerm("");
   } }
 , [searchParams]);
@@ -22,8 +22,10 @@ useEffect(() => {
     // update URL and trigger navigation
     const params = new URLSearchParams(window.location.search);
     if (value) {
-      if(  params.get('category')){
-        params.delete('category')
+      if(  params.get('category') || params.get("min-pr") || params.get("max-pr")){
+        params.delete('category');
+            params.delete('min-pr');
+                params.delete('max-pr');
       }
       params.set("search", value);
     } else {

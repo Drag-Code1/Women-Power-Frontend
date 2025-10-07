@@ -11,7 +11,7 @@ export const ArtistSearchBar: React.FC = () => {
 useEffect(() => {
 
   const params = new URLSearchParams(searchParams.toString());
-  if(params.get("artist-category")) {
+  if(params.get("artist-category") || params.get('min') || params.get('max')) {
     setSearchTerm("");
   } }
 , [searchParams]);
@@ -22,8 +22,10 @@ useEffect(() => {
     // update URL and trigger navigation
     const params = new URLSearchParams(window.location.search);
     if (value) {
-      if(  params.get('artist-category')){
+      if(  params.get('artist-category')|| params.get('min') || params.get("max")){
         params.delete('artist-category')
+         params.delete('min')
+          params.delete('max')
       }
       params.set("artist-search", value);
     } else {

@@ -30,10 +30,27 @@ async function getArts(searched:string) {
 
   return res.json()
 }
-const ProductFilterApp = async({ searchParams }: { searchParams: { search?: string } }) => {
+const ProductFilterApp = async({ searchParams }: { searchParams: { search?: string ,'category':string,'min-pr'?: string ,'max-pr':string} }) => {
   const searched = searchParams.search;
-  const arts = await getArts(searched);
+      const category = searchParams['category'];
+ const min = searchParams['min-pr'];
+        const max = searchParams['max-pr'];
+const categoryValues=category ? Array.isArray(category)
+      ? category
+      : [category]
+    : [];
+      console.log("✅ Normalized Category Value:", categoryValues);
+let arts ={data:[]};
+       if (categoryValues.length > 0 || min || max) {
+    // arts = await fetchFilteredArts(categoryValues, min, max);
+      //  arts = await fetchArtists();
+  }
+        else{
+          console.log("No Category Filter:");
+      arts = await getArts(searched);
   console.log(arts);
+        }
+
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
     <div className="min-h-screen bg-white">

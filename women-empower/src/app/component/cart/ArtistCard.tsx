@@ -17,8 +17,8 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => (
     <div className="flex-shrink-0">
       <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-gray-100">
         <img
-          src={artist.image}
-          alt={artist.name}
+          src={artist.artist_profile_pic}
+          alt={artist.artist_Name}
           className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
         />
       </div>
@@ -27,20 +27,20 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => (
     <div className="flex-grow flex flex-col justify-between text-center sm:text-left">
       <div>
         <h3 className="font-semibold text-lg sm:text-xl text-black mb-1 truncate">
-          {artist.name}
+          {artist.artist_Name}
         </h3>
         <p className="text-[#61503c] text-xs sm:text-sm font-medium mb-2">
-          {artist.category}
+          {artist.category_id}
         </p>
 
         {/* Description */}
         <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-3">
-          {artist.description}
+          {artist.introduction}
         </p>
       </div>
 
       {/* Social Links */}
-      <div className="flex items-center justify-center sm:justify-start gap-3 mt-4">
+      {/* <div className="flex items-center justify-center sm:justify-start gap-3 mt-4">
         <a href="#" className="text-blue-500 hover:text-blue-600 transition-colors">
           <MessageCircle className="w-5 h-5" />
         </a>
@@ -50,7 +50,7 @@ const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => (
         <a href="#" className="text-blue-700 hover:text-blue-800 transition-colors">
           <Linkedin className="w-5 h-5" />
         </a>
-      </div>
+      </div> */}
     </div>
   </div>
 );

@@ -8,6 +8,13 @@ interface ExperienceRange {
   max: number;
 }
 
+interface category{
+id:string,
+name:string,
+image:string
+
+}
+
 interface FiltersSidebarProps {
   categories: string[];
   selectedCategories: string[];
@@ -38,11 +45,12 @@ useEffect(() => {
 }, []);
 async function fetchData() {
     try {
-      const res = await fetch('http://localhost:5000/api/category');
+      const res = await fetch('http://localhost:7000/v1/category');
       const categoriesData_ = await res.json();
       console.log(categoriesData_);
-     const categoryObject= categoriesData_.map((cat:  string ) => ({ categoryName: cat, isChecked:allParams.includes(cat)? true:false }))
-setCategoriesData(categoryObject);
+     const categoryObject= categoriesData_.data.map((cat:  category ) => ({ categoryName: cat.name,categoryID:cat.id, isChecked:allParams.find((item)=>item==cat.id)? true:false }))
+console.log("categoryObject :",categoryObject)
+     setCategoriesData(categoryObject);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }
@@ -70,7 +78,7 @@ const toggleCategory = useCallback((category: string, e: React.ChangeEvent<HTMLI
   router.replace(`?${params.toString()}`, { scroll: false });
 
     const tempCategoryStatus = [...categoriesData];
-    const index = tempCategoryStatus.findIndex(cat => cat.categoryName === category);
+    const index = tempCategoryStatus.findIndex(cat => cat.categoryID === category);
     tempCategoryStatus[index].isChecked = !tempCategoryStatus[index].isChecked;
     setCategoriesData(tempCategoryStatus);
 }, [searchParams, categoriesData]);
@@ -98,7 +106,31 @@ setCategoriesData(categoriesData.map(cat => ({ ...cat, isChecked: false })));
     { label: "6-10 years", min: 6, max: 10 },
     { label: "10+ years", min: 11, max: Infinity },
   ];
+   const [minPrice, setMinPrice] = useState(0);
+  const [maxPrice, setMaxPrice] = useState(1000);
+ useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const min = params.get("min");
+    const max = params.get("max");
 
+    if (min) setMinPrice(Number(min));
+    if (max) setMaxPrice(Number(max));
+  }, []);
+
+  const updateUrl = (newMin: number, newMax: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (newMin) params.set("min", String(newMin));
+    else params.delete("min");
+
+    if (newMax) params.set("max", String(newMax));
+    else params.delete("max");
+
+    const newUrl = `?${params.toString()}`;
+
+    // 👇 Replaces the current URL (does not add to history)
+    router.replace(newUrl, { scroll: false });
+  };
 
   return (
     <div className="w-64 bg-white border-r border-gray-200 p-6 min-h-screen">
@@ -116,7 +148,7 @@ setCategoriesData(categoriesData.map(cat => ({ ...cat, isChecked: false })));
               <input
                 type="checkbox"
                 checked={category.isChecked}
-                onChange={(e) => toggleCategory(category.categoryName, e)}
+                onChange={(e) => toggleCategory(category.categoryID, e)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="ml-3 text-sm text-gray-700">{category.categoryName}</span>
@@ -132,27 +164,49 @@ setCategoriesData(categoriesData.map(cat => ({ ...cat, isChecked: false })));
       <div className="mb-8">
         <h3 className="text-sm font-medium text-gray-900 mb-4">Experience</h3>
         <div className="space-y-3">
-          {experienceRanges.map((range) => (
-            <label key={range.label} className="flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={selectedExperience.includes(range.label)}
-                // onChange={() => toggleExperience(range.label)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <span className="ml-3 text-sm text-gray-700">{range.label}</span>
-              <span className="ml-auto text-xs text-gray-500">
-                (
-                {/* {
-                  allArtists.filter((a) => {
-                    const exp = parseInt(a.experience);
-                    return exp >= range.min && exp <= range.max;
-                  }).length
-                } */}
-                )
-              </span>
-            </label>
-          ))}
+          <h3 className="text-lg font-semibold mb-2">Price Range</h3>
+
+      <div className="flex flex-col gap-2">
+      
+          <div className="flex flex-col gap-3">
+        {/* 🧮 Min Price */}
+        <label className="text-sm text-gray-600">
+          Min: ₹{minPrice}
+          <input
+            type="range"
+            min="0"
+            max="1000"
+            step="10"
+            value={minPrice}
+            onChange={(e) => setMinPrice(Number(e.target.value))}
+            onMouseUp={() => updateUrl(minPrice, maxPrice)}       // 🧠 only on release
+            onTouchEnd={() => updateUrl(minPrice, maxPrice)}       // mobile support
+            className="w-full accent-blue-600"
+          />
+        </label>
+
+        {/* 💰 Max Price */}
+        <label className="text-sm text-gray-600">
+          Max: ₹{maxPrice}
+          <input
+            type="range"
+            min="0"
+            max="1000"
+            step="10"
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(Number(e.target.value))}
+            onMouseUp={() => updateUrl(minPrice, maxPrice)}       // 🧠 only on release
+            onTouchEnd={() => updateUrl(minPrice, maxPrice)}       // mobile support
+            className="w-full accent-blue-600"
+          />
+        </label>
+
+        <div className="flex justify-between text-sm text-gray-500 mt-2">
+          <span>₹{minPrice}</span>
+          <span>₹{maxPrice}</span>
+        </div>
+      </div>
+      </div>
         </div>
       </div>
 
@@ -170,6 +224,29 @@ setCategoriesData(categoriesData.map(cat => ({ ...cat, isChecked: false })));
 };
 
 export default ArtistFiltersSidebar;
+
+
+//  {experienceRanges.map((range) => (
+//             <label key={range.label} className="flex items-center cursor-pointer">
+//               <input
+//                 type="checkbox"
+//                 checked={selectedExperience.includes(range.label)}
+//                 // onChange={() => toggleExperience(range.label)}
+//                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+//               />
+//               <span className="ml-3 text-sm text-gray-700">{range.label}</span>
+//               <span className="ml-auto text-xs text-gray-500">
+//                 (
+//                 {/* {
+//                   allArtists.filter((a) => {
+//                     const exp = parseInt(a.experience);
+//                     return exp >= range.min && exp <= range.max;
+//                   }).length
+//                 } */}
+//                 )
+//               </span>
+//             </label>
+//           ))}
 
 
 // "use client";
