@@ -29,11 +29,18 @@ export const EventCard: React.FC<EventCardProps> = ({
     >
       {/* Image Section */}
       <div className="relative overflow-hidden">
-        <img
-          src={event.thumbnail}
-          alt={event.title}
-          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+        {event.thumbnail && (
+          <img
+            src={event.thumbnail}
+            alt={event.title}
+            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        )}
+        {!event.thumbnail && (
+          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-500 text-sm">No image</span>
+          </div>
+        )}
 
         {/* Status Badge */}
         <div

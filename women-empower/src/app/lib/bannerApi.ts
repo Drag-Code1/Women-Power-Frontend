@@ -9,8 +9,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export async function fetchBannersServer(): Promise<Banner[]> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/banners`, {
+    // Try the backend API first
+    const res = await fetch('http://localhost:5000/v1/banner/', {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
@@ -18,13 +18,14 @@ export async function fetchBannersServer(): Promise<Banner[]> {
     });
 
     if (!res.ok) {
-      throw new Error('Failed to fetch banners');
+      console.warn('Backend banner API not available, returning empty array');
+      return [];
     }
 
     const data = await res.json();
-    return data.banners || [];
+    return data.data || data.banners || [];
   } catch (error) {
-    console.error('Server Error fetching banners:', error);
+    console.warn('Server Error fetching banners:', error);
     return [];
   }
 }
@@ -35,7 +36,7 @@ export async function fetchBannersServer(): Promise<Banner[]> {
 
 export async function fetchBannersClient(): Promise<Banner[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/banners`, {
+    const res = await fetch('http://localhost:5000/v1/banner/', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -43,14 +44,15 @@ export async function fetchBannersClient(): Promise<Banner[]> {
     });
 
     if (!res.ok) {
-      throw new Error('Failed to fetch banners');
+      console.warn('Backend banner API not available');
+      return [];
     }
 
     const data = await res.json();
-    return data.banners || [];
+    return data.data || data.banners || [];
   } catch (error) {
-    console.error('Error fetching banners:', error);
-    throw error;
+    console.warn('Error fetching banners:', error);
+    return [];
   }
 }
 
