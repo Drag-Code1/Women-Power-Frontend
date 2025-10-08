@@ -18,7 +18,21 @@ export const useProductManagement = (initialProducts: Product[]) => {
     setShowDropdown(null);
 
     if (product) {
-      setFormData({ ...product });
+      // Map only the fields that ProductFormData expects
+      const mappedData = {
+        p_Name: product.p_Name || "",
+        thumbnail: product.thumbnail || "",
+        p_images: product.p_images || [],
+        category_id: String(product.category_id || ""),
+        artist_id: String(product.artist_id || ""),
+        price: product.price || 0,
+        discount: product.discount || 0,
+        description: product.description || "",
+        specification: product.specification || "",
+      };
+      console.log("Setting form data for edit:", mappedData);
+      console.log("Product data:", product);
+      setFormData(mappedData);
     } else {
       setFormData(INITIAL_FORM_DATA);
     }
@@ -41,8 +55,11 @@ export const useProductManagement = (initialProducts: Product[]) => {
       const newProduct: Product = {
         ...formData,
         id: Date.now().toString(),
-        p_thumbnail: finalThumbnail,
+        thumbnail: finalThumbnail,
         p_images: validImages,
+        review_id: "",
+        sell_count: 0,
+        isTrending: false,
       };
       setProducts(prev => [...prev, newProduct]);
     } else if (drawerMode === "edit" && selectedProduct) {
@@ -50,9 +67,9 @@ export const useProductManagement = (initialProducts: Product[]) => {
         prev.map((p) =>
           p.id === selectedProduct.id
             ? {
+                ...p,
                 ...formData,
-                id: selectedProduct.id,
-                p_thumbnail: finalThumbnail,
+                thumbnail: finalThumbnail,
                 p_images: validImages,
               }
             : p

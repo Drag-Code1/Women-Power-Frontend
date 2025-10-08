@@ -42,11 +42,20 @@ export function useArtistManager(initialArtists: Artist[]) {
     setModalType(type);
     if (artist) {
       setSelectedArtist(artist);
+      const normalizedDate = (() => {
+        const raw = artist.joining_date || '';
+        // Expect input type=date as YYYY-MM-DD
+        if (!raw) return '';
+        if (raw.includes('T')) return raw.split('T')[0];
+        if (raw.includes(' ')) return raw.split(' ')[0];
+        return raw.length >= 10 ? raw.slice(0, 10) : raw;
+      })();
       setFormData({
         artist_name: artist.artist_name,
         category: artist.category,
+        category_id: artist.category_id,
         intro: artist.intro,
-        joining_date: artist.joining_date,
+        joining_date: normalizedDate,
         experience: artist.experience,
         image: artist.image || ''
       });

@@ -26,33 +26,129 @@ const normalizeProduct = (raw: any): Product => {
 };
 
 export const productService = {
-  // 🔹 Get all products
-  getAllProducts: async (): Promise<Product[]> => {
+  // 🔹 Get all products (paginated)
+  getAllProductsPaginated: async (
+    page: number = 1,
+    limit: number = 12
+  ): Promise<{ items: Product[]; totalItems: number; totalPages: number; currentPage: number; }> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/product/`, {
+      const url = `${API_BASE_URL}/product/?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`;
+      const res = await fetch(url, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+      const parseJsonSafely = async (r: Response) => {
+        const contentType = r.headers.get("content-type") || "";
+        try {
+          if (contentType.includes("application/json")) return await r.json();
+          const text = await r.text();
+          return { message: text } as any;
+        } catch {
+          return {} as any;
+        }
+      };
+      const body: any = await parseJsonSafely(res);
+
+      // If API returned the new paginated shape
+      if (body?.data?.data && Array.isArray(body.data.data)) {
+        const items = body.data.data.map(normalizeProduct);
+        return {
+          items,
+          totalItems: Number(body.data.totalItems) || items.length,
+          totalPages: Number(body.data.totalPages) || 1,
+          currentPage: Number(body.data.currentPage) || page,
+        };
+      }
+
+      // Fallback: handle non-paginated shapes
+      const list = Array.isArray(body) ? body : (body?.data || body?.products || []);
+      const items = Array.isArray(list) ? list.map(normalizeProduct) : [];
+      return {
+        items,
+        totalItems: items.length,
+        totalPages: 1,
+        currentPage: 1,
+      };
+    } catch (error) {
+      console.warn("Error fetching paginated products:", error);
+      return { items: [], totalItems: 0, totalPages: 1, currentPage: 1 };
+    }
+  },
+  // 🔹 Get trending products
+  getTrendingProducts: async (): Promise<Product[]> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/product/trending`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         cache: "no-store",
       });
 
       if (!response.ok) {
-        console.error(`Failed to fetch products: ${response.status}`);
+        console.error(`Failed to fetch trending products: ${response.status}`);
         return [];
       }
 
       const data = await response.json();
-
-      // ✅ support both array or { data: [] }
       const products = Array.isArray(data) ? data : data.data;
-
       if (!Array.isArray(products)) {
-        console.warn("API returned invalid products data");
+        console.warn("API returned invalid trending products data");
         return [];
       }
+      return products.map(normalizeProduct).map(p => ({ ...p, isTrending: true }));
+    } catch (error) {
+      console.error("Error fetching trending products:", error);
+      return [];
+    }
+  },
+  // 🔹 Get all products
+  getAllProducts: async (): Promise<Product[]> => {
+    try {
+      const primary = await fetch(`${API_BASE_URL}/product/`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
 
+      const parseJsonSafely = async (res: Response) => {
+        const contentType = res.headers.get("content-type") || "";
+        try {
+          if (contentType.includes("application/json")) return await res.json();
+          const text = await res.text();
+          return { message: text };
+        } catch {
+          return {};
+        }
+      };
+
+      let payload: any = null;
+      if (primary.ok) {
+        payload = await parseJsonSafely(primary);
+      } else {
+        console.warn(`Primary products endpoint failed (${primary.status}). Trying legacy /api/products...`);
+        const legacy = await fetch(`http://localhost:5000/api/products`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+        });
+        if (!legacy.ok) {
+          console.warn(`Legacy products endpoint also failed (${legacy.status}).`);
+          return [];
+        }
+        payload = await parseJsonSafely(legacy);
+      }
+
+      const products = Array.isArray(payload)
+        ? payload
+        : payload?.data || payload?.products || [];
+
+      if (!Array.isArray(products)) {
+        console.warn("Products payload not an array; returning empty list.");
+        return [];
+      }
       return products.map(normalizeProduct);
     } catch (error) {
-      console.error("Error fetching products:", error);
+      console.warn("Error fetching products:", error);
       return [];
     }
   },

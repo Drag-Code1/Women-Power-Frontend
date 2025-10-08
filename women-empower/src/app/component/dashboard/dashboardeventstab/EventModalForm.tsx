@@ -122,8 +122,18 @@ export const EventModalForm: React.FC<EventModalFormProps> = ({
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
         <select
-          value={formData.category}
-          onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+          value={categoryOptions && categoryOptions.length > 0
+            ? (categoryOptions.find(c => c.name === (formData.category as string))?.id || '')
+            : (formData.category as string) || ''}
+          onChange={(e) => {
+            const val = e.target.value;
+            if (categoryOptions && categoryOptions.length > 0) {
+              const found = categoryOptions.find(c => c.id === val);
+              setFormData({ ...formData, category: found?.name || '' });
+            } else {
+              setFormData({ ...formData, category: val });
+            }
+          }}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           <option value="">Select a category</option>

@@ -28,14 +28,12 @@ export const DEFAULT_THUMBNAIL = "https://cdn.pixabay.com/photo/2024/07/14/14/42
 
 export const INITIAL_FORM_DATA = {
   p_Name: "",
-  p_thumbnail: "",
+  thumbnail: "",
   p_images: ["", ""],
   category_id: "",
-  artist_name: "",
+  artist_id: "",
   price: 0,
   discount: 0,
-  review_id: "0",
-  sell_count: 0,
   description: "",
   specification: "",
 };

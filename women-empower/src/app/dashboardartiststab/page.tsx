@@ -1,10 +1,11 @@
 // app/artists/page.tsx
 import ArtistManagementClient from '../component/dashboard/dashboardartiststab/ArtistManagementClient';
-import { getArtistsApi, getCategoriesApi } from '@/app/lib/api';
+import { getArtistsPaginated, getCategoriesApi } from '@/app/lib/api';
 
-export default async function ArtistsPage() {
-  const [artistsRaw, categories] = await Promise.all([
-    getArtistsApi(),
+export default async function ArtistsPage({ searchParams }: { searchParams?: { page?: string } }) {
+  const page = Number(searchParams?.page || '1') || 1;
+  const [artistsResp, categories] = await Promise.all([
+    getArtistsPaginated(page),
     getCategoriesApi(),
   ]);
 
@@ -13,7 +14,7 @@ export default async function ArtistsPage() {
     categoryIdToName[c.id] = c.name;
   });
 
-  const artists = (artistsRaw || []).map((a: any) => ({
+  const artists = (artistsResp?.data || []).map((a: any) => ({
     id: a.id,
     artist_name: a.artist_Name,
     category: categoryIdToName[a.category_id] || 'Unknown',
@@ -24,5 +25,13 @@ export default async function ArtistsPage() {
     image: a.artist_profile_pic,
   }));
 
-  return <ArtistManagementClient initialArtists={artists} />;
+  return (
+    <ArtistManagementClient
+      initialArtists={artists}
+      pagination={{
+        currentPage: artistsResp.currentPage,
+        totalPages: artistsResp.totalPages,
+      }}
+    />
+  );
 }

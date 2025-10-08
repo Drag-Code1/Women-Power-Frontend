@@ -8,108 +8,15 @@ import { getAllImages } from "@/app/lib/utils/dashboardtrending-utils";
 import { TrendingHeader } from "../component/dashboard/dashboardtrendingproductstab/TrendingHeader";
 import { TrendingProductGrid } from "../component/dashboard/dashboardtrendingproductstab/TrendingProductGrid";
 import { TrendingProductDrawer } from "../component/dashboard/dashboardtrendingproductstab/TrendingProductDrawer";
+import { productService } from "@/app/lib/productapi";
+import { getCategoriesApi } from "@/app/lib/api";
 
-const INITIAL_PRODUCTS: TrendingProduct[] = [
-  {
-    id: "1",
-    p_Name: "Spiritual Wall Art",
-    p_thumbnail:
-      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400",
-    p_images: [
-      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=400",
-      "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400",
-    ],
-    category_id: "spiritual",
-    artist_name: "Rajesh Kumar",
-    price: 2999,
-    discount: 15,
-    review_id: "4.5",
-    sell_count: 156,
-    description: "Beautiful spiritual artwork for meditation spaces",
-    specification: "Canvas print, 24x36 inches, Premium quality",
-    isTrending: true,
-  },
-  {
-    id: "2",
-    p_Name: "Rangoli Stencil Set",
-    p_thumbnail:
-      "https://images.unsplash.com/photo-1604608672516-f1b7919aa817?w=400",
-    p_images: [
-      "https://images.unsplash.com/photo-1635776062043-223faf322554?w=400",
-      "https://images.unsplash.com/photo-1608896838107-90d2baf1e4e9?w=400",
-    ],
-    category_id: "rangoli",
-    artist_name: "Priya Sharma",
-    price: 899,
-    discount: 20,
-    review_id: "4.2",
-    sell_count: 89,
-    description: "Complete rangoli stencil set for festivals",
-    specification: "Plastic stencils, 12 designs, Reusable",
-    isTrending: false,
-  },
-  {
-    id: "3",
-    p_Name: "Handcrafted Resin Ganesha",
-    p_thumbnail:
-      "https://images.unsplash.com/photo-1583241800698-9c8652dcbdcf?w=400",
-    p_images: [
-      "https://images.unsplash.com/photo-1595050006260-9b7a93bc2dd0?w=400",
-      "https://images.unsplash.com/photo-1514496959998-c01c40915c5e?w=400",
-    ],
-    category_id: "resin",
-    artist_name: "Amit Patel",
-    price: 1899,
-    discount: 10,
-    review_id: "4.7",
-    sell_count: 234,
-    description: "Beautiful handcrafted resin Ganesha statue",
-    specification: "Eco-friendly resin, Hand painted, 6 inches",
-    isTrending: false,
-  },
-  {
-    id: "4",
-    p_Name: "Traditional Diya Set",
-    p_thumbnail:
-      "https://images.unsplash.com/photo-1604431696980-01264b7f4b83?w=400",
-    p_images: [
-      "https://images.unsplash.com/photo-1541692641319-981cc79ee10a?w=400",
-      "https://images.unsplash.com/photo-1571197123729-e5d7cd230c14?w=400",
-    ],
-    category_id: "diya_thali",
-    artist_name: "Meera Agarwal",
-    price: 1499,
-    discount: 25,
-    review_id: "4.8",
-    sell_count: 320,
-    description: "Handcrafted traditional diya set for festivals",
-    specification: "Brass material, Set of 12, Hand-painted",
-    isTrending: true,
-  },
-  {
-    id: "5",
-    p_Name: "Shubh Labh Wall Hanging",
-    p_thumbnail:
-      "https://images.unsplash.com/photo-1605883705077-8d3d3cebe78c?w=400",
-    p_images: [
-      "https://images.unsplash.com/photo-1582639510494-c80b5de9f148?w=400",
-      "https://images.unsplash.com/photo-1612198188060-c7c2a3b66eae?w=400",
-    ],
-    category_id: "shubh_labh",
-    artist_name: "Vikash Singh",
-    price: 799,
-    discount: 30,
-    review_id: "4.6",
-    sell_count: 180,
-    description: "Beautiful Shubh Labh wall hanging for prosperity",
-    specification: "Wood and metal, 14 inches, Traditional design",
-    isTrending: true,
-  },
-];
+const INITIAL_PRODUCTS: TrendingProduct[] = [];
 
 export default function TrendingPage() {
   const {
     products,
+    setProductsList,
     showDrawer,
     drawerMode,
     selectedProduct,
@@ -119,6 +26,7 @@ export default function TrendingPage() {
     closeDrawer,
     removeFromTrending,
   } = useTrendingManagement(INITIAL_PRODUCTS);
+  const [categoryNameMap, setCategoryNameMap] = React.useState<Record<string, string>>({});
 
   const {
     currentImageIndex,
@@ -134,6 +42,42 @@ export default function TrendingPage() {
       resetImageIndex();
     }
   }, [showDrawer, resetImageIndex]);
+
+  // Load trending products from API
+  useEffect(() => {
+    const load = async () => {
+      const [items, categories] = await Promise.all([
+        productService.getTrendingProducts(),
+        getCategoriesApi().catch(() => []),
+      ]);
+      const cmap: Record<string, string> = {};
+      const categoriesArr: any[] = Array.isArray(categories)
+        ? (categories as any[])
+        : ((categories as any)?.data ?? (categories as any)?.categories ?? []);
+      (categoriesArr || []).forEach((c: any) => {
+        if (c && c.id) cmap[c.id] = c.name || c.id;
+      });
+      setCategoryNameMap(cmap);
+      // map to TrendingProduct shape expected by this tab
+      const mapped: TrendingProduct[] = items.map((p) => ({
+        id: p.id,
+        p_Name: p.p_Name,
+        p_thumbnail: p.thumbnail,
+        p_images: p.p_images || [],
+        category_id: p.category_id,
+        artist_name: p.artist_id, // no name available in product model; using id
+        price: p.price,
+        discount: p.discount,
+        review_id: p.review_id,
+        sell_count: p.sell_count,
+        description: p.description,
+        specification: p.specification,
+        isTrending: true,
+      }));
+      setProductsList(mapped);
+    };
+    load();
+  }, [setProductsList]);
 
   const handleNextImage = () => {
     const allImages = getAllImages(selectedProduct);
@@ -156,6 +100,7 @@ export default function TrendingPage() {
           onToggleDropdown={setShowDropdown}
           onOpenDrawer={openDrawer}
           onRemoveFromTrending={removeFromTrending}
+          categoryNameMap={categoryNameMap}
         />
       </div>
 

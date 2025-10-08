@@ -16,6 +16,8 @@ import { getArtistsApi, getCategoriesApi } from "@/app/lib/api";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
   const [artistNameMap, setArtistNameMap] = useState<Record<string, string>>({});
   const [categoryNameMap, setCategoryNameMap] = useState<Record<string, string>>({});
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -53,28 +55,44 @@ export default function ProductsPage() {
     prevImage,
   } = useImageUpload();
 
-  // ✅ Fetch products from API
+  // ✅ Fetch products from API (paginated)
   useEffect(() => {
     const fetchProducts = async () => {
       setIsLoading(true);
       setError("");
       try {
-        const [apiProducts, artists, categories] = await Promise.all([
-          productService.getAllProducts(),
+        const [pageResp, artists, categories] = await Promise.all([
+          productService.getAllProductsPaginated(page, 12),
           getArtistsApi().catch(() => []),
           getCategoriesApi().catch(() => []),
         ]);
-        const map: Record<string, string> = {};
-        (artists as any[]).forEach((a) => {
-          if (a && a.id) map[a.id] = a.artist_Name || a.name || a.id;
+        setProducts(pageResp.items);
+        setTotalPages(pageResp.totalPages || 1);
+        const artistMap: Record<string, string> = {};
+        const artistsArr: any[] = Array.isArray(artists)
+          ? (artists as any[])
+          : ((artists as any)?.data ?? (artists as any)?.artists ?? []);
+        (artistsArr || []).forEach((a) => {
+          if (!a) return;
+          const key = a.id || a.artist_id || a._id;
+          if (!key) return;
+          const label = a.artist_Name || a.name || a.artist_name || String(key);
+          artistMap[key] = label;
         });
-        setArtistNameMap(map);
-        const cmap: Record<string, string> = {};
-        (categories as any[]).forEach((c) => {
-          if (c && c.id) cmap[c.id] = c.name || c.id;
+        setArtistNameMap(artistMap);
+
+        const categoryMap: Record<string, string> = {};
+        const categoriesArr: any[] = Array.isArray(categories)
+          ? (categories as any[])
+          : ((categories as any)?.data ?? (categories as any)?.categories ?? []);
+        (categoriesArr || []).forEach((c) => {
+          if (!c) return;
+          const key = c.id || c.category_id || c._id;
+          if (!key) return;
+          const label = c.name || c.category_name || String(key);
+          categoryMap[key] = label;
         });
-        setCategoryNameMap(cmap);
-        setProducts(apiProducts);
+        setCategoryNameMap(categoryMap);
       } catch (err) {
         console.error("Failed to load products:", err);
         setError("Failed to load products. Please try again later.");
@@ -83,7 +101,7 @@ export default function ProductsPage() {
       }
     };
     fetchProducts();
-  }, []);
+  }, [page]);
 
   // ✅ Reset images when drawer opens
   useEffect(() => {
@@ -236,6 +254,22 @@ export default function ProductsPage() {
     }
   };
 
+  // ✅ Edit product (fetch full details first)
+  const handleEditProduct = async (id: string) => {
+    try {
+      const productDetails = await productService.getProductDetails(id);
+
+      if (productDetails) {
+        openDrawer("edit", productDetails);
+      } else {
+        alert("❌ Failed to fetch product details for editing.");
+      }
+    } catch (error) {
+      console.error("Error fetching product details for editing:", error);
+      alert("❌ An error occurred while fetching product details for editing.");
+    }
+  };
+
   // ✅ Toggle trending
   const handleToggleTrending = async (id: string) => {
     const product = products.find((p) => p.id === id);
@@ -336,13 +370,40 @@ export default function ProductsPage() {
             products={filteredProducts}
             showDropdown={showDropdown}
             onToggleDropdown={setShowDropdown}
-            onOpenDrawer={openDrawer}
+            onOpenDrawer={(mode, product) => {
+              if (mode === "edit") {
+                handleEditProduct(product.id);
+              } else {
+                openDrawer(mode, product);
+              }
+            }}
             onToggleTrending={handleToggleTrending}
             onDelete={handleDeleteProduct}
             onViewDetails={handleProductDetails}
             artistNameMap={artistNameMap}
+            categoryNameMap={categoryNameMap}
           />
         )}
+        {/* Pagination Controls */}
+        <div className="flex items-center justify-between mt-6">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            className={`px-4 py-2 rounded-md border ${page <= 1 ? 'text-gray-400 border-gray-200 cursor-not-allowed' : 'text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+          >
+            Previous
+          </button>
+          <div className="text-sm text-gray-600">
+            Page {page} of {totalPages}
+          </div>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            className={`px-4 py-2 rounded-md border ${page >= totalPages ? 'text-gray-400 border-gray-200 cursor-not-allowed' : 'text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       <ProductDrawer

@@ -38,15 +38,29 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
     const load = async () => {
       try {
         const [cats, arts] = await Promise.all([getCategoriesApi(), getArtistsApi()]);
-        setCategories(Array.isArray(cats) ? cats : []);
-        setArtists(Array.isArray(arts) ? arts : []);
-      } catch {
+        
+        // Handle categories
+        const categoriesArr = Array.isArray(cats) ? cats : (cats?.data || []);
+        setCategories(categoriesArr);
+        
+        // Handle artists - normalize the data structure
+        const artistsArr = Array.isArray(arts) ? arts : (arts?.data || []);
+        const normalizedArtists = artistsArr.map((artist: any) => ({
+          id: artist.id || artist.artist_id || artist._id || "",
+          artist_Name: artist.artist_Name || artist.name || artist.artist_name || artist.id || "Unknown Artist"
+        }));
+        setArtists(normalizedArtists);
+        
+        console.log("Loaded artists:", normalizedArtists);
+        console.log("Current formData.artist_id:", formData.artist_id);
+      } catch (error) {
+        console.error("Error loading form data:", error);
         setCategories([]);
         setArtists([]);
       }
     };
     load();
-  }, []);
+  }, [formData.artist_id]);
   return (
     <div className="space-y-6">
       {/* Thumbnail Upload Section */}

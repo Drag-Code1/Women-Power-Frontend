@@ -43,6 +43,7 @@ export const useTrendingManagement = (initialProducts: TrendingProduct[]) => {
 
   return {
     products: trendingProducts,
+    setProductsList: (items: TrendingProduct[]) => setProducts(items),
     showDrawer,
     drawerMode,
     selectedProduct,

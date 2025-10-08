@@ -97,7 +97,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
           <select
-            value={formData.category}
+            value={categoryOptions.find(c => c.name === formData.category)?.id || ''}
             onChange={(e) => {
               const selectedId = e.target.value;
               const found = categoryOptions.find(c => c.id === selectedId);

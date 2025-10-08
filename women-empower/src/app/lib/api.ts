@@ -43,10 +43,54 @@ export const deleteCategory = async (id: string) => {
   return true;
 };
 
-export const getArtistsApi = async () => {
-  const res = await fetch('http://localhost:5000/v1/artist/', { cache: 'no-store' });
-  const body = await res.json();
-  return body.data;
+export const getArtistsApi = async (page: number = 1) => {
+  const url = `http://localhost:5000/v1/artist/?page=${encodeURIComponent(page)}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to fetch artists (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  // Maintain existing return (paginated container object)
+  return parsed?.data;
+};
+
+// Paginated Artists API
+export const getArtistsPaginated = async (
+  page: number = 1
+): Promise<{ totalArtists: number; totalPages: number; currentPage: number; data: any[] }> => {
+  const url = `http://localhost:5000/v1/artist/?page=${encodeURIComponent(page)}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to fetch artists (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  const data = parsed?.data || {};
+  return {
+    totalArtists: Number(data.totalArtists) || (Array.isArray(data.data) ? data.data.length : 0),
+    totalPages: Number(data.totalPages) || 1,
+    currentPage: Number(data.currentPage) || page,
+    data: Array.isArray(data.data) ? data.data : Array.isArray(parsed?.data) ? parsed.data : [],
+  };
 };
 
 export const getCoursesApi = async () => {

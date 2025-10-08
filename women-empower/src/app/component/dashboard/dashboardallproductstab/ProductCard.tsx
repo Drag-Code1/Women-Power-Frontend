@@ -61,7 +61,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         {product.category_id && (
           <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm text-gray-700 px-2.5 py-1 rounded-md flex items-center gap-1.5 text-xs font-medium shadow-md">
             <Tag className="w-3 h-3 text-blue-600" />
-            <span>{categoryNameMap?.[product.category_id] || product.category_id}</span>
+            <span>{categoryNameMap?.[product.category_id] || "Unknown Category"}</span>
           </div>
         )}
 

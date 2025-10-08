@@ -11,6 +11,7 @@ interface TrendingProductGridProps {
   onToggleDropdown: (id: string | null) => void;
   onOpenDrawer: (mode: TrendingDrawerMode, product: TrendingProduct) => void;
   onRemoveFromTrending: (id: string) => void;
+  categoryNameMap?: Record<string, string>;
 }
 
 export const TrendingProductGrid: React.FC<TrendingProductGridProps> = ({
@@ -19,6 +20,7 @@ export const TrendingProductGrid: React.FC<TrendingProductGridProps> = ({
   onToggleDropdown,
   onOpenDrawer,
   onRemoveFromTrending,
+  categoryNameMap,
 }) => {
   if (products.length === 0) {
     return (
@@ -45,6 +47,7 @@ export const TrendingProductGrid: React.FC<TrendingProductGridProps> = ({
             onToggleDropdown={onToggleDropdown}
             onOpenDrawer={onOpenDrawer}
             onRemoveFromTrending={onRemoveFromTrending}
+            categoryNameMap={categoryNameMap}
           />
         ))}
       </div>

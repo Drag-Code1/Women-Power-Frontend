@@ -14,6 +14,7 @@ interface ProductGridProps {
   onDelete: (id: string) => void;
   onViewDetails: (id: string) => void;
   artistNameMap?: Record<string, string>;
+  categoryNameMap?: Record<string, string>;
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({
@@ -25,6 +26,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onDelete,
   onViewDetails,
   artistNameMap,
+  categoryNameMap,
 }) => {
   if (products.length === 0) {
     return (
@@ -54,6 +56,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             onDelete={onDelete}
             onViewDetails={onViewDetails}
             artistNameMap={artistNameMap}
+          categoryNameMap={categoryNameMap}
           />
         ))}
       </div>
