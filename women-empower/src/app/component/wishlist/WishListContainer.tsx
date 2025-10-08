@@ -1,12 +1,23 @@
 "use client";
 import { Product } from "@/app/data/products";
-import { useAppSelector } from "@/state-management/hooks";
+import { useAppDispatch, useAppSelector } from "@/state-management/hooks";
 import ProductCardNew from "../cart/ProductCardNew";
 import { ContinueShopping } from "../ui/button/COntinewSHopping";
 import { Heart } from "lucide-react";
+import { fillWishlist } from "@/state-management/slices/wishlistSlice";
+interface wl{
 
-export const WishListContainer=()=>{
-
+   id: string,
+            user_id: string,
+            product_id:string
+}
+interface WlProp{
+  wishlistData:wl[]
+}
+export const WishListContainer:React.FC<WlProp>=({wishlistData})=>{
+   const dispatch = useAppDispatch();
+console.log(wishlistData,'---------------')
+  dispatch(fillWishlist(wishlistData));
       const wishListItems = useAppSelector(state => (state.wishlist as { items: Product[] }).items);
 
     return(
@@ -27,13 +38,13 @@ export const WishListContainer=()=>{
                 ) : (
                   // Wishlist Items Grid - Fixed to show exactly 5 cards per row on larger screens
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-none">
-                    {wishListItems.map((item) => {
+                    {/* {wishlistData.length>0 && wishListItems.map((item) => {
                     
         
                       return (
                                              <ProductCardNew product={item}/>
                       );
-                    })}
+                    })} */}
                   </div>
                 )}
               </div>

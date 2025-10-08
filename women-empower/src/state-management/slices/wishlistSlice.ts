@@ -1,9 +1,14 @@
 import { Product } from '@/app/data/products';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-
+interface tempWL{
+  id:string,
+            user_id:string,
+            product_id:string,
+}
 interface WishlistState {
-  items: Product[];
+  // items: Product[];
+  items:tempWL[];
 }
 
 const initialState: WishlistState = {

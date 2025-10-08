@@ -1,5 +1,15 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+// export interface CheckoutItem {
+//    id:number
+//     title: string
+//     subtitle:string
+//     price: number
+//     originalPrice: number
+//     rating: number
+//     quantity: number
+//     reviews: number
+// }
 export interface CheckoutItem {
    id:number
     title: string
@@ -10,6 +20,7 @@ export interface CheckoutItem {
     quantity: number
     reviews: number
 }
+
 
 interface CheckoutState {
   items: CheckoutItem[];

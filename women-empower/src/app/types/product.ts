@@ -14,3 +14,21 @@ export interface Product {
   price:number;
   isPopular: boolean;
 }
+
+
+export interface newProduct {
+  id: number;
+  p_Name:string;
+  // title: string;
+  // description: string;
+  // netPrice: number;      // Original MRP
+  // offerPrice?: number;   // Discounted price (optional)
+  // currency: string;
+  thumbnail: string;
+  category_id: string;
+  discount: number;
+  // rating: number;
+  isTrending: boolean;
+  price:number;
+  // isPopular: boolean;
+}

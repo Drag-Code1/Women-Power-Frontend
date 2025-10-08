@@ -19,19 +19,35 @@ import { ProductContainer } from "../component/arts/ProductsContainer";
 import { ViewMode } from "../component/arts/ViewMode";
 import { MobileView } from "../component/arts/MobileView";
 import { MobileViewFilter } from "../component/arts/MobileViewFilter";
-async function getArts(searched:string) {
+import { fetchFilteredArts } from "../lib/api";
+async function getArtsBysearch(searched:string) {
   console.log(searched);
   
   // const query = searched ? `?search=${encodeURIComponent(searched)}` : "";
   const query = searched ? `?search=${encodeURIComponent(searched)}` : "";
-  const res = await fetch(`http://localhost:7000/v1/product/${query}`, {
+  const res = await fetch(`http://localhost:7000/v1/product/search/${searched}`, {
     cache: "no-store", // better for live searching
   });
 
   return res.json()
 }
-const ProductFilterApp = async({ searchParams }: { searchParams: { search?: string ,'category':string,'min-pr'?: string ,'max-pr':string} }) => {
+
+
+
+async function getArts(pageNo:string) {
+  console.log(pageNo,`http://localhost:7000/v1/product/?page=${pageNo}`);
+  
+  // const query = searched ? `?search=${encodeURIComponent(searched)}` : "";
+  const query = pageNo ? `?page=${encodeURIComponent(pageNo)}` : "";
+  const res = await fetch(`http://localhost:7000/v1/product/?page=${pageNo}`, {
+    cache: "no-store", // better for live searching
+  });
+// http://localhost:7000/v1/product/search/
+  return res.json()
+}
+const ProductFilterApp = async({ searchParams }: { searchParams: { search?: string ,'category':string,'min-pr'?: string ,'max-pr':string,'pageNo':string} }) => {
   const searched = searchParams.search;
+    const pageNo = searchParams.pageNo ||'1';
       const category = searchParams['category'];
  const min = searchParams['min-pr'];
         const max = searchParams['max-pr'];
@@ -39,16 +55,22 @@ const categoryValues=category ? Array.isArray(category)
       ? category
       : [category]
     : [];
-      console.log("✅ Normalized Category Value:", categoryValues);
+      // console.log("✅ Normalized Category Value:", categoryValues);
 let arts ={data:[]};
        if (categoryValues.length > 0 || min || max) {
-    // arts = await fetchFilteredArts(categoryValues, min, max);
+    arts = await fetchFilteredArts(categoryValues, min, max);
+     console.log(arts);
       //  arts = await fetchArtists();
   }
-        else{
-          console.log("No Category Filter:");
-      arts = await getArts(searched);
+        else if(searched){
+        
+      arts = await getArtsBysearch(searched);
   console.log(arts);
+        }
+        else{
+            console.log("No Category Filter:");
+ arts = await getArts(pageNo);
+   console.log("No Category Filter:",arts);
         }
 
   return (
@@ -61,7 +83,7 @@ let arts ={data:[]};
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <h1 className="text-2xl font-bold text-gray-900">
               New Items 
-              ({arts.data.length})
+              {/* ({arts && arts?.data?.data.length}) */}
             </h1>
 
             <div className="flex flex-wrap items-center gap-3">
@@ -100,8 +122,12 @@ let arts ={data:[]};
      
 <MobileViewFilter />
           {/* Main Content Area */}
-      
-          <ProductContainer currentProducts={arts.data} totalPages={2} viewMode={'grid'} />
+      {arts && Array.isArray(arts.data) && arts.data.length==0   ?  
+        <h3>No search results</h3>
+              : (
+ <ProductContainer currentProducts={arts.data.data || arts.data} totalPages={arts.data?.totalPages||0} currentPage={arts.data?.currentPage ||1} viewMode={'grid'} />
+    
+)}
         </div>
       </div>
 

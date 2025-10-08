@@ -8,7 +8,7 @@ currentProducts:Product[]
 totalPages:number;
 viewMode:string;
 }
-export const ProductContainer:React.FC<productContainerProps>=({currentProducts,totalPages,viewMode})=>{
+export const ProductContainer:React.FC<productContainerProps>=({currentProducts,totalPages,currentPage,viewMode})=>{
     return(
 
 
@@ -53,7 +53,7 @@ export const ProductContainer:React.FC<productContainerProps>=({currentProducts,
                   </div>
 
                   {/* Enhanced Pagination */}
-                  {totalPages > 1 && (
+                  {totalPages >= 1 && (
                     // <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
                     //   {/* Page info */}
                     //   <div className="text-sm text-gray-600">
@@ -110,7 +110,7 @@ export const ProductContainer:React.FC<productContainerProps>=({currentProducts,
                   
                   // to be uncommented
                     // <Pagination filteredProducts={filteredProducts}  currentPage={currentPage} />
-<h1>pagination</h1>
+  <Pagination currentPage={currentPage} totalPages={totalPages} />
 
                     //
                   )}

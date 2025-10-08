@@ -5,6 +5,7 @@ import { sendOtp } from "@/app/services/sendOTPService";
 import { useFormState } from "react-dom";
 import { validateOTP } from "@/app/lib/api";
 import { useRouter } from "next/navigation";
+import { SignupForm } from "./SignUpForm";
 interface User {
   id: string;
   name: string;
@@ -40,6 +41,7 @@ export const LoginForm:React.FC=()=>{
   //   joinedDate: 'January 2023'
   // });
   const router=useRouter();
+  const[showSignUp,setShowSignUp]=useState(false)
 const[invalidOTP,setInvalidOTP]=useState(false);
     const [state, formAction] = useFormState(sendOtp, { success: false, message: "" });
   const [emailAddress, setEmailAddress] = useState("");
@@ -105,7 +107,8 @@ const otpJoined=Number(otp.join(',').replaceAll(',',''));
     }
   };
     return(
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <>
+      {!showSignUp &&     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
             <div className="max-w-md w-full">
               {!showOtpVerification ? (
                 // <div className="bg-white rounded-2xl shadow-xl p-10">
@@ -206,6 +209,11 @@ const otpJoined=Number(otp.join(',').replaceAll(',',''));
             By continuing, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>
+          <div className="text-center">
+          <p className="text-xs text-gray-500">
+          Dont have account?<span className="text-blue-600  cursor-pointer" onClick={()=>setShowSignUp(true)}>sign up</span> 
+          </p>
+        </div>
       </form>
     </div>
               ) : (
@@ -259,5 +267,8 @@ const otpJoined=Number(otp.join(',').replaceAll(',',''));
                 </div>
               )}
             </div>
-          </div>
+          </div>}
+        {showSignUp &&  <SignupForm setShowSignUp={setShowSignUp} /> } 
+      </>
+ 
 )}

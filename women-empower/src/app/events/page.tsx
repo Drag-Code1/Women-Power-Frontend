@@ -7,6 +7,7 @@ import FeaturedEventsSlider from "../component/product/FeaturedEventsSlider";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchEvents, fetchFeaturedEvents } from "../lib/api";
 import { Event }  from "../data/eventsData";
+import { EventContainer } from "../component/events/EventContainer";
 // ✅ Memoize EventCard so it doesn’t re-render unnecessarily
 const MemoizedEventCard = React.memo(EventCard);
 
@@ -20,36 +21,6 @@ const EventsSection = async({ searchParams }: { searchParams: { 'event-category'
   const[featuredEventData,eventData] = await Promise.allSettled([featuredEvents,events]);
 const featuredEventsArr = featuredEventData.status === "fulfilled" ? featuredEventData.value : [];
 let eventsArr = eventData.status === "fulfilled" ? eventData.value : [];
-
-   const eventCategory = searchParams['event-category'] || 'All';
-  const eventType = searchParams['event-type'] || 'All';
-  const eventStatus = searchParams['event-status'] || 'All';
-// console.log(eventCategory,eventType,eventStatus,"searchParams");
-
-function filterEvents(eventCategory:string,eventType:string,eventStatus:string,events:Event[]){
-return events=events.filter(event=>{if(eventCategory==="All"){
- return event
-
- }else{
-
- return event.category===eventCategory
- }}).filter(event=>{if(eventType==="All"){
- return event
- }  
-  else{
-  return  event.type===eventType
-  }
-}).filter(event=>{if(eventStatus==="All"){
- return event
- }
-  else{
- return   event.status===eventStatus
-  }
-})
- 
-}
-
-  eventsArr=filterEvents(eventCategory,eventType,eventStatus,eventsArr);
 
 
 
@@ -81,7 +52,7 @@ return events=events.filter(event=>{if(eventCategory==="All"){
           
           }
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {
               eventData.status === "fulfilled" &&  
               eventsArr.map((event:Event) => (
@@ -93,11 +64,14 @@ return events=events.filter(event=>{if(eventCategory==="All"){
                   />
                 </div>
               ))}
-            </div>
+            </div> */}
           </div>
-
+           {
+              eventData.status === "fulfilled" &&  
+<EventContainer eventArr={eventsArr} />
+}
           {/* ✅ Pagination */}
-        <h3>Pagination goes here</h3>
+        {/* <h3>Pagination goes here</h3> */}
         </div>
       </section>
 

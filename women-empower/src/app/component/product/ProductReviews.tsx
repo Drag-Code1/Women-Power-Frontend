@@ -17,7 +17,7 @@ export interface ProductReview {
 async function getProductsReviews(productID: string) {
   try {
     const res = await fetch(`http://localhost:7000/v1/product-review/${productID}`, {
-      cache: "force-cache",
+      cache:"no-cache",
     });
 
     if (!res.ok) {
@@ -292,7 +292,7 @@ const reviewData=[
             </div>
           )} */}
 {/* form here */}
-<ReviewForm submitReview={submitReviewAction} />
+<ReviewForm  productID='10c451d5-1134-47b4-81a4-832d3b73d715' userID={'a55a6087-3c15-415f-a4c3-f1d1d7825846'} />
 
           {/* Filters and Sort Section */}
           <div className="px-6 sm:px-8 py-4 bg-white border-b border-gray-200">

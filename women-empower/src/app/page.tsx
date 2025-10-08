@@ -9,7 +9,7 @@ import CraftGiftHero from "./component/product/CraftGiftHero";
 import TopRatedArtists from "./component/product/TopRatedArtists";
 import PopularCourses from "./component/product/PopularCourses";
 import ProductCardNew from "./component/cart/ProductCardNew";
-import { Product } from "@/app/types/product"; 
+import { newProduct, Product } from "@/app/types/product"; 
 
 import { Category } from "@/app/types/category";
 
@@ -25,15 +25,15 @@ async function getCategories() {
   return res.json()
 }
 async function getProducts() {
-  const res = await fetch(`http://localhost:5000/api/best-products`, {
-    cache: "force-cache",
+  const res = await fetch(`http://localhost:7000/v1/product/?page=1`, {
+    // cache: "no-",
   })
   return res.json()
 }
  
 async function getTrendingProducts() {
-  const res = await fetch(`http://localhost:5000/api/trending-products`, {
-    cache: "force-cache",
+  const res = await fetch(`http://localhost:7000/v1/product/?page=1`, {
+    // cache: "force-cache",
   })
   return res.json()
 }
@@ -75,7 +75,7 @@ export default async function Home() {
  
   // Wait for the promises to resolve
   const [categories,products, trendingProducts,TopArtists] = await Promise.all([categoriesData,productsData, trendingProductData,TopArtistsData])
-//  console.log(products,comments);
+ console.log(products, trendingProducts,'sssssssssssssssss');
   return (
     <div>
       <ImageSlider />
@@ -91,7 +91,7 @@ export default async function Home() {
       </TopCategories>
 <ProductsGrid>
   {
-    products.map((product:Product)=>(
+    products.data.data.map((product:newProduct)=>(
 <ProductCardNew product={product} />
     )
     )
@@ -116,7 +116,7 @@ export default async function Home() {
       <TrandingProducts >
 
   {
-    trendingProducts.map((product:Product)=>(
+    trendingProducts.data.data.map((product:newProduct)=>(
 <ProductCardNew product={product} />
     )
     )

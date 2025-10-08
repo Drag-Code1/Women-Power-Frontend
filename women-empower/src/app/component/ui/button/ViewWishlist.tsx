@@ -1,6 +1,6 @@
 "use client";
 import { Product } from "@/app/data/products";
-import { fetchWishListItems } from "@/app/lib/api";
+import { fetchWishlist, fetchWishListItems } from "@/app/lib/api";
 import { useAppDispatch, useAppSelector } from "@/state-management/hooks";
 import { fillWishlist } from "@/state-management/slices/wishlistSlice";
 import { FavoriteBorder } from "@mui/icons-material";
@@ -11,21 +11,23 @@ import React, { useEffect } from "react";
 
 export const ViewWishlist = () => {
     
-     const selector = useAppSelector(state => (state.wishlist as { items: Product[] }).items);
-     const dispatch = useAppDispatch();
+    //  const selector = useAppSelector(state => (state.wishlist as { items: Product[] }).items);
+    //  const dispatch = useAppDispatch();
 
-     useEffect(() => {
-       // This will run once when the component mounts
-       async function fetchWishlist() {
+    //  useEffect(() => {
+    //    // This will run once when the component mounts
+    //    async function fetchWishlist_() {
+    //      const userID='5ffda320-72dc-420f-8b30-1223f807c9aa'
+    //      const wishlistData=await fetchWishlist(userID);
+    
+    // console.log("Fetched wishlist data:", wishlistData);
+    // dispatch(fillWishlist(wishlistData.data));
+    // }
+    // fetchWishlist_();
+    //    console.log("Wishlist items:", selector);
        
-    const wishlistData=await fetchWishListItems();
-    console.log("Fetched wishlist data:", wishlistData);
-    dispatch(fillWishlist(wishlistData));
-    }
-    fetchWishlist();
-       console.log("Wishlist items:", selector);
-     }
-        , []);
+    //  }
+    //     , []);
 
     //  const router = useRouter();    
 
@@ -42,7 +44,7 @@ export const ViewWishlist = () => {
                   <FavoriteBorder className="w-5 h-5" />
                 </button>
                 <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                {selector.length}
+                {/* {selector.length} */}
                 </span>
 
                  </Link>

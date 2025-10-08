@@ -42,8 +42,8 @@ const url=new URLSearchParams(params.toString());
     
     console.log("editedUser",editedUser)
     const data =await updateUser(user_.id,editedUser);
-
-    setUser(data);
+console.log(data,"updated user")
+    setEditedUser(data.data);
     setIsEditing(false);
   };
    const handleCancelEdit = () => {
@@ -51,9 +51,9 @@ const url=new URLSearchParams(params.toString());
     setEditedUser(user);
     setIsEditing(false);
   };
-
+console.log(  params.get('active-tab'))
     return(
-    params.get('active-tab')=='profile' &&
+    params.get('active-tab')=='profile'  &&
     <div>
                       <div className="flex items-center justify-between mb-6">
                         <h2 className="text-2xl font-bold text-gray-900">Personal Information</h2>
@@ -96,7 +96,7 @@ const url=new URLSearchParams(params.toString());
                               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                           ) : (
-                            <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.firstName}</div>
+                            <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{editedUser.firstName}</div>
                           )}
                         </div>
     <div>
@@ -109,7 +109,7 @@ const url=new URLSearchParams(params.toString());
                               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                           ) : (
-                            <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.lastName}</div>
+                            <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{editedUser.lastName}</div>
                           )}
                         </div>
                         <div>
@@ -122,13 +122,13 @@ const url=new URLSearchParams(params.toString());
                               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                           ) : (
-                            <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.email}</div>
+                            <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{editedUser.email}</div>
                           )}
                         </div>
     
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">mobile Number</label>
-                          <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.mobileNo}</div>
+                          <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{editedUser.mobileNo}</div>
                         </div>
     
                         <div>

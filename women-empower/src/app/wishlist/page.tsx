@@ -2,6 +2,7 @@
 import { RemoveAllWishlistItem } from "../component/ui/button/RemoveAllWishlistItem";
 import { WishlistTitle } from "../component/wishlist/WishlistTitle";
 import { WishListContainer } from "../component/wishlist/WishListContainer";
+import { fetchWishlist } from "../lib/api";
 
 interface WishListItem {
   id: string;
@@ -22,8 +23,10 @@ interface WishListProps {
   className?: string;
 }
 
-const WishList: React.FC<WishListProps> = ({ className = "" }) => {
-  
+const WishList: React.FC<WishListProps> = async({ className = "" }) => {
+  const userID='5ffda320-72dc-420f-8b30-1223f807c9aa'
+  // const wishlistData=await fetchWishlist(userID);
+
       
 
   return (
@@ -44,7 +47,7 @@ const WishList: React.FC<WishListProps> = ({ className = "" }) => {
       
 
     
-     <WishListContainer /> 
+     {/* <WishListContainer wishlistData={wishlistData.data}/>  */}
     </div>
     </div>
   );

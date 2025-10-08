@@ -1,5 +1,5 @@
 "use client"
-import { addAddress, getAddress } from "@/app/lib/api";
+import { addAddress, deleteAddress, getAddress, updateAddress } from "@/app/lib/api";
 import { Add, Cancel, Delete, Edit, Home, LocationOn, Work } from "@mui/icons-material";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -91,23 +91,37 @@ fetchAddress()
     setShowAddAddress(true);
   };
 
-    const handleDeleteAddress = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this address?')) {
-      setAddresses(addresses.filter(addr => addr.id !== id));
-    }
-  };
-    const setDefaultAddress = (id: string) => {
-    setAddresses(addresses.map(addr => ({
-      ...addr,
-      isDefault: addr.id === id
-    })));
-  };
-  const handleUpdateAddress = () => {
+    const handleDeleteAddress = async(id: string) => {
+
+   const addressData=await  deleteAddress(id);
+      // http://localhost:7000/v1/address/2d085ce1-514c-43be-ac2b-07303d0ebaae
+  //   if (window.confirm('Are you sure you want to delete this address?')) {
+  //     setAddresses(addresses.filter(addr => addr.id !== id));
+  //   }
+  // };
+  //   const setDefaultAddress = (id: string) => {
+  //   setAddresses(addresses.map(addr => ({
+  //     ...addr,
+  //     isDefault: addr.id === id
+  //   })));
+  }
+  const handleUpdateAddress = async() => {
     // if (editingAddress && newAddress.name && newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.phone) {
     //   setAddresses(addresses.map(addr => 
     //     addr.id === editingAddress.id ? { ...newAddress, id: editingAddress.id } : addr
     //   ));
     // }
+// newAddress
+  //  const addressData=await  addAddress('a55a6087-3c15-415f-a4c3-f1d1d7825846',newAddress);
+  console.log("addressData",newAddress)
+
+const data=await updateAddress(newAddress)
+console.log(data)
+
+
+    setShowAddAddress(false);
+       setEditingAddress(null);
+  
 }
   const handleAddAddress = async() => {
        console.log(newAddress,"new-address")

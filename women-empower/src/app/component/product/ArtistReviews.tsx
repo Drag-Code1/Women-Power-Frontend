@@ -1,13 +1,14 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Star, ArrowUpDown, Filter, Music, Palette, Camera } from 'lucide-react';
+import { getArtistReview } from '@/app/lib/api';
 
 interface Review {
   id: number;
   rating: number;
   title: string;
-  description: string;
-  timeAgo: string;
+  rating_description: string;
+  date: string;
   verified?: boolean;
   reviewerName?: string;
 }
@@ -21,73 +22,84 @@ const ArtistReviews: React.FC = () => {
   const [newReviewDescription, setNewReviewDescription] = useState('');
   const [reviewerName, setReviewerName] = useState('');
   const [displayCount, setDisplayCount] = useState(4);
+  const artistID='0667079c-90a9-4e17-a426-bddb8430672c'
+  
+  const userID= "a55a6087-3c15-415f-a4c3-f1d1d7825846"
+    const [reviews, setReviews] = useState<Review[]>([
+   
+  ]);
+  useEffect(() => {
+    fetchReviews();
+  }, [artistID]);
+
+  const fetchReviews = async () => {
+    const data = await getArtistReview(artistID);
+    if (data && data.data) setReviews(data.data);
+  };
 
   // Sample reviews data - using state to allow adding new reviews
-  const [reviews, setReviews] = useState<Review[]>([
-    {
-      id: 1,
-      rating: 5,
-      title: "Absolutely mesmerizing performance!",
-      description: "I attended their concert last week and was completely blown away. The artist's stage presence is incredible and their vocal range is phenomenal. Every song was performed with such passion and emotion. Definitely one of the best live performances I've ever witnessed.",
-      timeAgo: "2 days ago",
-      verified: true,
-      reviewerName: "Sarah M."
-    },
-    {
-      id: 2,
-      rating: 5,
-      title: "Pure artistic genius",
-      description: "This artist has a unique style that sets them apart from everyone else in the industry. Their latest work showcases incredible creativity and technical skill. I've been following their career for years and they continue to evolve and surprise me.",
-      timeAgo: "5 days ago",
-      verified: true,
-      reviewerName: "Michael R."
-    },
-    {
-      id: 3,
-      rating: 4,
-      title: "Great talent with room to grow",
-      description: "Really impressed with their artistic vision and execution. The performance was solid and engaging, though there were a few moments that could have been smoother. Overall, a very talented artist with huge potential.",
-      timeAgo: "1 week ago",
-      reviewerName: "Emma L."
-    },
-    {
-      id: 4,
-      rating: 5,
-      title: "Exceeded all expectations",
-      description: "I went in with high expectations based on all the positive reviews, and somehow they still managed to exceed them. The attention to detail, the emotional depth, and the technical mastery - everything was perfect. Can't wait to see what they create next.",
-      timeAgo: "2 weeks ago",
-      verified: true,
-      reviewerName: "David K."
-    }
-  ]);
+
 
   // Function to handle adding new review
-  const handleSubmitReview = () => {
-    if (newReviewRating > 0 && newReviewTitle.trim() && newReviewDescription.trim() && reviewerName.trim()) {
-      const newReview: Review = {
-        id: Math.max(...reviews.map(r => r.id)) + 1,
-        rating: newReviewRating,
-        title: newReviewTitle.trim(),
-        description: newReviewDescription.trim(),
-        timeAgo: "Just now",
-        verified: true,
-        reviewerName: reviewerName.trim()
-      };
+  // const handleSubmitReview = () => {
+  //   if (newReviewRating > 0 && newReviewTitle.trim() && newReviewDescription.trim() && reviewerName.trim()) {
+  //     const newReview: Review = {
+  //       id: Math.max(...reviews.map(r => r.id)) + 1,
+  //       rating: newReviewRating,
+  //       title: newReviewTitle.trim(),
+  //       description: newReviewDescription.trim(),
+  //       timeAgo: "Just now",
+  //       verified: true,
+  //       reviewerName: reviewerName.trim()
+  //     };
       
-      // Add new review to the beginning of the array
-      setReviews([newReview, ...reviews]);
+  //     // Add new review to the beginning of the array
+  //     setReviews([newReview, ...reviews]);
       
-      // Reset form
-      setNewReviewRating(0);
-      setNewReviewTitle('');
-      setNewReviewDescription('');
-      setReviewerName('');
-      setShowWriteReview(false);
+  //     // Reset form
+  //     setNewReviewRating(0);
+  //     setNewReviewTitle('');
+  //     setNewReviewDescription('');
+  //     setReviewerName('');
+  //     setShowWriteReview(false);
       
-      // Reset display count to show all reviews including the new one
-      setDisplayCount(4);
-    }
+  //     // Reset display count to show all reviews including the new one
+  //     setDisplayCount(4);
+  //   }
+  // };
+  const handleSubmitReview = async () => {
+  if (!newReviewRating || !newReviewDescription || !artistID || !userID) {
+    alert("Please fill all fields and select a rating");
+    return;
+  }
+
+  const body = {
+    artist_id: artistID, // pass as prop
+    user_id: userID, // pass as prop
+    rating: newReviewRating,
+    rating_description: newReviewDescription,
   };
+
+  try {
+    const response = await fetch("http://localhost:7000/v1/artist-review", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (response.ok) {
+      console.log("✅ Review submitted successfully");
+      setShowWriteReview(false);
+    } else {
+      console.error("❌ Failed to submit review", response.status);
+    }
+  } catch (error) {
+    console.error("❌ Error submitting review", error);
+  }
+};
+
 
   // Filter reviews based on selected filter
   const filteredReviews = reviews.filter(review => {
@@ -219,81 +231,88 @@ const ArtistReviews: React.FC = () => {
 
             {/* Write Review Form */}
             {showWriteReview && (
-              <div className="px-6 sm:px-8 py-6 bg-blue-50 border-b border-gray-200">
-                <div className="max-w-2xl">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Camera className="w-6 h-6 text-gray-600" />
-                    <h3 className="text-xl font-semibold text-gray-900">Write Your Artist Review</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Rating
-                      </label>
-                      <div className="flex items-center gap-2">
-                        {renderStars(newReviewRating, 'medium', true)}
-                        <span className="text-sm text-gray-600 ml-2">
-                          {newReviewRating > 0 ? `${newReviewRating} out of 5` : 'Click to rate'}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Name
-                      </label>
-                      <input 
-                        type="text" 
-                        value={reviewerName}
-                        onChange={(e) => setReviewerName(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Enter your name"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Review Title
-                      </label>
-                      <input 
-                        type="text" 
-                        value={newReviewTitle}
-                        onChange={(e) => setNewReviewTitle(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Summarize your experience with this artist"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Review
-                      </label>
-                      <textarea 
-                        rows={4}
-                        value={newReviewDescription}
-                        onChange={(e) => setNewReviewDescription(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                        placeholder="Share your thoughts about this artist's work, performance, or creativity. What impressed you most?"
-                      />
-                    </div>
-                    
-                    <div className="flex gap-3 pt-2">
-                      <button 
-                        onClick={handleSubmitReview}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
-                      >
-                        Submit Review
-                      </button>
-                      <button 
-                        onClick={() => setShowWriteReview(false)}
-                        className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-medium transition-colors"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+             <div className="px-6 sm:px-8 py-6 bg-blue-50 border-b border-gray-200">
+  <div className="max-w-2xl">
+    <div className="flex items-center gap-3 mb-4">
+      <Camera className="w-6 h-6 text-gray-600" />
+      <h3 className="text-xl font-semibold text-gray-900">Write Your Artist Review</h3>
+    </div>
+    <div className="space-y-4">
+      
+      {/* Rating */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Your Rating
+        </label>
+        <div className="flex items-center gap-2">
+          {renderStars(newReviewRating, "medium", true)}
+          <span className="text-sm text-gray-600 ml-2">
+            {newReviewRating > 0 ? `${newReviewRating} out of 5` : "Click to rate"}
+          </span>
+        </div>
+      </div>
+
+      {/* Your Name */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Your Name
+        </label>
+        <input
+          type="text"
+          value={reviewerName}
+          onChange={(e) => setReviewerName(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Enter your name"
+        />
+      </div>
+
+      {/* Review Title */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Review Title
+        </label>
+        <input
+          type="text"
+          value={newReviewTitle}
+          onChange={(e) => setNewReviewTitle(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Summarize your experience with this artist"
+        />
+      </div>
+
+      {/* Review Description */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Your Review
+        </label>
+        <textarea
+          rows={4}
+          value={newReviewDescription}
+          onChange={(e) => setNewReviewDescription(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+          placeholder="Share your thoughts about this artist's work, performance, or creativity."
+        />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex gap-3 pt-2">
+        <button
+          onClick={handleSubmitReview}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
+        >
+          Submit Review
+        </button>
+        <button
+          onClick={() => setShowWriteReview(false)}
+          className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-medium transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
             )}
 
             {/* Filters and Sort Section */}
@@ -344,7 +363,7 @@ const ArtistReviews: React.FC = () => {
             <div className="px-6 sm:px-8 py-6">
               {displayedReviews.length > 0 ? (
                 <div className="space-y-6">
-                  {displayedReviews.map((review, index) => (
+                  {reviews.map((review, index) => (
                     <div key={review.id} className={`${index !== displayedReviews.length - 1 ? 'border-b border-gray-200' : ''} pb-6`}>
                       <div className="flex flex-col gap-3">
                         
@@ -360,25 +379,25 @@ const ArtistReviews: React.FC = () => {
                           </div>
                           {review.reviewerName && (
                             <span className="text-sm font-medium text-gray-600">
-                              {review.reviewerName}
+                              {review.rating_description}
                             </span>
                           )}
                         </div>
 
                         {/* Review Title */}
                         <h4 className="font-semibold text-gray-900 text-lg">
-                          {review.title}
+                          {review.rating_description}
                         </h4>
 
                         {/* Review Description */}
                         <p className="text-gray-700 leading-relaxed">
-                          {review.description}
+                          {review.rating_description}
                         </p>
 
                         {/* Review Footer */}
                         <div className="flex items-center justify-between pt-2">
                           <span className="text-sm text-gray-500">
-                            {review.timeAgo}
+                            {review.date}
                           </span>
                         
                         </div>

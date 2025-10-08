@@ -11,15 +11,19 @@ import { MobileView } from "../component/arts/MobileView";
 import { ArtistMobileViewFilter } from "../component/artist/ArtistMobileViewFilter";
 import { Artist } from "../types/artist";
 import { fetchArtists, fetchFilteredArtists } from "../lib/api";
+import { Pagination } from "../component/arts/Pagination";
+import { ArtistContainer } from "../component/artist/ArtistContainer";
 
-// const fetchArtists = async () => {
-//   const res = await fetch('http://localhost:5000/api/artist', { cache: 'no-store' });
-//   const data = await res.json();
-//   return data;
-// }
+const fetchArtistsBysearch = async (searched:string) => {
+  console.log(`http://localhost:7000/v1/artist/${searched} ` );
+  const res = await fetch(`http://localhost:7000/v1/artist/${searched}`, { cache: 'no-store' });
+  const data = await res.json();
+  return data;
+}
 
-const ArtistDirectoryApp = async({ searchParams }: { searchParams: { 'artist-search'?: string ,'artist-category':string,'min'?: string ,'max':string} }) => {
-    const searched = searchParams['artist-search'];
+const ArtistDirectoryApp = async({ searchParams }: { searchParams: { 'artist-search'?: string ,'artist-category':string,'min'?: string ,'max':string,'pageNo':string} }) => {
+     const pageNo = searchParams.pageNo ||'1'; 
+  const searched = searchParams['artist-search'];
         const category = searchParams['artist-category'];
  const min = searchParams['min'];
         const max = searchParams['max'];
@@ -34,15 +38,24 @@ const ArtistDirectoryApp = async({ searchParams }: { searchParams: { 'artist-sea
   console.log("✅ Normalized Category Value:", categoryValues);
 let allArtists =[];
        if (categoryValues.length > 0 || min || max) {
+        console.log("cat Filter:");
     // allArtists = await fetchFilteredArtists(categoryValues, min, max);
-       allArtists = await fetchArtists();
+       allArtists = await fetchFilteredArtists(categoryValues, min, max);
+       console.log("allArtists Filter:",allArtists);
   }
-        else{
-          console.log("No Category Filter:");
-   allArtists = await fetchArtists();
+      else if(searched){
+        {
+          console.log("search Filter:");
+   allArtists = await fetchArtistsBysearch(searched);
+     console.log("search Filter:",allArtists);
         }
-
- 
+      }
+else {
+        
+          console.log("No Category Filter:");
+   allArtists = await fetchArtists(pageNo);
+        }
+      
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -53,7 +66,7 @@ let allArtists =[];
           {/* Header: Title + Buttons */}
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
             <h1 className="text-2xl font-bold text-gray-900">
-              Artists ({allArtists.data.length})
+              {/* Artists ({allArtists.data.length}) */}
             </h1>
 
             {/* Mobile: Filters + Sort together */}
@@ -84,43 +97,10 @@ let allArtists =[];
          
 <ArtistMobileViewFilter />
           {/* Main Content */}
-          <div className="flex-1 p-6">
-            {allArtists.data.length > 0 ? (
-              <>
-                {/* Artists Grid with fade transition */}
-                <div
-                  className={`transition-opacity duration-300`
-                  //    ${
-                  //   isTransitioning ? 'opacity-50' : 'opacity-100'
-                  // }`
-                  
-                  }
-                >
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {allArtists.data.map((artist:Artist) => (
-                      <div
-                        key={artist.id}
-                        className="animate-fadeIn"
-                        style={{
-                          // animationDelay: `${index * 100}ms`,
-                          animationFillMode: 'both'
-                        }}
-                      >
-                        <ArtistCard artist={artist} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-           
-              </>
-            ) : (
-              <ClearFilter/>  
-
-            
-
-            )}
-          </div>
-        </div>
+      {allArtists && Array.isArray(allArtists.data)  && allArtists.data.length==0  ?  
+        <h3>No search results</h3>
+              : (   <ArtistContainer allArtists={allArtists.data?.data || allArtists.data} totalPages={allArtists.data?.totalPages||0} currentPage={allArtists.data?.currentPage ||1} viewMode={'grid'}  />
+     )}   </div>
       </div>
 
      
@@ -130,3 +110,40 @@ let allArtists =[];
 };
 
 export default ArtistDirectoryApp;
+
+  // <div className="flex-1 p-6">
+  //           {allArtists.data.length > 0 ? (
+  //             <>
+  //               {/* Artists Grid with fade transition */}
+  //               <div
+  //                 className={`transition-opacity duration-300`
+  //                 //    ${
+  //                 //   isTransitioning ? 'opacity-50' : 'opacity-100'
+  //                 // }`
+                  
+  //                 }
+  //               >
+  //                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+  //                   {allArtists.data.map((artist:Artist) => (
+  //                     <div
+  //                       key={artist.id}
+  //                       className="animate-fadeIn"
+  //                       style={{
+  //                         // animationDelay: `${index * 100}ms`,
+  //                         animationFillMode: 'both'
+  //                       }}
+  //                     >
+  //                       <ArtistCard artist={artist} />
+  //                     </div>
+  //                   ))}
+  //                 </div>
+  //               </div>
+  //           <Pagination currentPage={3} totalPages={10} />
+  //             </>
+  //           ) : (
+  //             <ClearFilter/>  
+
+            
+
+  //           )}
+          // </div>

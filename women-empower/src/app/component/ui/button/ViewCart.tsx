@@ -5,10 +5,10 @@ import { ShoppingCartOutlined } from "@mui/icons-material"
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { fillCart } from "@/state-management/slices/cartSlice";
-const fetchCartItems = async () => {
+const fetchCartItems = async (cartID:string) => {
   
   try {
-    const response = await fetch('http://localhost:5000/api/cart');
+    const response = await fetch(`http://localhost:7000/v1/cart/${cartID}`);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     } 
@@ -21,11 +21,12 @@ const fetchCartItems = async () => {
   }
 };
 export const ViewCart: React.FC = () => {
+  const cartID='5ffda320-72dc-420f-8b30-1223f807c9aa'
 const dispatch = useAppDispatch();
   useEffect(() => {
     const loadCartItems = async () => {
-      const items = await fetchCartItems();
-dispatch(fillCart(items));
+      const items = await fetchCartItems(cartID);
+dispatch(fillCart(items.data));
       console.log('Cart items:', items);
     };
     loadCartItems();

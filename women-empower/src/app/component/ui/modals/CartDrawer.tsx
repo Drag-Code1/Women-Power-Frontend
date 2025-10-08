@@ -11,15 +11,20 @@ import {
 } from "@mui/icons-material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAppSelector } from "@/state-management/hooks";
+import { CartQuantityContainer } from "../../cart/CartQuantityContainer";
 
-interface CartItem {
+export interface CartItem {
   id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-  category?: string;
+  cartId:string,
+  productId:string
+quantity: number;
+  image: string|null;
+    productName: string|null;
+  price: number|null;
+  categoryName:string|null
+  discount:number|null
 }
+
 
 interface CartDrawerProps {
   isCartOpen: boolean;
@@ -49,6 +54,12 @@ const selector = useAppSelector(state => (state.cart as { items: CartItem[] }).i
 const searchParams=useSearchParams();
 const isCartOpen_=searchParams.get('cart');
 const params=new URLSearchParams(searchParams.toString());
+
+
+const updateItemQuantity=()=>{
+
+
+}
   return (
     <>
       <div
@@ -125,28 +136,28 @@ history.pushState(null, '', `?${params.toString()}`);
                           </span>
                         </div>
                         <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-500 text-black text-xs rounded-full flex items-center justify-center font-bold">
-                          {item.quantity}
+                          {item.quantity} 
                         </div>
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-gray-900 text-sm truncate">
-                          {item.name}
+                          {item.productId}
                         </h3>
                         <p className="text-xs text-gray-500 mb-1">
-                          Category: {item.category}
+                          Category: {item.category_id} null
                         </p>
                         <div className="flex items-center space-x-1">
                           <span className="text-base font-bold text-[#61503c]">
-                            ₹{item.price}
+                            ₹{item.price} null
                           </span>
                           <span className="text-xs text-gray-400 line-through">
-                            ₹{item.offerPrice}
+                            ₹{item.offerPrice} null
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex flex-col items-end space-y-1">
+                      {/* <div className="flex flex-col items-end space-y-1">
                         <button
                           // onClick={() => removeItem(item.id)}
                           className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
@@ -156,7 +167,7 @@ history.pushState(null, '', `?${params.toString()}`);
 
                         <div className="flex items-center bg-gray-100 rounded-md">
                           <button
-                            // onClick={() => updateQuantity(item.id, -1)}
+                            onClick={() => updateItemQuantity(item.id, -1)}
                             className="px-2 py-1 hover:bg-gray-200 rounded-l-md"
                           >
                             <Remove className="w-4 h-4 text-gray-600" />
@@ -165,13 +176,14 @@ history.pushState(null, '', `?${params.toString()}`);
                             {item.quantity}
                           </span>
                           <button
-                            // onClick={() => updateQuantity(item.id, 1)}
+                            onClick={() => updateItemQuantity(item.id, 1)}
                             className="px-2 py-1 hover:bg-gray-200 rounded-r-md"
                           >
                             <Add className="w-4 h-4 text-gray-600" />
                           </button>
                         </div>
-                      </div>
+                      </div> */}
+                      <CartQuantityContainer cartItem={item} />
                     </div>
                   </div>
                 ))}

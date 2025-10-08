@@ -65,19 +65,19 @@ const FeaturedEventsSlider: React.FC<FeaturedEventsSliderProps> = ({ featuredEve
                     <Calendar className="w-5 h-5 mr-2" />
                     {formatDate(featuredEvents[currentBanner]?.date || '')}
                   </div>
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <MapPin className="w-5 h-5 mr-2" />
                     {featuredEvents[currentBanner]?.location}
                   </div>
                   <div className="flex items-center">
                     <Star className="w-5 h-5 mr-2 text-yellow-400" />
                     {featuredEvents[currentBanner]?.rating}
-                  </div>
+                  </div> */}
                 </div>
-                <button className="bg-[#695946] hover:bg-[#61503c] text-white px-8 py-3 rounded-lg font-semibold flex items-center">
+                {/* <button className="bg-[#695946] hover:bg-[#61503c] text-white px-8 py-3 rounded-lg font-semibold flex items-center">
                   Register Now
                   <ChevronRight className="w-5 h-5 ml-2" />
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
