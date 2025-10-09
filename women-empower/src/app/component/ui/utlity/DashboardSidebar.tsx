@@ -1,7 +1,6 @@
-"use client";
 import React from "react";
 import Drawer from "@mui/material/Drawer";
-import SidebarContent from "@/app/component/dashboard/sidebar/SidebarContent";
+import SidebarContent from "../../dashboard/sidebar/SidebarContent";
 
 interface DashboardSidebarProps {
   isOpen?: boolean;
@@ -19,7 +18,6 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
         open={isOpen}
         onClose={onClose}
         sx={{ display: { xs: "block", lg: "none" } }}
-        // PaperProps={{ sx: { width: 300 } }}
       >
         <SidebarContent onClose={onClose} />
       </Drawer>

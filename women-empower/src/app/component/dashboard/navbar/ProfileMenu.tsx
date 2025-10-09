@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState } from "react";
 import { User, LogOut, ChevronDown } from "lucide-react";
@@ -41,15 +42,16 @@ const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
         />
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <>
+          {/* Overlay background click */}
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-100"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
-            {/* User Info */}
+
+          {/* Dropdown menu */}
+          <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-100">
             <div className="px-6 py-6 bg-gray-50 border-b border-gray-200">
               <div className="flex items-center space-x-4">
                 {userInfo.avatar ? (
@@ -74,7 +76,6 @@ const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
               </div>
             </div>
 
-            {/* Menu Item */}
             <div className="py-2">
               <button className="flex items-center w-full px-6 py-3.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 group">
                 <div className="p-2 rounded-lg bg-gray-100 group-hover:bg-gray-200 transition-colors mr-4">
@@ -84,7 +85,6 @@ const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
               </button>
             </div>
 
-            {/* Logout */}
             <div className="border-t border-gray-200 py-2">
               <button className="flex items-center w-full px-6 py-3.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 group">
                 <div className="p-2 rounded-lg bg-red-100 group-hover:bg-red-200 transition-colors mr-4">
@@ -101,3 +101,4 @@ const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
 };
 
 export default ProfileMenu;
+
