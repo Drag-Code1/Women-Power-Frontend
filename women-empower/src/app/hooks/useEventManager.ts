@@ -132,9 +132,10 @@ export const useEventManager = (initialEvents: Event[]) => {
     if (selectedEvent) {
       try {
         // Map dashboard form to API payload
+        const categoryId = categoryOptions.find(c => c.name === formData.category)?.id || formData.category || '';
         const payload = {
           e_image: formData.thumbnail || '',
-          category_id: formData.category || '',
+          category_id: categoryId,
           title: formData.title || '',
           description: formData.description || '',
           date_time: formData.dateTime || '',

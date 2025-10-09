@@ -365,6 +365,12 @@ export const updateEventV1 = async (
   }
   if (!res.ok) {
     const msg = parsed?.message || parsed?.error || `Failed to update event (status ${res.status})`;
+    console.error('Event update failed:', {
+      status: res.status,
+      statusText: res.statusText,
+      response: parsed,
+      payload
+    });
     const error = new Error(msg);
     // @ts-ignore
     (error as any).details = parsed;
