@@ -1,5 +1,7 @@
 // lib/services/dashboardService.ts
 
+import { getLatestEvents } from '../lib/api';
+
 export interface DashboardStats {
   title: string;
   value: string;
@@ -33,9 +35,8 @@ export interface DashboardData {
 
 // Server-side data fetching function
 export async function getDashboardData(): Promise<DashboardData> {
-  // Yahan aap real API calls kar sakte hain
-  // const response = await fetch('your-api-url');
-  // const data = await response.json();
+  // Fetch latest events from API
+  const upcomingEvents = await getLatestEvents();
   
   return {
     stats: [
@@ -86,28 +87,7 @@ export async function getDashboardData(): Promise<DashboardData> {
         amount: "₹1,120",
       },
     ],
-    upcomingEvents: [
-      {
-        name: "Art Workshop",
-        date: "Oct 15, 2025",
-        time: "10:00 AM",
-      },
-      {
-        name: "Digital Art Course",
-        date: "Oct 20, 2025",
-        time: "2:30 PM",
-      },
-      {
-        name: "Gallery Opening",
-        date: "Oct 25, 2025",
-        time: "6:00 PM",
-      },
-      {
-        name: "Painting Masterclass",
-        date: "Oct 30, 2025",
-        time: "11:00 AM",
-      },
-    ],
+    upcomingEvents,
     quickActions: [
       {
         action: "Add New Product",

@@ -304,6 +304,49 @@ export const getEventsV1 = async () => {
   }));
 };
 
+// Get latest events for dashboard (limited to 4)
+export const getLatestEvents = async () => {
+  try {
+    const res = await fetch('http://localhost:5000/v1/event/', { cache: 'no-store' });
+    const contentType = res.headers.get('content-type') || '';
+    let parsed: any = null;
+    try {
+      parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+    } catch {
+      parsed = {};
+    }
+    if (!res.ok) {
+      console.warn('Failed to fetch events for dashboard:', parsed?.message || 'Unknown error');
+      return [];
+    }
+    
+    const events = Array.isArray(parsed?.data) ? parsed.data : [];
+    
+    // Sort by date_time (newest first) and take latest 4
+    const sortedEvents = events
+      .sort((a: any, b: any) => new Date(b.date_time).getTime() - new Date(a.date_time).getTime())
+      .slice(0, 4);
+    
+    // Format for dashboard display
+    return sortedEvents.map((event: any) => ({
+      name: event.title || 'Untitled Event',
+      date: new Date(event.date_time).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      }),
+      time: new Date(event.date_time).toLocaleTimeString('en-US', { 
+        hour: 'numeric', 
+        minute: '2-digit',
+        hour12: true 
+      }),
+    }));
+  } catch (error) {
+    console.warn('Error fetching latest events:', error);
+    return [];
+  }
+};
+
 export const createEventV1 = async (
   payload: {
     e_image: string;
