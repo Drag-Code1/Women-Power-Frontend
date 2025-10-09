@@ -12,7 +12,6 @@ export interface Product {
   rating: number;
   isTrending: boolean;
   price:number;
-  isPopular: boolean;
 }
 
 

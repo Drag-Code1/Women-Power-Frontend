@@ -123,7 +123,7 @@ let arts ={data:[]};
 <MobileViewFilter />
           {/* Main Content Area */}
       {arts && Array.isArray(arts.data) && arts.data.length==0   ?  
-        <h3>No search results</h3>
+         <ClearFilter/>  
               : (
  <ProductContainer currentProducts={arts.data.data || arts.data} totalPages={arts.data?.totalPages||0} currentPage={arts.data?.currentPage ||1} viewMode={'grid'} />
     

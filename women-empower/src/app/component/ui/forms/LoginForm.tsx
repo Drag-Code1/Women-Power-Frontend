@@ -3,7 +3,7 @@ import { ArrowBack, Phone, Shield } from "@mui/icons-material";
 import React, { SetStateAction, useEffect, useState } from "react";
 import { sendOtp } from "@/app/services/sendOTPService";
 import { useFormState } from "react-dom";
-import { validateOTP } from "@/app/lib/api";
+import { validateOTP } from "@/app/services/validateOTPService";
 import { useRouter } from "next/navigation";
 import { SignupForm } from "./SignUpForm";
 interface User {
@@ -69,15 +69,15 @@ const otpJoined=Number(otp.join(',').replaceAll(',',''));
     const data=await validateOTP(emailAddress,otpJoined);
     
     console.log(data,'otp verification')
-    if(data.data==true)
-    {
+    // if(data.data==true)
+    // {
     router.replace('http://localhost:3000/');
     
     // console.log(data,'otp verification')
-    }
-    else{
-  setInvalidOTP(true);
-    }
+    // }
+  //   else{
+  // setInvalidOTP(true);
+  //   }
     setOtp(['', '', '', '', '', '']);
 //     {
 //     "success": true,

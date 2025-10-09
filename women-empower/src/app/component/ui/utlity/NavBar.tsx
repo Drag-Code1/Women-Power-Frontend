@@ -1,4 +1,6 @@
 // "use client";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 import React, {  } from "react";
 import Image from "next/image";
 import {
@@ -52,7 +54,12 @@ const NavBar: React.FC = () => {
     { name: "EVENTS", href: "/events" },
     { name: "CONTACT US", href: "/contact" },
   ];
+    const cookieStore = cookies();
 
+  const token = cookieStore.get("auth_token")?.value;
+const decoded = jwt.decode(token) as { admin?: boolean | string };
+
+      console.log("Decoded Token:", decoded);
   // const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   // const [isSearchOpen, setIsSearchOpen] = useState(false);
   // const [isCartOpen, setIsCartOpen] = useState(false);
@@ -276,7 +283,7 @@ const NavBar: React.FC = () => {
                   0
                 </span>
               </div> */}
-<ViewWishlist />
+  {!decoded  &&  <ViewWishlist />}
               {/* <div className="relative">
                 <button
                   onClick={toggleCart}
@@ -288,7 +295,7 @@ const NavBar: React.FC = () => {
                   {cartItems.reduce((total, item) => total + item.quantity, 0)}
                 </span>
               </div> */}
-              <ViewCart/>
+         {!decoded  &&        <ViewCart/>}
             </div>
           </div>
 
@@ -299,10 +306,10 @@ const NavBar: React.FC = () => {
         </div>
       </nav>
 
-      <CartDrawer
+ {!decoded  &&      <CartDrawer
     
       />
-
+ }
       <div className="h-20"></div>
     </>
   );

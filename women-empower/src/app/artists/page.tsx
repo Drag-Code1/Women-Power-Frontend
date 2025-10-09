@@ -98,7 +98,7 @@ else {
 <ArtistMobileViewFilter />
           {/* Main Content */}
       {allArtists && Array.isArray(allArtists.data)  && allArtists.data.length==0  ?  
-        <h3>No search results</h3>
+        <ClearFilter/>  
               : (   <ArtistContainer allArtists={allArtists.data?.data || allArtists.data} totalPages={allArtists.data?.totalPages||0} currentPage={allArtists.data?.currentPage ||1} viewMode={'grid'}  />
      )}   </div>
       </div>
