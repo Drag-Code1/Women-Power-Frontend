@@ -7,6 +7,7 @@ export const store = configureStore({
  cart: require('./slices/cartSlice').default,  
   wishlist: require('./slices/wishlistSlice').default,
   checkout: require('./slices/checkoutSlice').default,
+    address: require('./slices/addressSlice').default,
   },
 })
 

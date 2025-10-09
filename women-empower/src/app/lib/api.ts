@@ -340,7 +340,7 @@ export async function deleteAddress(addressId: string) {
     }
 
     console.log("✅ Address deleted successfully");
-    return true;
+    return response.json();
   } catch (error) {
     console.error("❌ Error deleting address:", error);
     return false;

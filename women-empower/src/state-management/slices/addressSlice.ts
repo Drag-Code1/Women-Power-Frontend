@@ -1,16 +1,20 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export interface Address {
- id:string;
-    type: string;        // e.g., "home" or "work"
-  address: string;     // street address or building name
-  city: string;        // city name or detailed location
-  state: string;       // state name
-  pincode: string;     // postal/zip code
-  landmark?: string;   // optional nearby landmark
-  mobileNo: string;    // contact number (+91 format)
-  userId: string;      // UUID of the user
+interface Address {
+  id:string;
+  userId: string;
+  type:string
+  // name: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  // phone: string;
+  landmark:string;
+  mobileNo:string;
+  // isDefault: boolean;
 }
+
 
 interface AddressState {
   items: Address[];
@@ -22,22 +26,32 @@ const initialState: AddressState = {
 };
 
 const AddressSlice = createSlice({
-  name: 'cart',
+  name: 'address',
   initialState,
   reducers: {
     fillAddress(state, action: PayloadAction<Address[]>) {
       state.items = action.payload;
     },
-    addAddress(state, action: PayloadAction<Address>) {
+    addNewAddress(state, action: PayloadAction<Address>) {
+      console.log('new entry',action.payload)
       state.items.push(action.payload);
     },
-    removeAddress(state, action: PayloadAction<number>) {
-    //   state.items = state.items.filter(item => item.id !== action.payload);
+    removeAddress(state, action: PayloadAction<string>) {
+       console.log('delete id:::',action.payload)
+      state.items = state.items.filter(item => item.id !== action.payload);
     },
  
+updateAddress_(state, action: PayloadAction<Address >) {
+  const  updatedData  = action.payload;
+  console.log('update id:::', updatedData);
+
+  state.items = state.items.map(item =>
+    item.id === updatedData.id ? { ...item, ...updatedData } : item
+  );
+},
 
   },
 });
 
-export const { addAddress, removeAddress ,fillAddress} = AddressSlice.actions;
+export const { addNewAddress, removeAddress ,fillAddress,updateAddress_} = AddressSlice.actions;
 export default AddressSlice.reducer;

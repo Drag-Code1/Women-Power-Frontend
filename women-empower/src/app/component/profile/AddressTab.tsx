@@ -1,5 +1,7 @@
 "use client"
 import { addAddress, deleteAddress, getAddress, updateAddress } from "@/app/lib/api";
+import { useAppDispatch, useAppSelector } from "@/state-management/hooks";
+import { addNewAddress, fillAddress, removeAddress, updateAddress_ } from "@/state-management/slices/addressSlice";
 import { Add, Cancel, Delete, Edit, Home, LocationOn, Work } from "@mui/icons-material";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -28,6 +30,9 @@ interface Address {
             // "mobileNo": "9877583210",
             // "userId": "a55a6087-3c15-415f-a4c3-f1d1d7825846"
 export const AddressTab:React.FC=()=>{
+  
+  const selector = useAppSelector(state => (state.address as { items: Address[] }).items);  
+const dispatch=useAppDispatch();
      const [addresses, setAddresses] = useState<Address[]>([
         // {
         //   id: '1',
@@ -56,6 +61,12 @@ export const AddressTab:React.FC=()=>{
 const fetchAddress=async()=>{
   const addressData=await getAddress('a55a6087-3c15-415f-a4c3-f1d1d7825846');
       console.log("✅ Address fetched", addressData);
+if(addressData.success==true){
+ dispatch(fillAddress(addressData.data))
+
+
+}
+
       setAddresses(addressData.data);
 }
 fetchAddress()
@@ -94,6 +105,9 @@ fetchAddress()
     const handleDeleteAddress = async(id: string) => {
 
    const addressData=await  deleteAddress(id);
+if(addressData.success==true){
+ dispatch(removeAddress(id));
+}
       // http://localhost:7000/v1/address/2d085ce1-514c-43be-ac2b-07303d0ebaae
   //   if (window.confirm('Are you sure you want to delete this address?')) {
   //     setAddresses(addresses.filter(addr => addr.id !== id));
@@ -117,6 +131,10 @@ fetchAddress()
 
 const data=await updateAddress(newAddress)
 console.log(data)
+if(data.success==true){
+  
+  dispatch(updateAddress_(data.data))
+}
 
 
     setShowAddAddress(false);
@@ -132,6 +150,10 @@ console.log(data)
 
    const addressData=await  addAddress('a55a6087-3c15-415f-a4c3-f1d1d7825846',newAddress);
   console.log("addressData",addressData)
+  if(addressData.success==true){
+  
+  dispatch(addNewAddress(addressData.data))
+}
    // const address: Address = {
       //   ...newAddress,
       //   id: Date.now().toString()
@@ -184,7 +206,7 @@ console.log(data)
                       </div>
     
                       <div className="space-y-4">
-                        {addresses.map((address) => (
+                        {selector.map((address) => (
                           <div key={address.id} className="border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
                             <div className="flex items-start justify-between">
                               <div className="flex items-start space-x-3">
