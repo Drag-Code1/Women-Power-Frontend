@@ -46,7 +46,7 @@ export default function RootLayout({
             {children}
           </DashboardLayout>
         ) : (
-          // User Layout
+
           <>
             <NavBar />
             <ScrollToTopButton />
