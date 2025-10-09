@@ -2,6 +2,7 @@
 'use client';
 import { useState, useCallback } from "react";
 import { TrendingProduct,TrendingDrawerMode } from "../types/dashboardtrendingtab";
+import { productService } from "../lib/productapi";
 
 export const useTrendingManagement = (initialProducts: TrendingProduct[]) => {
   const [products, setProducts] = useState<TrendingProduct[]>(initialProducts);
@@ -24,16 +25,22 @@ export const useTrendingManagement = (initialProducts: TrendingProduct[]) => {
     }, 300);
   }, []);
 
-  const removeFromTrending = useCallback((id: string) => {
+  const removeFromTrending = useCallback(async (id: string) => {
     if (window.confirm("Are you sure you want to remove this product from trending?")) {
-      setProducts(prev =>
-        prev.map((p) =>
-          p.id === id ? { ...p, isTrending: false } : p
-        )
-      );
-      setShowDropdown(null);
-      if (selectedProduct?.id === id) {
-        closeDrawer();
+      try {
+        // Call API to update trending status
+        await productService.updateProductTrendingStatus(id, false);
+        
+        // Update local state - remove from trending list
+        setProducts(prev => prev.filter(p => p.id !== id));
+        setShowDropdown(null);
+        
+        if (selectedProduct?.id === id) {
+          closeDrawer();
+        }
+      } catch (error) {
+        console.error('Failed to remove product from trending:', error);
+        alert('Failed to remove product from trending. Please try again.');
       }
     }
   }, [selectedProduct, closeDrawer]);

@@ -345,4 +345,43 @@ export const productService = {
       throw error;
     }
   },
+
+  // 🔹 Update product trending status
+  updateProductTrendingStatus: async (
+    id: string,
+    isTrending: boolean
+  ): Promise<Product> => {
+    try {
+      const url = `${API_BASE_URL}/product/${encodeURIComponent(id)}`;
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+        body: JSON.stringify({ isTrending }),
+      });
+
+      const parseJsonSafely = async (r: Response) => {
+        const contentType = r.headers.get("content-type") || "";
+        try {
+          if (contentType.includes("application/json")) return await r.json();
+          const text = await r.text();
+          return { message: text } as any;
+        } catch {
+          return {} as any;
+        }
+      };
+
+      const body: any = await parseJsonSafely(res);
+
+      if (!res.ok) {
+        const msg = body?.message || body?.error || `Failed to update trending status (status ${res.status})`;
+        throw new Error(msg);
+      }
+
+      return normalizeProduct(body?.data || body);
+    } catch (error) {
+      console.error("Error updating product trending status:", error);
+      throw error;
+    }
+  },
 };
