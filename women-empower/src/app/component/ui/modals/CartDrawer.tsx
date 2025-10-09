@@ -183,7 +183,7 @@ history.pushState(null, '', `?${params.toString()}`);
                           </button>
                         </div>
                       </div> */}
-                      <CartQuantityContainer cartItem={item} />
+                      <CartQuantityContainer key={item.quantity} cartItem={item} />
                     </div>
                   </div>
                 ))}

@@ -1,4 +1,6 @@
 import { fetchDeleteCartItemQuantity, fetchupdateCartItemQuantity } from "@/app/lib/api";
+import { useAppDispatch, useAppSelector } from "@/state-management/hooks";
+import { removeItem, updateQuantity } from "@/state-management/slices/cartSlice";
 import { Add, Delete, Remove } from "@mui/icons-material";
 import { useState } from "react";
 
@@ -18,6 +20,9 @@ interface CartItemProps{
 }
 
 export const CartQuantityContainer:React.FC<CartItemProps>=({cartItem})=>{
+  
+  const selector = useAppSelector(state => (state.cart as { items: CartItem[] }).items);
+  const dispatch=useAppDispatch();
 const [qt,setQt]=useState(cartItem.quantity);
 
 const updateItemQuantity=async(op:number)=>{
@@ -28,18 +33,28 @@ const updateItemQuantity=async(op:number)=>{
        
         const tempQt=qt-1;
         const res=await fetchupdateCartItemQuantity(cartItem.id,tempQt)
+        if(res.success==true){
+dispatch(updateQuantity(res.data));
+        }
        
-        setQt(prev=>prev-1);
+        // setQt(prev=>prev-1);
  }
  else{
 
-         fetchDeleteCartItemQuantity(cartItem.id)
+        const res= await fetchDeleteCartItemQuantity(cartItem.id)
+         if(res.success==true){
+          dispatch(removeItem(cartItem.id))
+        }
  }
+
     }
     else{
           const tempQt=qt+1;
        const res=await  fetchupdateCartItemQuantity(cartItem.id,tempQt)
-        setQt(prev=>prev+1);
+            if(res.success==true){
+dispatch(updateQuantity(res.data));
+        }
+        // setQt(prev=>prev+1);
     }
 
 }
@@ -49,7 +64,13 @@ const updateItemQuantity=async(op:number)=>{
     return(
           <div className="flex flex-col items-end space-y-1">
                                 <button
-                                  onClick={() => fetchDeleteCartItemQuantity(cartItem.id)}
+                                  onClick={async() =>{       const res= await fetchDeleteCartItemQuantity(cartItem.id)
+         if(res.success==true){
+          dispatch(removeItem(cartItem.id))
+        }
+
+
+                                  }}
                                   className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
                                 >
                                   <Delete className="w-4 h-4" />

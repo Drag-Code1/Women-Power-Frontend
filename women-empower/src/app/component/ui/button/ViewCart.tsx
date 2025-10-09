@@ -1,10 +1,10 @@
 
 "use client"
-import { useAppDispatch } from "@/state-management/hooks";
+import { useAppDispatch, useAppSelector } from "@/state-management/hooks";
 import { ShoppingCartOutlined } from "@mui/icons-material"
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import { fillCart } from "@/state-management/slices/cartSlice";
+import { CartItem, fillCart } from "@/state-management/slices/cartSlice";
 const fetchCartItems = async (cartID:string) => {
   
   try {
@@ -17,17 +17,25 @@ const fetchCartItems = async (cartID:string) => {
   }
   catch (error) {
     console.error('Error fetching cart items:', error);
-    return []; 
+    // return []; 
   }
 };
 export const ViewCart: React.FC = () => {
-  const cartID='5ffda320-72dc-420f-8b30-1223f807c9aa'
+  
+
+const selector = useAppSelector(state => (state.cart as { items: CartItem[] }).items);  
+const cartID='a3508c3d-9784-4d8a-bdad-ea0ffaa4c9cc'
 const dispatch = useAppDispatch();
   useEffect(() => {
     const loadCartItems = async () => {
       const items = await fetchCartItems(cartID);
+
+if(items.success=true){
 dispatch(fillCart(items.data));
       console.log('Cart items:', items);
+}
+
+
     };
     loadCartItems();
   }
@@ -48,7 +56,7 @@ const params=new URLSearchParams(searchParams.toString());
                      <ShoppingCartOutlined className="w-5 h-5" />
                    </button>
                    <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                     {3}
+                     {selector && selector.length}
                    </span>
                  </div>
   )
