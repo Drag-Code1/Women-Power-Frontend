@@ -482,7 +482,7 @@ export const fetchWishlist = async (userID: string) => {
     return data; // Expecting { reviews: Review[] }
   } catch (error: any) {
     console.error(error);
-    return { wishlist: [] }; // fallback
+    return; // fallback
   }
 };
 
