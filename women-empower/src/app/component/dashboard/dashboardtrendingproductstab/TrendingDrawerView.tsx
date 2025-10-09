@@ -4,7 +4,7 @@ import React from "react";
 import { ChevronLeft, ChevronRight, Star, TrendingUp } from "lucide-react";
 import { TrendingProduct } from "@/app/types/dashboardtrendingtab";
 import { calculateDiscountedPrice, getAllImages } from "@/app/lib/utils/dashboardtrending-utils";
-import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import { DEFAULT_PRODUCT_IMAGE } from "../../../data/dashboard-productdata";
 interface TrendingDrawerViewProps {
   selectedProduct: TrendingProduct | null;
   currentImageIndex: number;
@@ -29,7 +29,7 @@ export const TrendingDrawerView: React.FC<TrendingDrawerViewProps> = ({
     <div className="space-y-6">
       <div className="relative">
         <img
-          src={currentImage || DEFAULT_THUMBNAIL}
+          src={currentImage || DEFAULT_PRODUCT_IMAGE}
           alt={selectedProduct.p_Name}
           className="w-full h-64 object-cover rounded-lg"
         />

@@ -1,8 +1,8 @@
 // hooks/useProductManagement.ts
 'use client';
 import { useState, useCallback } from "react";
-import { Product, ProductFormData, DrawerMode } from "@/app/types/dashboardproduct";
-import { INITIAL_FORM_DATA, DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import { Product, ProductFormData, DrawerMode } from "@/app/types/dashboard-product";
+import { INITIAL_FORM_DATA, DEFAULT_THUMBNAIL } from "@/app/data/dashboard-productdata";
 
 export const useProductManagement = (initialProducts: Product[]) => {
   const [products, setProducts] = useState<Product[]>(initialProducts);

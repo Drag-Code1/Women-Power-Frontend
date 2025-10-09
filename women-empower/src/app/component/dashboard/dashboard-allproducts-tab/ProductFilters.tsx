@@ -1,31 +1,33 @@
-// components/SearchControls.tsx
-'use client';
+"use client";
 import React from "react";
-import { Search, Filter, Plus } from "lucide-react";
-import { CATEGORIES } from "@/app/data/dashboardproductdata";
-import { formatCategoryName } from "@/app/lib/utils/dashboardproduct-utils";
+import { Plus, Search, Filter } from "lucide-react";
+import { Product } from "@/app/types/dashboard-product";
+import { CATEGORIES, CATEGORY_LABELS } from "@/app/data/dashboard-productdata";
+import { getUniqueArtists } from "@/app/lib/utils/dashboardproduct-utils";
 
-interface SearchControlsProps {
+interface ProductFiltersProps {
   searchTerm: string;
   selectedCategory: string;
   selectedArtist: string;
-  uniqueArtists: string[];
+  products: Product[];
   onSearchChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
   onArtistChange: (value: string) => void;
   onAddProduct: () => void;
 }
 
-export const SearchControls: React.FC<SearchControlsProps> = ({
+const ProductFilters: React.FC<ProductFiltersProps> = ({
   searchTerm,
   selectedCategory,
   selectedArtist,
-  uniqueArtists,
+  products,
   onSearchChange,
   onCategoryChange,
   onArtistChange,
   onAddProduct,
 }) => {
+  const uniqueArtists = getUniqueArtists(products);
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
@@ -50,7 +52,7 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
             >
               {CATEGORIES.map((cat) => (
                 <option key={cat} value={cat}>
-                  {formatCategoryName(cat)}
+                  {CATEGORY_LABELS[cat] || cat}
                 </option>
               ))}
             </select>
@@ -63,8 +65,8 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
               value={selectedArtist}
               onChange={(e) => onArtistChange(e.target.value)}
             >
-              {uniqueArtists.map((artist) => (
-                <option key={artist} value={artist}>
+              {uniqueArtists.map((artist, index) => (
+                <option key={`${artist}-${index}`} value={artist}>
                   {artist === "all" ? "All Artists" : artist}
                 </option>
               ))}
@@ -83,3 +85,5 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
     </div>
   );
 };
+
+export default ProductFilters;

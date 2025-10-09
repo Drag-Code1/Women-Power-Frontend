@@ -1,245 +1,241 @@
-import { Product, ProductFormData } from "@/app/types/dashboardproduct";
+// lib/api/products.ts
+import {
+  Product,
+  ProductFormData,
+  ApiResponse,
+} from "@/app/types/dashboard-product";
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1";
+// Backend API base URL
+const BASE_URL = "http://localhost:5000/v1/product";
 
-// ✅ Utility: normalize raw API product into Product
-const normalizeProduct = (raw: any): Product => {
-  return {
-    id: raw.id || crypto.randomUUID(),
-    p_Name: raw.p_Name || "",
-    thumbnail: raw.thumbnail || "",
-    p_images: Array.isArray(raw.p_images) ? raw.p_images : [],
-    category_id: raw.category_id || "uncategorized",
-    artist_id: raw.artist_id || "unknown",
-    price: Number(raw.price) || 0,
-    discount: Number(raw.discount) || 0,
-    review_id: raw.review_id || "",
-    sell_count: Number(raw.sell_count) || 0,
-    description: raw.description || "",
-    specification: raw.specification || "",
-    isTrending: raw.isTrending ?? false,
-  };
+// Helper function to handle API requests
+const handleResponse = async <T>(
+  response: Response
+): Promise<ApiResponse<T>> => {
+  try {
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorMessage = "Request failed";
+
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorMessage = errorJson.message || errorJson.error || errorText;
+      } catch {
+        errorMessage = errorText || errorMessage;
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    const data = await response.json();
+    return {
+      success: true,
+      data: data.data || data,
+      message: data.message || "Success",
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Something went wrong",
+    };
+  }
 };
 
-export const productService = {
-  // 🔹 Get all products
-  getAllProducts: async (): Promise<Product[]> => {
+export const productApi = {
+  // GET: Fetch all products
+  getAllProducts: async (): Promise<ApiResponse<Product[]>> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/product`, {
+      const res = await fetch(`${BASE_URL}`, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
         cache: "no-store",
       });
-
-      if (!response.ok) {
-        console.error(`Failed to fetch products: ${response.status}`);
-        return [];
-      }
-
-      const data = await response.json();
-
-      // ✅ support both array or { data: [] }
-      const products = Array.isArray(data) ? data : data.data;
-
-      if (!Array.isArray(products)) {
-        console.warn("API returned invalid products data");
-        return [];
-      }
-
-      return products.map(normalizeProduct);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      return [];
-    }
-  },
-
-  // 🔹 Get single product details
-  getProductDetails: async (id: string): Promise<Product | null> => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/product/${id}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-        cache: "no-store",
-      });
-
-      if (!response.ok) {
-        console.error(`Failed to fetch product details: ${response.status}`);
-        return null;
-      }
-
-      const data = await response.json();
-
-      // ✅ API returns { success, message, data: {...} }
-      if (data.success && data.data) {
-        return normalizeProduct(data.data);
-      }
-
-      // Handle case where data is directly the product
-      if (data.id) {
-        return normalizeProduct(data);
-      }
-
-      return null;
-    } catch (error) {
-      console.error("Error fetching product details:", error);
-      return null;
-    }
-  },
-
-  // 🔹 Create product
-  createProduct: async (
-    productData: Partial<Product>
-  ): Promise<Product | null> => {
-    try {
-      // Clean the data before sending
-      const cleanData = {
-        p_Name: productData.p_Name,
-        thumbnail: productData.thumbnail || "",
-        p_images: productData.p_images || [],
-        category_id: productData.category_id,
-        artist_id: productData.artist_id,
-        price: Number(productData.price),
-        discount: Number(productData.discount) || 0,
-        description: productData.description || "",
-        specification: productData.specification || "",
-        isTrending: productData.isTrending || false,
+      return handleResponse<Product[]>(res);
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch products",
       };
+    }
+  },
 
-      const response = await fetch(`${API_BASE_URL}/product`, {
+  // GET: Fetch single product by ID
+  getProductById: async (id: string): Promise<ApiResponse<Product>> => {
+    try {
+      const res = await fetch(`${BASE_URL}/${id}`, {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return handleResponse<Product>(res);
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch product",
+      };
+    }
+  },
+
+  // POST: Create new product
+  createProduct: async (
+    productData: ProductFormData
+  ): Promise<ApiResponse<Product>> => {
+    try {
+      const res = await fetch(`${BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cleanData),
+        body: JSON.stringify(productData),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error(
-          `Failed to create product: ${response.status}`,
-          errorData
-        );
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      const data = await response.json();
-      return normalizeProduct(data.data || data);
-    } catch (error) {
-      console.error("Error creating product:", error);
-      throw error;
+      return handleResponse<Product>(res);
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to create product",
+      };
     }
   },
 
-  // 🔹 Update product
+  // PUT: Update existing product
   updateProduct: async (
     id: string,
-    productData: Partial<Product>
-  ): Promise<Product | null> => {
+    productData: ProductFormData
+  ): Promise<ApiResponse<Product>> => {
     try {
-      // Clean the data before sending
-      const cleanData: any = {};
-
-      if (productData.p_Name !== undefined)
-        cleanData.p_Name = productData.p_Name;
-      if (productData.thumbnail !== undefined)
-        cleanData.thumbnail = productData.thumbnail;
-      if (productData.p_images !== undefined)
-        cleanData.p_images = productData.p_images;
-      if (productData.category_id !== undefined)
-        cleanData.category_id = productData.category_id;
-      if (productData.artist_id !== undefined)
-        cleanData.artist_id = productData.artist_id;
-      if (productData.price !== undefined)
-        cleanData.price = Number(productData.price);
-      if (productData.discount !== undefined)
-        cleanData.discount = Number(productData.discount);
-      if (productData.description !== undefined)
-        cleanData.description = productData.description;
-      if (productData.specification !== undefined)
-        cleanData.specification = productData.specification;
-      if (productData.isTrending !== undefined)
-        cleanData.isTrending = productData.isTrending;
-
-      const response = await fetch(`${API_BASE_URL}/product/${id}`, {
+      const res = await fetch(`${BASE_URL}/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cleanData),
+        body: JSON.stringify(productData),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error(
-          `Failed to update product: ${response.status}`,
-          errorData
-        );
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      const data = await response.json();
-      return normalizeProduct(data.data || data);
-    } catch (error) {
-      console.error("Error updating product:", error);
-      throw error;
+      return handleResponse<Product>(res);
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to update product",
+      };
     }
   },
 
-  // 🔹 Delete product
-  deleteProduct: async (id: string): Promise<boolean> => {
+
+  // DELETE: Delete product (soft delete)
+deleteProduct: async (
+  id: string
+): Promise<ApiResponse<{ message: string }>> => {
+  try {
+    const res = await fetch(`${BASE_URL}/${id}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    // Agar server error deta hai
+    if (!res.ok) {
+      const errorText = await res.text(); // raw error text
+      return {
+        success: false,
+        error: `Failed with status ${res.status}: ${errorText}`,
+      };
+    }
+
+    // ✅ Content-Type check karo
+    const contentType = res.headers.get("content-type");
+
+    if (contentType && contentType.includes("application/json")) {
+      const data = await res.json();
+      return {
+        success: true,
+        data,
+      };
+    } else {
+      // Agar JSON nahi hai to raw text return karo
+      const text = await res.text();
+      return {
+        success: true,
+        data: { message: text } as any,
+      };
+    }
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message || "Failed to delete product",
+    };
+  }
+},
+
+
+  // PATCH: Toggle trending status
+  toggleTrending: async (id: string): Promise<ApiResponse<Product>> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/product/${id}`, {
-        method: "DELETE",
+      const res = await fetch(`${BASE_URL}/${id}/toggle-trending`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error(
-          `Failed to delete product: ${response.status}`,
-          errorData
-        );
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
-
-      return true;
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      throw error;
+      return handleResponse<Product>(res);
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to toggle trending status",
+      };
     }
   },
 
-  // 🔹 Toggle trending status
-  toggleTrending: async (
-    id: string,
-    isTrending: boolean
-  ): Promise<Product | null> => {
+  // GET: Fetch trending products
+  getTrendingProducts: async (): Promise<ApiResponse<Product[]>> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/product/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isTrending }),
+      const res = await fetch(`${BASE_URL}/trending`, {
+        method: "GET",
+        cache: "no-store",
       });
+      return handleResponse<Product[]>(res);
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch trending products",
+      };
+    }
+  },
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error(
-          `Failed to toggle trending: ${response.status}`,
-          errorData
-        );
-        throw new Error(
-          errorData.message || `HTTP error! status: ${response.status}`
-        );
-      }
+  // GET: Fetch products by category
+  getProductsByCategory: async (
+    category: string
+  ): Promise<ApiResponse<Product[]>> => {
+    try {
+      const res = await fetch(
+        `${BASE_URL}/category/${encodeURIComponent(category)}`,
+        {
+          method: "GET",
+          cache: "no-store",
+        }
+      );
+      return handleResponse<Product[]>(res);
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch products by category",
+      };
+    }
+  },
 
-      const data = await response.json();
-      return normalizeProduct(data.data || data);
-    } catch (error) {
-      console.error("Error toggling trending:", error);
-      throw error;
+  // GET: Fetch products by artist
+  getProductsByArtist: async (
+    artist: string
+  ): Promise<ApiResponse<Product[]>> => {
+    try {
+      const res = await fetch(
+        `${BASE_URL}/artist/${encodeURIComponent(artist)}`,
+        {
+          method: "GET",
+          cache: "no-store",
+        }
+      );
+      return handleResponse<Product[]>(res);
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.message || "Failed to fetch products by artist",
+      };
     }
   },
 };

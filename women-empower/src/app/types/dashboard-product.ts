@@ -1,4 +1,5 @@
-// types/dashboardproduct.ts
+// types/product.ts
+
 export interface Product {
   id: string;
   p_Name: string;
@@ -8,10 +9,8 @@ export interface Product {
   artist_id: string;
   price: number;
   discount: number;
-  review_id: string;
-  sell_count: number;
   description: string;
-  specification: string;
+  specification: string[];
   isTrending?: boolean;
 }
 
@@ -24,7 +23,20 @@ export interface ProductFormData {
   price: number;
   discount: number;
   description: string;
-  specification: string;
+  specification: string[];
 }
 
 export type DrawerMode = "add" | "edit" | "view";
+
+export interface ProductFilters {
+  searchTerm?: string;
+  category?: string;
+  artist?: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}

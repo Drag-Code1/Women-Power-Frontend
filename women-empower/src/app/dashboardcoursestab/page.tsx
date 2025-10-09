@@ -1,4 +1,4 @@
-"use client";
+
 // app/courses/page.tsx
 import React from "react";
 import { Plus } from "lucide-react";

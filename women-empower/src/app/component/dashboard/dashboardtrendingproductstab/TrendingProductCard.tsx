@@ -4,7 +4,7 @@ import React from "react";
 import { Star, TrendingUp, MoreVertical, Eye, X } from "lucide-react";
 import { TrendingProduct, TrendingDrawerMode } from "@/app/types/dashboardtrendingtab";
 import { calculateDiscountedPrice } from "@/app/lib/utils/dashboardtrending-utils";
-import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import { DEFAULT_PRODUCT_IMAGE } from "../../../data/dashboard-productdata";
 
 interface TrendingProductCardProps {
   product: TrendingProduct;
@@ -28,7 +28,7 @@ export const TrendingProductCard: React.FC<TrendingProductCardProps> = ({
     >
       <div className="relative">
         <img
-          src={product.p_thumbnail || DEFAULT_THUMBNAIL}
+          src={product.p_thumbnail || DEFAULT_PRODUCT_IMAGE}
           alt={product.p_Name}
           className="w-full h-40 object-cover rounded-t-md"
         />
@@ -60,7 +60,6 @@ export const TrendingProductCard: React.FC<TrendingProductCardProps> = ({
           <h3 className="font-medium text-gray-900 text-sm mb-1 line-clamp-2 h-10">
             {product.p_Name}
           </h3>
-          <p className="text-xs text-gray-600 mb-2">by {product.artist_name}</p> 
         </div>
 
         <div className="flex items-center gap-1 flex-wrap">
