@@ -1,53 +1,59 @@
+// app/courses/FiltersSidebar.tsx
 "use client";
 import React from "react";
+import "@/app/globals.css";
+
+interface Course {
+  id: string;
+  thumbnail: string;
+  course_coordinator: string;
+  category_id: string;
+  title: string;
+  description: string;
+  lessons: number;
+  level: string;
+  price: string;
+  discount: number;
+}
 
 interface FiltersSidebarProps {
   categories: string[];
   levels: string[];
-  languages: string[];
-  priceRanges: { label: string; min: number; max: number }[];
   selectedCategories: string[];
   selectedLevels: string[];
-  selectedLanguages: string[];
   priceRange: string;
-  toggleCategory: (c: string) => void;
-  toggleLevel: (l: string) => void;
-  toggleLanguage: (l: string) => void;
-  setPriceRange: (val: string) => void;
+  toggleCategory: (category: string) => void;
+  toggleLevel: (level: string) => void;
+  setPriceRange: (range: string) => void;
   clearFilters: () => void;
-  allCourses: any[];
+  allCourses: Course[];
   showFilters: boolean;
 }
 
-const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
+const FiltersSidebar = ({
   categories,
   levels,
-  languages,
-  priceRanges,
   selectedCategories,
   selectedLevels,
-  selectedLanguages,
   priceRange,
   toggleCategory,
   toggleLevel,
-  toggleLanguage,
   setPriceRange,
   clearFilters,
   allCourses,
   showFilters,
-}) => (
+}: FiltersSidebarProps) => (
   <div
-    className={`w-80 bg-white border-r border-gray-200 p-6 min-h-screen overflow-y-auto ${
+    className={`w-80 bg-white border-r border-gray-200 p-6 max-h-screen overflow-y-auto scrollbar-hide  ${
       showFilters ? "block" : "hidden lg:block"
     }`}
   >
     <h2 className="text-xl font-bold text-gray-900 mb-6">Filters</h2>
 
-    {/* Categories */}
     <div className="mb-6">
       <h3 className="text-sm font-semibold text-gray-900 mb-2">Categories</h3>
       <div className="space-y-1">
-        {categories.map((category) => (
+        {categories.map((category: string) => (
           <label
             key={category}
             className="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md transition-colors"
@@ -59,19 +65,21 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <span className="ml-2 text-sm text-gray-700">{category}</span>
-            <span className="ml-auto text-xs text-gray-500 bg-gray-100 px-2 rounded-full">
-              {allCourses.filter((c) => c.category === category).length}
+            <span className="ml-auto text-xs text-gray-500 bg-gray-100 px-2 rounded-full flex-shrink-0">
+              {
+                allCourses.filter((c: Course) => c.category_id === category)
+                  .length
+              }
             </span>
           </label>
         ))}
       </div>
     </div>
 
-    {/* Levels */}
     <div className="mb-6">
       <h3 className="text-sm font-semibold text-gray-900 mb-2">Skill Level</h3>
       <div className="space-y-1">
-        {levels.map((level) => (
+        {levels.map((level: string) => (
           <label
             key={level}
             className="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md transition-colors"
@@ -82,44 +90,26 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
               onChange={() => toggleLevel(level)}
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
-            <span className="ml-2 text-sm text-gray-700">{level}</span>
-            <span className="ml-auto text-xs text-gray-500 bg-gray-100 px-2 rounded-full">
-              {allCourses.filter((c) => c.level === level).length}
+            <span className="ml-2 text-sm text-gray-700">
+              {level.charAt(0).toUpperCase() + level.slice(1)}
+            </span>
+            <span className="ml-auto text-xs text-gray-500 bg-gray-100 px-2 rounded-full flex-shrink-0">
+              {allCourses.filter((c: Course) => c.level === level).length}
             </span>
           </label>
         ))}
       </div>
     </div>
 
-    {/* Languages */}
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-gray-900 mb-2">Language</h3>
-      <div className="space-y-1">
-        {languages.map((language) => (
-          <label
-            key={language}
-            className="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md transition-colors"
-          >
-            <input
-              type="checkbox"
-              checked={selectedLanguages.includes(language)}
-              onChange={() => toggleLanguage(language)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <span className="ml-2 text-sm text-gray-700">{language}</span>
-            <span className="ml-auto text-xs text-gray-500 bg-gray-100 px-2 rounded-full">
-              {allCourses.filter((c) => c.language === language).length}
-            </span>
-          </label>
-        ))}
-      </div>
-    </div>
-
-    {/* Price */}
     <div className="mb-6">
       <h3 className="text-sm font-semibold text-gray-900 mb-2">Price Range</h3>
       <div className="space-y-1">
-        {priceRanges.map((range) => (
+        {[
+          { label: "Under ₹100", min: 0, max: 100 },
+          { label: "₹100 - ₹250", min: 100, max: 250 },
+          { label: "₹250 - ₹500", min: 250, max: 500 },
+          { label: "Above ₹500", min: 500, max: Infinity },
+        ].map((range) => (
           <label
             key={range.label}
             className="flex items-center cursor-pointer hover:bg-gray-50 p-1 rounded-md transition-colors"
@@ -134,10 +124,12 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
               className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
             />
             <span className="ml-2 text-sm text-gray-700">{range.label}</span>
-            <span className="ml-auto text-xs text-gray-500 bg-gray-100 px-2 rounded-full">
+            <span className="ml-auto text-xs text-gray-500 bg-gray-100 px-2 rounded-full flex-shrink-0">
               {
                 allCourses.filter(
-                  (c) => c.price >= range.min && c.price <= range.max
+                  (c: Course) =>
+                    parseFloat(c.price) >= range.min &&
+                    parseFloat(c.price) <= range.max
                 ).length
               }
             </span>
@@ -146,10 +138,8 @@ const FiltersSidebar: React.FC<FiltersSidebarProps> = ({
       </div>
     </div>
 
-    {/* Clear */}
     {(selectedCategories.length > 0 ||
       selectedLevels.length > 0 ||
-      selectedLanguages.length > 0 ||
       priceRange) && (
       <button
         onClick={clearFilters}

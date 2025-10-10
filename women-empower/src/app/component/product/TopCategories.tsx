@@ -1,14 +1,12 @@
 "use client";
 
-import React, { useRef, useState } from "react";
-import { allProducts } from "../../data/products";
-import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material"; // ✅ MUI Icons
-import "@/app/globals.css"; 
+import React, { useRef, useState, useEffect } from "react";
+import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 
 interface Category {
-  id: number;
+  id: string;
   name: string;
-  count: number;
+  image: string;
 }
 
 interface CategoryCardProps {
@@ -17,16 +15,16 @@ interface CategoryCardProps {
 
 const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
   return (
-    <div className="flex-shrink-0 w-28 sm:w-32 md:w-36 bg-white rounded-xl transition duration-300 overflow-hidden cursor-pointer relative">
-      <div className="relative w-full h-24 sm:h-28 md:h-32 overflow-hidden flex items-center justify-center">
+    <div className="flex-shrink-0 w-28 sm:w-32 md:w-36 bg-white rounded-xl overflow-hidden cursor-pointer">
+      <div className="w-full h-20 sm:h-24 md:h-28 flex items-center justify-center">
         <img
-          src="/images/tedee.png"
+          src={category.image}
           alt={category.name}
-          className="w-20 h-20 object-cover hover:scale-105 transition-transform duration-300"
+          className="w-16 h-16 sm:w-20 sm:h-20 object-contain"
         />
       </div>
-      <div className="p-1 sm:p-1">
-        <h3 className="font-medium text-gray-800 text-xs sm:text-sm text-center leading-tight min-h-[28px] flex items-center justify-center">
+      <div className="p-2 sm:p-3">
+        <h3 className="font-medium text-gray-800 text-xs sm:text-sm text-center leading-tight min-h-[28px] flex items-center justify-center capitalize">
           {category.name}
         </h3>
       </div>
@@ -35,24 +33,69 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
 };
 
 const TopCategories: React.FC = () => {
-  const categoriesMap: Record<string, Category> = {};
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
-  allProducts.forEach((product, index) => {
-    if (!categoriesMap[product.category]) {
-      categoriesMap[product.category] = {
-        id: index + 1,
-        name: product.category,
-        count: 1,
-      };
-    } else {
-      categoriesMap[product.category].count += 1;
+  // Categories data with your specified image path
+  const categories: Category[] = [
+    {
+      id: "1",
+      name: "Rangoli",
+      image: "/images/tedee.png"
+    },
+    {
+      id: "2",
+      name: "Spiritual",
+      image: "/images/tedee.png"
+    },
+    {
+      id: "3",
+      name: "Resin",
+      image: "/images/tedee.png"
+    },
+    {
+      id: "4",
+      name: "Shubh Labh",
+      image: "/images/tedee.png"
+    },
+    {
+      id: "5",
+      name: "Lapdesk",
+      image: "/images/tedee.png"
+    },
+     {
+      id: "6",
+      name: "Diya & Thali",
+      image: "/images/tedee.png"
+    },
+    {
+      id: "7",
+      name: "Decor",
+      image: "/images/tedee.png"
+    },
+     {
+      id: "9",
+      name: "Diya & Thali",
+      image: "/images/tedee.png"
+    },
+    {
+      id: "11",
+      name: "Decor",
+      image: "/images/tedee.png"
     }
-  });
+  ];
 
-  const categories = Object.values(categoriesMap);
+  // Check scroll position
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+    }
+  };
 
+  // Scroll function
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
       const firstChild = scrollContainerRef.current.children[0] as HTMLElement;
@@ -64,45 +107,57 @@ const TopCategories: React.FC = () => {
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
       });
-
-      setCurrentIndex((prev) =>
-        direction === "left"
-          ? Math.max(0, prev - 1)
-          : Math.min(categories.length - 1, prev + 1)
-      );
+      
+      // Check scroll position after animation
+      setTimeout(checkScroll, 300);
     }
   };
 
+  // Initial scroll check
+  useEffect(() => {
+    checkScroll();
+  }, []);
+
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
-      <section className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 bg-white rounded-sm relative">
-        
-        {/* Left Arrow */}
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6  bg-white rounded-sm">        
+        {/* Navigation Buttons */}
         <button
           onClick={() => scroll("left")}
-          className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full 
-                     flex items-center justify-center shadow-md bg-white text-gray-700 
-                     hover:bg-gray-100 transition-all"
+          disabled={!canScrollLeft}
+          className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full 
+                     flex items-center justify-center shadow-lg transition-all duration-200
+                     ${canScrollLeft 
+                       ? "bg-white text-gray-700 hover:bg-gray-100 hover:scale-110" 
+                       : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
         >
           <ArrowBackIos fontSize="small" />
         </button>
 
-        {/* Right Arrow */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full 
-                     flex items-center justify-center shadow-md bg-white text-gray-700 
-                     hover:bg-gray-100 transition-all"
+          disabled={!canScrollRight}
+          className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 sm:w-12 sm:h-12 rounded-full 
+                     flex items-center justify-center shadow-lg transition-all duration-200
+                     ${canScrollRight 
+                       ? "bg-white text-gray-700 hover:bg-gray-100 hover:scale-110" 
+                       : "bg-gray-200 text-gray-400 cursor-not-allowed"}`}
         >
           <ArrowForwardIos fontSize="small" />
         </button>
 
-        {/* Scrollable Categories */}
-        <div ref={scrollContainerRef} className="overflow-x-auto scroll-smooth scrollbar-hide">
-          <div className="flex gap-4 sm:gap-5 md:gap-6 w-max">
-            {categories.map((category) => (
-              <CategoryCard key={category.id} category={category} />
-            ))}
+        {/* Categories Container */}
+        <div className="relative">
+          <div 
+            ref={scrollContainerRef} 
+            className="overflow-x-auto scroll-smooth scrollbar-hide"
+            onScroll={checkScroll}
+          >
+            <div className="flex gap-4 sm:gap-6 w-max py-4 px-2">
+              {categories.map((category) => (
+                <CategoryCard key={category.id} category={category} />
+              ))}
+            </div>
           </div>
         </div>
       </section>

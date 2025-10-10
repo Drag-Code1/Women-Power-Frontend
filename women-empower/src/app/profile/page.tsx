@@ -24,22 +24,20 @@ import {
   Delete,
   Home,
   Work,
-  Business
+  Business,
+  AccountCircle,
+  ArrowForward
 } from '@mui/icons-material';
 
 interface User {
   id: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  gender: 'male' | 'female' | 'other';
   email: string;
-  phone: string;
-  avatar: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    pincode: string;
-  };
-  joinedDate: string;
+  mobileNo: string;
+  joining_date: string;
+  role: 'user' | 'admin';
 }
 
 interface Address {
@@ -66,14 +64,21 @@ interface Order {
 const ProfileSection: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [activeTab, setActiveTab] = useState('profile');
-  const [loginMethod, setLoginMethod] = useState<'mobile' | 'email'>('mobile');
-  const [showOtpVerification, setShowOtpVerification] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState('');
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [emailAddress, setEmailAddress] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  const [showOtpVerification, setShowOtpVerification] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  
+  // Signup form states
+  const [signupData, setSignupData] = useState({
+    firstName: '',
+    lastName: '',
+    gender: 'male' as 'male' | 'female' | 'other',
+    email: '',
+    mobileNo: '',
+    role: 'user' as 'user' | 'admin'
+  });
   
   // Address management states
   const [addresses, setAddresses] = useState<Address[]>([
@@ -114,18 +119,14 @@ const ProfileSection: React.FC = () => {
   });
   
   const [user, setUser] = useState<User>({
-    id: '1',
-    name: 'Rahul Sharma',
-    email: 'rahul.sharma@email.com',
-    phone: '+91 9876543210',
-    avatar: '/images/man1.jpg',
-    address: {
-      street: '123 MG Road',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pincode: '400001'
-    },
-    joinedDate: 'January 2023'
+    id: '4cf0865c-ae9c-4381-84ce-4ddec3582db8',
+    firstName: 'dannyy',
+    lastName: 'sharmaaa',
+    gender: 'female',
+    email: 'danggy@xamplee.com',
+    mobileNo: '9879873212',
+    joining_date: '2025-10-04 12:17:53',
+    role: 'user'
   });
 
   const [editedUser, setEditedUser] = useState<User>(user);
@@ -156,6 +157,37 @@ const ProfileSection: React.FC = () => {
       image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop'
     }
   ];
+
+  // Load users from localStorage on component mount
+  useEffect(() => {
+    const storedUsers = localStorage.getItem('users');
+    if (storedUsers) {
+      try {
+        const parsedUsers = JSON.parse(storedUsers);
+        // Add default user if not exists
+        if (!parsedUsers.some((u: User) => u.email === 'danggy@xamplee.com')) {
+          const defaultUser = {
+            id: '4cf0865c-ae9c-4381-84ce-4ddec3582db8',
+            firstName: 'dannyy',
+            lastName: 'sharmaaa',
+            gender: 'female',
+            email: 'danggy@xamplee.com',
+            mobileNo: '9879873212',
+            joining_date: '2025-10-04 12:17:53',
+            role: 'user'
+          };
+          localStorage.setItem('users', JSON.stringify([...parsedUsers, defaultUser]));
+        }
+      } catch (error) {
+        console.error('Error parsing stored users:', error);
+        // Initialize with default user
+        localStorage.setItem('users', JSON.stringify([user]));
+      }
+    } else {
+      // Initialize with default user
+      localStorage.setItem('users', JSON.stringify([user]));
+    }
+  }, []);
 
   // Address management functions
   const handleAddAddress = () => {
@@ -230,29 +262,55 @@ const ProfileSection: React.FC = () => {
     }
   };
 
-  const handleMobileLogin = () => {
-    if (mobileNumber.length === 10) {
-      setShowOtpVerification(true);
-    } else {
-      alert('Please enter valid mobile number');
-    }
-  };
-
   const handleEmailLogin = () => {
-    if (emailAddress && password) {
-      setIsLoggedIn(true);
-      setUser(prev => ({ ...prev, email: emailAddress }));
+    if (emailAddress && emailAddress.includes('@')) {
+      // Check if user exists in localStorage
+      const storedUsers = localStorage.getItem('users');
+      if (storedUsers) {
+        try {
+          const users = JSON.parse(storedUsers);
+          const existingUser = users.find((u: User) => u.email === emailAddress);
+          
+          if (existingUser) {
+            setShowOtpVerification(true);
+          } else {
+            alert('User not found. Please sign up first.');
+          }
+        } catch (error) {
+          console.error('Error checking user:', error);
+          alert('An error occurred. Please try again.');
+        }
+      } else {
+        alert('User not found. Please sign up first.');
+      }
     } else {
-      alert('Please enter email and password');
+      alert('Please enter a valid email address');
     }
   };
 
   const handleOtpVerification = () => {
     const otpValue = otp.join('');
     if (otpValue.length === 6) {
-      setShowOtpVerification(false);
-      setIsLoggedIn(true);
-      setUser(prev => ({ ...prev, phone: `+91 ${mobileNumber}` }));
+      // Get user from localStorage
+      const storedUsers = localStorage.getItem('users');
+      if (storedUsers) {
+        try {
+          const users = JSON.parse(storedUsers);
+          const existingUser = users.find((u: User) => u.email === emailAddress);
+          
+          if (existingUser) {
+            setUser(existingUser);
+            setEditedUser(existingUser);
+            setShowOtpVerification(false);
+            setIsLoggedIn(true);
+          } else {
+            alert('User not found. Please sign up first.');
+          }
+        } catch (error) {
+          console.error('Error verifying user:', error);
+          alert('An error occurred. Please try again.');
+        }
+      }
     } else {
       alert('Please enter complete OTP');
     }
@@ -269,6 +327,73 @@ const ProfileSection: React.FC = () => {
         nextInput?.focus();
       }
     }
+  };
+
+  const handleSignup = () => {
+    // Validate form
+    if (!signupData.firstName || !signupData.lastName || !signupData.email || !signupData.mobileNo) {
+      alert('Please fill all required fields');
+      return;
+    }
+    
+    if (!signupData.email.includes('@')) {
+      alert('Please enter a valid email address');
+      return;
+    }
+    
+    if (signupData.mobileNo.length !== 10) {
+      alert('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    
+    // Check if user already exists
+    const storedUsers = localStorage.getItem('users');
+    if (storedUsers) {
+      try {
+        const users = JSON.parse(storedUsers);
+        const existingUser = users.find((u: User) => u.email === signupData.email);
+        
+        if (existingUser) {
+          alert('User with this email already exists. Please login.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking existing user:', error);
+      }
+    }
+    
+    // Create new user with auto-generated ID and current date
+    const newUser: User = {
+      ...signupData,
+      id: generateId(),
+      joining_date: new Date().toISOString().replace('T', ' ').substring(0, 19)
+    };
+    
+    // Save to localStorage
+    if (storedUsers) {
+      try {
+        const users = JSON.parse(storedUsers);
+        users.push(newUser);
+        localStorage.setItem('users', JSON.stringify(users));
+      } catch (error) {
+        console.error('Error saving user:', error);
+        localStorage.setItem('users', JSON.stringify([newUser]));
+      }
+    } else {
+      localStorage.setItem('users', JSON.stringify([newUser]));
+    }
+    
+    // Show OTP verification
+    setEmailAddress(signupData.email);
+    setShowOtpVerification(true);
+  };
+
+  const generateId = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   };
 
   const handleSaveProfile = () => {
@@ -298,7 +423,7 @@ const ProfileSection: React.FC = () => {
     { id: 'help', label: 'Help', icon: Help },
   ];
 
-  // Login Screen
+  // Login/Signup Screen
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -307,69 +432,138 @@ const ProfileSection: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-xl p-10">
               <div className="text-center mb-8">
                 <div className="w-16 h-16 bg-[#61503c] rounded-full flex items-center justify-center mx-auto mb-4">
-                  {loginMethod === 'mobile' ? (
-                    <Phone className="w-8 h-8 text-white" />
-                  ) : (
+                  {authMode === 'login' ? (
                     <Email className="w-8 h-8 text-white" />
+                  ) : (
+                    <AccountCircle className="w-8 h-8 text-white" />
                   )}
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back!</h1>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                  {authMode === 'login' ? 'Welcome Back!' : 'Create Account'}
+                </h1>
                 <p className="text-gray-600">
-                  {loginMethod === 'mobile' 
-                    ? 'Enter your mobile number to continue'
-                    : 'Enter your email and password to continue'
+                  {authMode === 'login' 
+                    ? 'Enter your email address to continue'
+                    : 'Fill in your details to create an account'
                   }
                 </p>
               </div>
 
-              {/* Login Method Toggle */}
+              {/* Auth Mode Toggle */}
               <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
                 <button
-                  onClick={() => setLoginMethod('mobile')}
+                  onClick={() => setAuthMode('login')}
                   className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-all ${
-                    loginMethod === 'mobile'
+                    authMode === 'login'
                       ? 'bg-[#61503c] text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  <Phone className="w-4 h-4" />
-                  <span>Mobile</span>
+                  <Login className="w-4 h-4 text-gray-400" />
+                  <span>Login</span>
                 </button>
                 <button
-                  onClick={() => setLoginMethod('email')}
+                  onClick={() => setAuthMode('signup')}
                   className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-lg font-medium transition-all ${
-                    loginMethod === 'email'
+                    authMode === 'signup'
                       ? 'bg-[#61503c] text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-800'
                   }`}
                 >
-                  <Email className="w-4 h-4" />
-                  <span>Email</span>
+                  <AccountCircle className="w-4 h-4" />
+                  <span>Sign Up</span>
                 </button>
               </div>
 
               <div className="space-y-6">
-                {loginMethod === 'mobile' ? (
+                {authMode === 'login' ? (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Mobile Number
+                      Email Address
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                        <span className="text-gray-500 text-sm">+91</span>
+                        <Email className="w-5 h-5 text-gray-400" />
                       </div>
                       <input
-                        type="tel"
-                        value={mobileNumber}
-                        onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
-                        placeholder="Enter 10-digit mobile number"
-                        maxLength={10}
+                        type="email"
+                        value={emailAddress}
+                        onChange={(e) => setEmailAddress(e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
+                        placeholder="Enter your email address"
                       />
                     </div>
                   </div>
                 ) : (
                   <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          First Name
+                        </label>
+                        <input
+                          type="text"
+                          value={signupData.firstName}
+                          onChange={(e) => setSignupData(prev => ({ ...prev, firstName: e.target.value }))}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
+                          placeholder="First name"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Last Name
+                        </label>
+                        <input
+                          type="text"
+                          value={signupData.lastName}
+                          onChange={(e) => setSignupData(prev => ({ ...prev, lastName: e.target.value }))}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
+                          placeholder="Last name"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Gender
+                      </label>
+                      <div className="flex space-x-4">
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="male"
+                            checked={signupData.gender === 'male'}
+                            onChange={(e) => setSignupData(prev => ({ ...prev, gender: 'male' }))}
+                            className="mr-2"
+                          />
+                          <span>Male</span>
+                        </label>
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="female"
+                            checked={signupData.gender === 'female'}
+                            onChange={(e) => setSignupData(prev => ({ ...prev, gender: 'female' }))}
+                            className="mr-2"
+                          />
+                          <span>Female</span>
+                        </label>
+                        <label className="flex items-center">
+                          <input
+                            type="radio"
+                            name="gender"
+                            value="other"
+                            checked={signupData.gender === 'other'}
+                            onChange={(e) => setSignupData(prev => ({ ...prev, gender: 'other' }))}
+                            className="mr-2"
+                          />
+                          <span>Other</span>
+                        </label>
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Email Address
@@ -380,8 +574,8 @@ const ProfileSection: React.FC = () => {
                         </div>
                         <input
                           type="email"
-                          value={emailAddress}
-                          onChange={(e) => setEmailAddress(e.target.value)}
+                          value={signupData.email}
+                          onChange={(e) => setSignupData(prev => ({ ...prev, email: e.target.value }))}
                           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
                           placeholder="Enter your email address"
                         />
@@ -390,51 +584,36 @@ const ProfileSection: React.FC = () => {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Password
+                        Mobile Number
                       </label>
                       <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center">
+                          <Phone className="w-5 h-5 text-gray-400" />
+                        </div>
                         <input
-                          type={showPassword ? 'text' : 'password'}
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="w-full pl-4 pr-12 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
-                          placeholder="Enter your password"
+                          type="tel"
+                          value={signupData.mobileNo}
+                          onChange={(e) => setSignupData(prev => ({ ...prev, mobileNo: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-blue-500 focus:border-transparent transition-all"
+                          placeholder="Enter 10-digit mobile number"
+                          maxLength={10}
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                        >
-                          {showPassword ? (
-                            <VisibilityOff className="w-5 h-5 text-gray-400" />
-                          ) : (
-                            <Visibility className="w-5 h-5 text-gray-400" />
-                          )}
-                        </button>
                       </div>
                     </div>
                   </>
                 )}
 
                 <button
-                  onClick={loginMethod === 'mobile' ? handleMobileLogin : handleEmailLogin}
+                  onClick={authMode === 'login' ? handleEmailLogin : handleSignup}
                   disabled={
-                    loginMethod === 'mobile' 
-                      ? mobileNumber.length !== 10 
-                      : !emailAddress || !password
+                    authMode === 'login' 
+                      ? !emailAddress || !emailAddress.includes('@')
+                      : !signupData.firstName || !signupData.lastName || !signupData.email || !signupData.mobileNo
                   }
                   className="w-full bg-[#61503c] text-white py-3 px-4 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  {loginMethod === 'mobile' ? 'Send OTP' : 'Login'}
+                  {authMode === 'login' ? 'Send OTP' : 'Create Account'}
                 </button>
-
-                {loginMethod === 'email' && (
-                  <div className="text-center">
-                    <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                      Forgot Password?
-                    </button>
-                  </div>
-                )}
 
                 <div className="text-center">
                   <p className="text-xs text-gray-500">
@@ -458,7 +637,7 @@ const ProfileSection: React.FC = () => {
                 </div>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Verify OTP</h1>
                 <p className="text-gray-600">
-                  We've sent a 6-digit code to +91 {mobileNumber}
+                  We've sent a 6-digit code to {emailAddress}
                 </p>
               </div>
 
@@ -506,15 +685,15 @@ const ProfileSection: React.FC = () => {
         <div className="bg-white rounded-sm p-2 lg:p-2 mb-4">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center space-x-4 mb-4 lg:mb-0">
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-16 h-16 lg:w-20 lg:h-20 rounded-full object-cover border-4 border-blue-100"
-              />
+              <div className="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center border-4 border-blue-100">
+                <span className="text-2xl font-bold text-amber-600">
+                  {user.firstName.charAt(0).toUpperCase()}{user.lastName.charAt(0).toUpperCase()}
+                </span>
+              </div>
               <div>
-                <h1 className="text-1xl lg:text-2xl text-gray-900">{user.name}</h1>
+                <h1 className="text-1xl lg:text-2xl text-gray-900">{user.firstName} {user.lastName}</h1>
                 <p className="text-gray-600">{user.email}</p>
-                <p className="text-sm text-gray-500">Member since {user.joinedDate}</p>
+                <p className="text-sm text-gray-500">Member since {new Date(user.joining_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
               </div>
             </div>
             <button
@@ -592,87 +771,80 @@ const ProfileSection: React.FC = () => {
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
                       {isEditing ? (
                         <input
                           type="text"
-                          value={editedUser.name}
-                          onChange={(e) => setEditedUser(prev => ({ ...prev, name: e.target.value }))}
+                          value={editedUser.firstName}
+                          onChange={(e) => setEditedUser(prev => ({ ...prev, firstName: e.target.value }))}
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         />
                       ) : (
-                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.name}</div>
+                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.firstName}</div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={editedUser.lastName}
+                          onChange={(e) => setEditedUser(prev => ({ ...prev, lastName: e.target.value }))}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        />
+                      ) : (
+                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.lastName}</div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                      {isEditing ? (
+                        <select
+                          value={editedUser.gender}
+                          onChange={(e) => setEditedUser(prev => ({ ...prev, gender: e.target.value as 'male' | 'female' | 'other' }))}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        >
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </select>
+                      ) : (
+                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900 capitalize">{user.gender}</div>
                       )}
                     </div>
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                      <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.email}</div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
                       {isEditing ? (
                         <input
-                          type="email"
-                          value={editedUser.email}
-                          onChange={(e) => setEditedUser(prev => ({ ...prev, email: e.target.value }))}
+                          type="tel"
+                          value={editedUser.mobileNo}
+                          onChange={(e) => setEditedUser(prev => ({ ...prev, mobileNo: e.target.value }))}
                           className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         />
                       ) : (
-                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.email}</div>
+                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.mobileNo}</div>
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                      <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.phone}</div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Street Address</label>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          value={editedUser.address.street}
-                          onChange={(e) => setEditedUser(prev => ({ 
-                            ...prev, 
-                            address: { ...prev.address, street: e.target.value }
-                          }))}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        />
-                      ) : (
-                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.address.street}</div>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          value={editedUser.address.city}
-                          onChange={(e) => setEditedUser(prev => ({ 
-                            ...prev, 
-                            address: { ...prev.address, city: e.target.value }
-                          }))}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        />
-                      ) : (
-                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.address.city}</div>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
-                      {isEditing ? (
-                        <input
-                          type="text"
-                          value={editedUser.address.pincode}
-                          onChange={(e) => setEditedUser(prev => ({ 
-                            ...prev, 
-                            address: { ...prev.address, pincode: e.target.value }
-                          }))}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                        />
-                      ) : (
-                        <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">{user.address.pincode}</div>
-                      )}
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Joining Date</label>
+                      <div className="px-4 py-3 bg-gray-50 rounded-xl text-gray-900">
+                        {new Date(user.joining_date).toLocaleDateString('en-US', { 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -989,5 +1161,12 @@ const ProfileSection: React.FC = () => {
     </div>
   );
 };
+
+// Add the missing Login icon
+const Login = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+  </svg>
+);
 
 export default ProfileSection;
