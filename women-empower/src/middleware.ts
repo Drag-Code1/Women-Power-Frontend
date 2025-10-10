@@ -37,18 +37,18 @@ export function middleware(request: NextRequest) {
       console.error("JWT decode failed:", err);
     }
   }
-
+  // admin = false;
   const path = request.nextUrl.pathname;
   const isPublicPage = publicPages.some((p) => path === p || path.startsWith(p + "/"));
-  const isAuthPage = AuthPages.includes(path);
+  const isAuthPage = AuthPages.some((p) => path === p || path === p + "/");
 
   // ❌ Not logged in → redirect to login
-  if (!token && !isPublicPage) {
-    return NextResponse.redirect(new URL("/auth", request.url));
-  }
-
+if (!token && !isPublicPage && !isAuthPage) {
+  return NextResponse.redirect(new URL("/auth", request.url));
+}
   // Logged in user should not access Auth pages
   if (token && isAuthPage) {
+    console.log("-----------------is auth------------",isAuthPage,path)
     return NextResponse.redirect(new URL("/", request.url));
   }
 
@@ -66,5 +66,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [ '/auth',"/wishlist","/profile/:path*", "/cart", "/checkout", "/order-details", "/admin/:path*"],
+  matcher: ["/auth","/wishlist","/profile/:path*", "/cart", "/checkout", "/order-details", "/admin/:path*"],
 };

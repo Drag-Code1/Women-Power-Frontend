@@ -242,7 +242,7 @@ const decoded = jwt.decode(token) as { admin?: boolean | string };
                 //     }`}
                 //   />
                 // </button>
-                <DesktopNavItem item={item}/>
+                <DesktopNavItem key={item.name} item={item}/>
               ))}
             </div>
 

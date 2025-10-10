@@ -362,7 +362,7 @@ export const getArtistReview = async (artistID: string) => {
     return data; // Expecting { reviews: Review[] }
   } catch (error: any) {
     console.error(error);
-    return { reviews: [] }; // fallback
+    return []; // fallback
   }
 };
 
@@ -482,7 +482,7 @@ export const fetchWishlist = async (userID: string) => {
     return data; // Expecting { reviews: Review[] }
   } catch (error: any) {
     console.error(error);
-    return; // fallback
+    return []; // fallback
   }
 };
 
@@ -597,7 +597,80 @@ export const updateAddress = async (document:updateAddress) => {
    
     return data;
   } catch (error: any) {
-   
+   return [];
   }
 };
 // 5ffda320-72dc-420f-8b30-1223f807c9aa
+
+
+export async function getCategories() {
+  try{ const res = await fetch(`http://localhost:7000/v1/category/`, {
+    cache: "force-cache",
+  })
+   if(!res.ok){
+throw  'error occured at getProducts';
+   
+  }
+  return res.json()
+}
+catch(er){
+console.log(er);
+ return [];
+}
+}
+export async function getProducts() {
+try{  const res = await fetch(`http://localhost:7000/v1/product/?page=1`, {
+    // cache: "no-",
+  })
+   if(!res.ok){
+throw  'error occured at getProducts';
+   
+  }
+  return res.json()
+}
+catch(er){
+console.log(er);
+ return [];
+}
+}
+
+export async function getTrendingProducts() {
+ try{ const res = await fetch(`http://localhost:7000/v1/product/?page=1`, {
+    // cache: "force-cache",
+  })
+   if(!res.ok){
+throw  'error occured at getTrendingProducts';
+   
+  }
+  return res.json()
+}
+catch(er){
+console.log(er);
+ return [];
+}
+}
+
+ 
+export async function getTopArtists() {
+ 
+ try{ const res = await fetch(`http://localhost:5000/api/top-artist`, {
+    cache: "force-cache",
+  })
+
+  if(!res.ok){
+throw  'error occured at getTopArtists';
+   
+  }
+  return res.json()
+}
+catch(er){
+console.log(er);
+ return [];
+}
+}
+// async function getTrendingProducts() {
+//   const res = await fetch(`http://localhost:5000/api/trending-products`, {
+//     cache: "force-cache",
+//   })
+//   return res.json()
+// }

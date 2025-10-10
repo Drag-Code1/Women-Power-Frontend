@@ -17,34 +17,8 @@ import { Category } from "@/app/types/category";
 import { CategoryCard } from "./component/category/CategoryCard";
 import ArtistCard from "./component/cart/ArtistCard";
 import { Artist } from "./types/artist";
+import { getCategories, getProducts, getTopArtists, getTrendingProducts } from "./lib/api";
 
-async function getCategories() {
-  const res = await fetch(`http://localhost:7000/v1/category/`, {
-    cache: "force-cache",
-  })
-  return res.json()
-}
-async function getProducts() {
-  const res = await fetch(`http://localhost:7000/v1/product/?page=1`, {
-    // cache: "no-",
-  })
-  return res.json()
-}
- 
-async function getTrendingProducts() {
-  const res = await fetch(`http://localhost:7000/v1/product/?page=1`, {
-    // cache: "force-cache",
-  })
-  return res.json()
-}
-
- 
-async function getTopArtists() {
-  const res = await fetch(`http://localhost:5000/api/top-artist`, {
-    cache: "force-cache",
-  })
-  return res.json()
-}
 
  
 
@@ -82,7 +56,7 @@ export default async function Home() {
       <TopCategories>
 
         {categories.data.map((category:Category)=>(
-<CategoryCard  category={category} />
+<CategoryCard key={category.id} category={category} />
 
         ))}
 

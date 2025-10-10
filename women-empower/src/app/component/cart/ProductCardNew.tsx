@@ -5,13 +5,17 @@ import { AddToCart } from "../ui/button/AddToCart";
 import { AddToWIshlist } from "../ui/button/AddToWIshlist";
 // import { useSearchParams } from 'next/navigation';
 import { newProduct, Product } from "@/app/types/product"; 
-
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 interface Props {
   product: newProduct
 }
 
 const ProductCardNew: React.FC<Props> = ({ product }) => {
+    const cookieStore = cookies();
+    const token = cookieStore.get("auth_token")?.value;
+  const decoded = jwt.decode(token) as { admin?: boolean | string };
   if (!product) return null;
   // const [isLiked, setIsLiked] = useState(false);
 
@@ -50,7 +54,7 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
           />
         </button> */}
 
-        <AddToWIshlist id_={product.id} />
+        {!decoded  &&    <AddToWIshlist id_={product.id} /> }
       </div>
 
       {/* Product Details */}
@@ -92,7 +96,7 @@ const ProductCardNew: React.FC<Props> = ({ product }) => {
           {/* <button className="bg-[#695946] text-white px-3 py-1.5 rounded text-xs hover:bg-[#61503c] transition-colors">
             Add to Cart
           </button> */}
-          <AddToCart id={product.id} />
+        {!decoded  &&    <AddToCart id={product.id} />}
         </div>
       </div>
     </div>

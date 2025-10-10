@@ -4,12 +4,8 @@ import RelatedProducts from '@/app/component/product/RelatedProducts'
 import ProductReviews from '../component/product/ProductReviews'
 import ProductCardNew from '../component/cart/ProductCardNew'
 import { Product } from '../types/product'
-async function getTrendingProducts() {
-  const res = await fetch(`http://localhost:5000/api/trending-products`, {
-    cache: "force-cache",
-  })
-  return res.json()
-}
+import { getTrendingProducts } from '../lib/api'
+
 
 async function page() {
 
