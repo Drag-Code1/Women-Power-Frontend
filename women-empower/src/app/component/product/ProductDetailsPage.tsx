@@ -1,5 +1,7 @@
 // 'use client';
 import React  from "react";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 import type { JSX } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/state-management/hooks";
@@ -32,9 +34,14 @@ async function getTrendingProducts(productID: string) {
   }
 }
 
-const ProductDetailsPage = async() => {
+const ProductDetailsPage = async() => { 
+   
   const pData=await getTrendingProducts('10c451d5-1134-47b4-81a4-832d3b73d715');
   console.log('nn',pData);
+  const cookieStore = cookies();
+
+  const token = cookieStore.get("auth_token")?.value;
+const decoded = jwt.decode(token) as { admin?: boolean | string };
   const productData = {
     id:1,
     title: "Traditional Shubh Labh",
@@ -182,7 +189,7 @@ const ProductDetailsPage = async() => {
                       <Plus size={16} />
                     </button>
                   </div> */}
-                  <ProductQuantityContainer />
+                  {!decoded  && <ProductQuantityContainer /> }
                   <span className="bg-green-50 text-green-700 text-sm px-3 py-1 rounded-full font-medium">
                     ✓ In Stock
                   </span>
@@ -195,7 +202,7 @@ const ProductDetailsPage = async() => {
                 {/* <button className="w-full bg-[#695946] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#5a4a3a] transition-colors shadow-sm">
                   Add to Cart
                 </button> */}
-                <ProductAddToCart />
+              {!decoded  &&     <ProductAddToCart id={pData.data.id} /> }
                 <div className="flex gap-3">
                          {/* client */}
                   {/* <button
@@ -205,7 +212,7 @@ const ProductDetailsPage = async() => {
                     <ShoppingCart size={18} />
                     Buy Nnow
                   </button> */}
-<ProductBuyNow />
+ {!decoded  &&  <ProductBuyNow /> }
                
                          {/* client */}
                   {/* <button
@@ -218,7 +225,7 @@ const ProductDetailsPage = async() => {
                   >
                     <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
                   </button> */}
-                     <ProductAddToWishList />
+                  {!decoded  &&     <ProductAddToWishList  id_={pData.data.id}  /> }
                 </div>
               </div>
 

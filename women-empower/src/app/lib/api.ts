@@ -370,7 +370,7 @@ export const getArtistReview = async (artistID: string) => {
 
 export async function fetchAddToCart(
   cart_id: string,
-  id: number,
+  id: string,
   pQt: number|null
 ) {
   const cartBody = {
@@ -482,7 +482,7 @@ export const fetchWishlist = async (userID: string) => {
     return data; // Expecting { reviews: Review[] }
   } catch (error: any) {
     console.error(error);
-    return []; // fallback
+    // return []; // fallback
   }
 };
 

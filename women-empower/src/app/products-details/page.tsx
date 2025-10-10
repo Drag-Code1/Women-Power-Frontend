@@ -17,7 +17,7 @@ async function page() {
       <RelatedProducts>
 
         {
-relatedProducts.map(
+relatedProducts.data.data.map(
   (item:Product)=>
 
       <ProductCardNew product={item} />

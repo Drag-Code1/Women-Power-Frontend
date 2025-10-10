@@ -16,7 +16,7 @@ const dispatch=useAppDispatch();
          const handleWishlist=async()=>{
           console.log("Clicked on wishlist button for product ID:", id_);
           console.log("Current wishlist items from Redux:", selector);
-if(selector.length>0 && selector.find((item)=>item.product_id==id_)){
+if(selector && selector.length>0 && selector.find((item)=>item.product_id==id_)){
   const foundItem=selector.find((item)=>item.product_id==id_);
  
   console.log("Item already in wishlist","remove it",selector.find((item)=>item.product_id==id_));
