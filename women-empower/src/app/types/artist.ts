@@ -1,22 +1,9 @@
 export interface Artist {
-  id: number;
-  name: string;
-  description: string;
-  phone: string;
-  location: string;
-  image: string;
+  id: string;
+  artist_Name: string;
+  artist_profile_pic: string;
+  category_id: string;
   category: string;
-  rating: number;
-  experience: string;
-  speciality: string;
-  completedWorks: number;
-  topRated: boolean;
-}
-export interface ArtworkItem {
-  id: number;
-  title: string;
-  image: string;
-  rating: number;
-  likes: number;
-  category: string;
+  joining_date: string;
+  experience: number;
 }

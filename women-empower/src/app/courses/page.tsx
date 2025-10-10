@@ -1,5 +1,5 @@
 // app/courses/page.tsx (Server Component)
-import CoursesDirectoryClient from "../component/courese/CoursesDirectoryClient ";
+import CoursesDirectoryClient from "../component/courses/CoursesDirectoryClient ";
 
 interface Course {
   id: string;
