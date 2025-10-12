@@ -38,7 +38,6 @@ import HelpTab from './HelpTab';
 
 // Import AuthContext
 import { useAuth } from '@/app/contexts/AuthContext';
-import { testTokenManagement } from '@/app/lib/authApi';
 import { useCart } from '@/app/contexts/CartContext';
 
 // Types
@@ -179,45 +178,21 @@ const ProfileSection: React.FC = () => {
     }
   }, [user]);
 
-  // Debug function to check token status
-  const debugTokenStatus = () => {
-    console.log('🔍 === CURRENT AUTH STATE ===');
-    console.log('isAuthenticated:', isAuthenticated);
-    console.log('isLoading:', isLoading);
-    console.log('user:', user);
-    console.log('token exists:', !!user);
-    
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('auth_token');
-      const userData = localStorage.getItem('auth_user');
-      console.log('localStorage token:', token ? token.substring(0, 20) + '...' : 'null');
-      console.log('localStorage user:', userData ? JSON.parse(userData) : 'null');
-    }
-    console.log('🔍 === END AUTH STATE ===');
-  };
-
-  // Test cart functionality
-  const testCartFunctionality = async () => {
-    console.log('🛒 === TESTING CART FUNCTIONALITY ===');
-    
-    if (!user) {
-      console.error('❌ No user found');
-      return;
-    }
-    
-    try {
-      // Test with a dummy product ID
-      const testProductId = 'test-product-123';
-      console.log('🛒 Testing add to cart with product ID:', testProductId);
+  // Redirect already logged-in admin users to dashboard
+  useEffect(() => {
+    if (user && !isLoading && user.role === 'admin') {
+      console.log('🔄 Admin user detected on profile page, redirecting to dashboard');
+      console.log('👤 User role:', user.role);
+      console.log('📧 User email:', user.email);
       
-      await addToCart(testProductId, 1);
-      console.log('✅ Add to cart test successful!');
-    } catch (error) {
-      console.error('❌ Add to cart test failed:', error);
+      // Add a small delay to ensure component is fully loaded
+      setTimeout(() => {
+        console.log('🚀 Redirecting admin to dashboard...');
+        window.location.href = "/dashboardmaintab";
+      }, 100);
     }
-    
-    console.log('🛒 === END CART TEST ===');
-  };
+  }, [user, isLoading]);
+
 
   // Address management functions
   const handleAddAddress = () => {
@@ -304,13 +279,30 @@ const ProfileSection: React.FC = () => {
       setSuccess(null);
       try {
         console.log('Calling verifyOtp API...');
-        await verifyOtp(emailAddress, parseInt(otpValue));
+        const loggedInUser = await verifyOtp(emailAddress, parseInt(otpValue));
         console.log('OTP verification successful');
+        console.log('👤 User data from OTP verification:', loggedInUser);
+        console.log('🎯 User role:', loggedInUser?.role);
+        
         setShowOtpVerification(false);
         setSuccess('Login successful!');
         // Reset form
         setEmailAddress('');
         setOtp(['', '', '', '', '', '']);
+        
+        // Role-based routing after successful OTP verification
+        console.log('🔄 Starting role-based redirect...');
+        
+        if (loggedInUser?.role === 'admin') {
+          console.log('🔐 Admin user detected, redirecting to admin dashboard');
+          // Add a small delay to ensure state updates are complete
+          setTimeout(() => {
+            window.location.href = "/dashboardmaintab";
+          }, 100);
+        } else {
+          console.log('👤 Regular user detected, staying on profile page');
+          console.log('ℹ️ User is already on profile page, no redirect needed');
+        }
       } catch (error: any) {
         console.error('OTP verification error:', error);
         setError(error.message || 'Invalid OTP. Please try again.');
@@ -474,27 +466,6 @@ const ProfileSection: React.FC = () => {
         {/* Profile Header */}
         <ProfileHeader user={user} onLogout={handleLogout} />
         
-        {/* Debug Button - Remove in production */}
-        <div className="mb-4 text-center">
-          <button
-            onClick={debugTokenStatus}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 mr-2"
-          >
-            Debug Token Status
-          </button>
-          <button
-            onClick={testTokenManagement}
-            className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 mr-2"
-          >
-            Test Token Management
-          </button>
-          <button
-            onClick={testCartFunctionality}
-            className="px-4 py-2 bg-purple-500 text-white rounded-lg text-sm hover:bg-purple-600"
-          >
-            Test Cart Functionality
-          </button>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}

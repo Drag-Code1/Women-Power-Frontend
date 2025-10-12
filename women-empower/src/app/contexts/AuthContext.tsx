@@ -86,7 +86,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const verifyOtpAndLogin = async (email: string, otp: number): Promise<void> => {
+  const verifyOtpAndLogin = async (email: string, otp: number): Promise<User> => {
     setAuthState(prev => ({ ...prev, isLoading: true }));
     try {
       const response = await verifyOtp(email, otp);
@@ -122,6 +122,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           token: token ? token.substring(0, 20) + '...' : 'null',
           isAuthenticated: true
         });
+        
+        // Return user data for role-based routing
+        return user;
       } else {
         throw new Error(response.message || 'OTP verification failed');
       }

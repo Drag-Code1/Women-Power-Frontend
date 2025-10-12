@@ -1,10 +1,11 @@
 "use client";
 
+import React from "react";
 import { useAuth } from "@/app/contexts/AuthContext";
-import NavBar from "../ui/utlity/NavBar";
-import Footer from "../ui/utlity/Footer";
-import ScrollToTopButton from "../ui/utlity/ScrollToTopButton";
-import DashboardLayout from "../../DashboardLayout";
+import NavBar from "./ui/utlity/NavBar";
+import Footer from "./ui/utlity/Footer";
+import ScrollToTopButton from "./ui/utlity/ScrollToTopButton";
+import DashboardLayout from "../DashboardLayout";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -36,7 +37,7 @@ const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ children }) => {
   });
 
   if (isAdmin) {
-    // Admin Layout - Dashboard
+    // Admin Layout
     return (
       <DashboardLayout>
         <ScrollToTopButton />
@@ -57,4 +58,3 @@ const LayoutWrapper: React.FC<LayoutWrapperProps> = ({ children }) => {
 };
 
 export default LayoutWrapper;
-

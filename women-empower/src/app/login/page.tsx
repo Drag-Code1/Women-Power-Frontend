@@ -46,10 +46,22 @@ const LoginPage: React.FC = () => {
     }
     try {
       setError(null);
-      await verifyOtp(emailAddress, parseInt(value, 10)); // POST /v1/login/otp
+      const loggedInUser = await verifyOtp(emailAddress, parseInt(value, 10)); // POST /v1/login/otp
       setShowOtpVerification(false);
       setOtp(["", "", "", "", "", ""]);
-      router.push("/profile");
+      
+      // Role-based routing after successful OTP verification
+      console.log('🔄 Starting role-based redirect...');
+      console.log('👤 User data from OTP verification:', loggedInUser);
+      console.log('🎯 User role:', loggedInUser?.role);
+      
+      if (loggedInUser?.role === 'admin') {
+        console.log('🔐 Admin user detected, redirecting to admin dashboard');
+        router.push("/dashboardmaintab");
+      } else {
+        console.log('👤 Regular user detected, redirecting to profile');
+        router.push("/profile");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "OTP verification failed");
     }

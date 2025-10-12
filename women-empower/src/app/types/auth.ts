@@ -60,7 +60,7 @@ export interface AuthState {
 
 export interface AuthContextType extends AuthState {
   login: (email: string) => Promise<void>;
-  verifyOtp: (email: string, otp: number) => Promise<void>;
+  verifyOtp: (email: string, otp: number) => Promise<User>;
   signup: (userData: SignupRequest) => Promise<void>;
   logout: () => void;
   sendOtp: (email: string) => Promise<void>;
