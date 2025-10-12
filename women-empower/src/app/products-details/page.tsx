@@ -1,6 +1,6 @@
 import React from 'react'
 import ProductDetailsPage from '@/app/component/product/ProductDetailsPage'
-import RelatedProducts from '@/app/component/product/RelatedProducts'
+import RelatedProductsWithCategory from '@/app/component/product/RelatedProductsWithCategory'
 import ProductReviews from '../component/product/ProductReviews'
 
 interface PageProps {
@@ -15,7 +15,7 @@ function page({ searchParams }: PageProps) {
   return (
     <div>
       <ProductDetailsPage productId={productId} />
-      <RelatedProducts />
+      <RelatedProductsWithCategory productId={productId} />
       <ProductReviews productId={productId} />
     </div>
   )

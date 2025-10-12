@@ -68,11 +68,6 @@ const ArtistCard: React.FC<{ artist: Artist }> = ({ artist }) => {
             {artist.category || 'Artist'}
           </p>
           
-          {artist.introduction && (
-            <p className="text-gray-600 text-xs sm:text-sm mb-3 line-clamp-2">
-              {artist.introduction}
-            </p>
-          )}
 
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">

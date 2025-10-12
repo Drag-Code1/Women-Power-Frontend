@@ -186,6 +186,39 @@ export const productService = {
     }
   },
 
+  // 🔹 Get related products by category ID
+  getRelatedProducts: async (categoryId: string): Promise<Product[]> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/product/related/${categoryId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        console.error(`Failed to fetch related products: ${response.status}`);
+        return [];
+      }
+
+      const data = await response.json();
+
+      // ✅ API returns { success, message, data: [...] }
+      if (data.success && Array.isArray(data.data)) {
+        return data.data.map(normalizeProduct);
+      }
+
+      // Handle case where data is directly an array
+      if (Array.isArray(data)) {
+        return data.map(normalizeProduct);
+      }
+
+      return [];
+    } catch (error) {
+      console.error("Error fetching related products:", error);
+      return [];
+    }
+  },
+
   // 🔹 Create product
   createProduct: async (
     productData: Partial<Product>

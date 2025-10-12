@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Heart, ShoppingCart, Check } from "lucide-react";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { productService } from "@/app/lib/productapi";
 
 // Product Interface - Updated to match your data structure
 export interface Product {
@@ -236,18 +237,49 @@ const allProducts: Product[] = [
   }
 ];
 
-// TrendingProducts Main Component
-const RelatedProducts: React.FC = () => {
+// RelatedProducts Main Component
+interface RelatedProductsProps {
+  categoryId?: string;
+}
+
+const RelatedProducts: React.FC<RelatedProductsProps> = ({ categoryId }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [products, setProducts] = useState<Product[]>(allProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const { addToCart, isInCart } = useCart();
   const { user } = useAuth();
 
-  // Filter only trending products
-  const trendingProducts = products.filter((p) => p.isTrending);
+  // Fetch related products when categoryId changes
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!categoryId) {
+        // Fallback to sample data if no categoryId provided
+        setProducts(allProducts.filter((p) => p.isTrending));
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const relatedProducts = await productService.getRelatedProducts(categoryId);
+        setProducts(relatedProducts);
+      } catch (err) {
+        console.error('Error fetching related products:', err);
+        setError('Failed to load related products');
+        // Fallback to sample data on error
+        setProducts(allProducts.filter((p) => p.isTrending));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRelatedProducts();
+  }, [categoryId]);
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -275,7 +307,7 @@ const RelatedProducts: React.FC = () => {
         behavior: "smooth",
       });
 
-      setCurrentIndex((prev) => Math.min(trendingProducts.length - 1, prev + 1));
+      setCurrentIndex((prev) => Math.min(products.length - 1, prev + 1));
     }
   };
 
@@ -354,9 +386,9 @@ const RelatedProducts: React.FC = () => {
           {/* Right Navigation Button */}
           <button
             onClick={scrollRight}
-            disabled={currentIndex >= trendingProducts.length - 1}
+            disabled={currentIndex >= products.length - 1}
             className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
-              currentIndex >= trendingProducts.length - 1
+              currentIndex >= products.length - 1
                 ? "bg-gray-200 text-gray-400 cursor-not-allowed"
                 : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
             }`}
@@ -378,6 +410,20 @@ const RelatedProducts: React.FC = () => {
 
           {/* Products Container */}
           <div className="bg-white rounded-lg px-0">
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#695946]"></div>
+                <span className="ml-2 text-gray-600">Loading related products...</span>
+              </div>
+            ) : error ? (
+              <div className="flex justify-center items-center py-8">
+                <span className="text-red-500">{error}</span>
+              </div>
+            ) : products.length === 0 ? (
+              <div className="flex justify-center items-center py-8">
+                <span className="text-gray-500">No related products found</span>
+              </div>
+            ) : (
             <div
               ref={scrollContainerRef}
               className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
@@ -387,7 +433,7 @@ const RelatedProducts: React.FC = () => {
                 WebkitOverflowScrolling: "touch"
               }}
             >
-              {trendingProducts.map((product: Product) => (
+                {products.map((product: Product) => (
                 <div 
                   key={product.id} 
                   className="flex-shrink-0 w-64 sm:w-72"
@@ -402,6 +448,7 @@ const RelatedProducts: React.FC = () => {
                 </div>
               ))}
             </div>
+            )}
           </div>
         </div>
       </section>

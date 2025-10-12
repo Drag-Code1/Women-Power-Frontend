@@ -8,7 +8,6 @@ import { getCurrentToken, getCurrentUser } from '@/app/lib/authenticatedApi';
 interface Review {
   id: string;
   rating: number;
-  title: string;
   description: string;
   timeAgo: string;
   verified?: boolean;
@@ -25,7 +24,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
   const [filterBy, setFilterBy] = useState('All Star');
   const [showWriteReview, setShowWriteReview] = useState(false);
   const [newReviewRating, setNewReviewRating] = useState(0);
-  const [newReviewTitle, setNewReviewTitle] = useState('');
   const [newReviewDescription, setNewReviewDescription] = useState('');
   const [displayCount, setDisplayCount] = useState(4);
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -52,7 +50,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
         const transformedReviews: Review[] = apiReviews.map((review: ProductReview) => ({
           id: review.id,
           rating: review.rating,
-          title: review.rating_description.substring(0, 50) + (review.rating_description.length > 50 ? '...' : ''),
           description: review.rating_description,
           timeAgo: review.date ? new Date(review.date).toLocaleDateString('en-IN', {
             year: 'numeric',
@@ -112,7 +109,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
       const newReview: Review = {
           id: Date.now().toString(), // Temporary ID
         rating: newReviewRating,
-          title: newReviewDescription.trim().substring(0, 50) + (newReviewDescription.trim().length > 50 ? '...' : ''),
         description: newReviewDescription.trim(),
         timeAgo: "Just now",
           verified: true,
@@ -124,7 +120,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
       
       // Reset form
       setNewReviewRating(0);
-      setNewReviewTitle('');
       setNewReviewDescription('');
       setShowWriteReview(false);
       
@@ -335,19 +330,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
                   
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Review Title
-                    </label>
-                    <input 
-                      type="text" 
-                      value={newReviewTitle}
-                      onChange={(e) => setNewReviewTitle(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Summarize your experience in a few words"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
                       Your Review
                     </label>
                     <textarea 
@@ -444,11 +426,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
                           </span>
                         )}
                       </div>
-
-                      {/* Review Title */}
-                      <h4 className="font-semibold text-gray-900 text-lg">
-                        {review.title}
-                      </h4>
 
                       {/* Review Description */}
                       <p className="text-gray-700 leading-relaxed">
