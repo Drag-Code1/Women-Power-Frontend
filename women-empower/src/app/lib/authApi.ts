@@ -265,3 +265,38 @@ export const getCurrentUser = async (userId: string): Promise<any> => {
     throw error;
   }
 };
+
+// Test function to verify token management
+export const testTokenManagement = () => {
+  console.log('🧪 === TOKEN MANAGEMENT TEST ===');
+  
+  const token = getToken();
+  const user = getUser();
+  
+  console.log('Token exists:', !!token);
+  console.log('Token preview:', token ? token.substring(0, 20) + '...' : 'null');
+  console.log('User exists:', !!user);
+  console.log('User email:', user?.email || 'null');
+  
+  // Test token validation
+  if (token) {
+    const isValid = isTokenValid(token);
+    console.log('Token is valid:', isValid);
+  }
+  
+  // Test localStorage directly
+  if (typeof window !== 'undefined') {
+    const directToken = localStorage.getItem('auth_token');
+    const directUser = localStorage.getItem('auth_user');
+    console.log('Direct localStorage token:', directToken ? directToken.substring(0, 20) + '...' : 'null');
+    console.log('Direct localStorage user:', directUser ? JSON.parse(directUser)?.email : 'null');
+  }
+  
+  console.log('🧪 === END TOKEN TEST ===');
+  
+  return {
+    hasToken: !!token,
+    hasUser: !!user,
+    tokenValid: token ? isTokenValid(token) : false
+  };
+};

@@ -117,7 +117,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           isLoading: false,
         });
         
-        console.log('Login successful:', user);
+        console.log('✅ Auth state updated:', {
+          user: user?.email,
+          token: token ? token.substring(0, 20) + '...' : 'null',
+          isAuthenticated: true
+        });
       } else {
         throw new Error(response.message || 'OTP verification failed');
       }

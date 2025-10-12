@@ -53,11 +53,6 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
   };
 
   const handleAddToCart = async (product: Product) => {
-    if (!user) {
-      alert('Please login to add items to cart');
-      return;
-    }
-
     try {
       setAddingToCart(product.id);
       await addToCart(product.id, 1);

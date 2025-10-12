@@ -38,6 +38,8 @@ import HelpTab from './HelpTab';
 
 // Import AuthContext
 import { useAuth } from '@/app/contexts/AuthContext';
+import { testTokenManagement } from '@/app/lib/authApi';
+import { useCart } from '@/app/contexts/CartContext';
 
 // Types
 export interface User {
@@ -74,6 +76,7 @@ export interface Order {
 
 const ProfileSection: React.FC = () => {
   const { user, isAuthenticated, isLoading, signup, sendOtp, verifyOtp, logout } = useAuth();
+  const { addToCart } = useCart();
   
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
@@ -191,6 +194,29 @@ const ProfileSection: React.FC = () => {
       console.log('localStorage user:', userData ? JSON.parse(userData) : 'null');
     }
     console.log('🔍 === END AUTH STATE ===');
+  };
+
+  // Test cart functionality
+  const testCartFunctionality = async () => {
+    console.log('🛒 === TESTING CART FUNCTIONALITY ===');
+    
+    if (!user) {
+      console.error('❌ No user found');
+      return;
+    }
+    
+    try {
+      // Test with a dummy product ID
+      const testProductId = 'test-product-123';
+      console.log('🛒 Testing add to cart with product ID:', testProductId);
+      
+      await addToCart(testProductId, 1);
+      console.log('✅ Add to cart test successful!');
+    } catch (error) {
+      console.error('❌ Add to cart test failed:', error);
+    }
+    
+    console.log('🛒 === END CART TEST ===');
   };
 
   // Address management functions
@@ -452,9 +478,21 @@ const ProfileSection: React.FC = () => {
         <div className="mb-4 text-center">
           <button
             onClick={debugTokenStatus}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600"
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 mr-2"
           >
             Debug Token Status
+          </button>
+          <button
+            onClick={testTokenManagement}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg text-sm hover:bg-green-600 mr-2"
+          >
+            Test Token Management
+          </button>
+          <button
+            onClick={testCartFunctionality}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg text-sm hover:bg-purple-600"
+          >
+            Test Cart Functionality
           </button>
         </div>
 

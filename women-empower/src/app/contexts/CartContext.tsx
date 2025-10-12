@@ -1,8 +1,9 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useAuth } from "./AuthContext";
+// Cart API functions
 import { addToCartApi, getCartItemsApi, updateCartItemApi, removeFromCartApi, CartItem } from "../lib/cartApi";
-import { getCurrentUser, getCurrentToken } from "../lib/authenticatedApi";
+import { getToken, getUser } from "../lib/authApi";
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -40,10 +41,13 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   // Fetch cart items when user changes
   useEffect(() => {
     const fetchCartItems = async () => {
-      const currentUser = user || getCurrentUser();
-      const currentToken = token || getCurrentToken();
+      const currentUser = getUser();
+      const currentToken = getToken();
+
+      console.log('🛒 Fetching cart items - User:', currentUser?.email, 'Token:', currentToken ? 'exists' : 'null');
 
       if (!currentUser || !currentToken) {
+        console.log('🛒 No user or token, clearing cart items');
         setCartItems([]);
         setLoading(false);
         return;
@@ -54,12 +58,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setError(null);
         const items = await getCartItemsApi(currentUser.id, currentToken);
         setCartItems(items);
+        console.log('🛒 Cart items fetched successfully:', items.length, 'items');
       } catch (err) {
         console.error("Error fetching cart items:", err);
         const errorMessage = err instanceof Error ? err.message : "Failed to fetch cart items";
 
         // Handle specific error cases
         if (errorMessage.includes("Forbidden") || errorMessage.includes("Access denied")) {
+          console.log('🛒 Access denied, clearing cart items');
           setError(null);
         } else {
           setError(errorMessage);
@@ -75,10 +81,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }, [user, token]);
 
   const addToCart = async (productId: string, quantity: number = 1) => {
-    const currentUser = user || getCurrentUser();
-    const currentToken = token || getCurrentToken();
+    const currentUser = getUser();
+    const currentToken = getToken();
+
+    // Debug logging
+    console.log('🛒 Add to Cart Debug:');
+    console.log('  - currentUser from getUser():', currentUser);
+    console.log('  - currentToken from getToken():', currentToken ? currentToken.substring(0, 20) + '...' : 'null');
 
     if (!currentUser || !currentToken) {
+      console.error('❌ Missing user or token:', { currentUser: !!currentUser, currentToken: !!currentToken });
       throw new Error("Please login to add items to cart");
     }
 
@@ -90,7 +102,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         quantity,
       };
 
+      console.log('🛒 Sending cart data:', cartData);
       await addToCartApi(cartData, currentToken);
+      console.log('✅ Item added to cart successfully');
 
       // Refresh cart items from API to get updated data
       await refreshCart();
@@ -101,7 +115,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const updateCartItem = async (cartItemId: string, quantity: number) => {
-    const currentToken = token || getCurrentToken();
+    const currentToken = getToken();
 
     if (!currentToken) {
       throw new Error("Please login to update cart");
@@ -120,7 +134,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const removeFromCart = async (cartItemId: string) => {
-    const currentToken = token || getCurrentToken();
+    const currentToken = getToken();
 
     if (!currentToken) {
       throw new Error("Please login to remove items from cart");
@@ -139,8 +153,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const refreshCart = async () => {
-    const currentUser = user || getCurrentUser();
-    const currentToken = token || getCurrentToken();
+    const currentUser = getUser();
+    const currentToken = getToken();
 
     if (!currentUser || !currentToken) {
       setCartItems([]);
