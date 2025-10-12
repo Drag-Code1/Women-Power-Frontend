@@ -13,14 +13,10 @@ import {
 import CartDrawer from "../modals/CartDrawer";
 import { usePathname, useRouter } from "next/navigation";
 import ProfilePopUp from "../modals/ProfilePopUp";
+import { useCart } from "@/app/contexts/CartContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 
-interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
+// Remove local CartItem interface since we're using CartContext
 interface ProfilePopUpProps {
   isOpen: boolean;
   onClose: () => void;
@@ -36,24 +32,10 @@ const NavBar: React.FC = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: 1,
-      name: "Abstract Canvas Art",
-      price: 2999,
-      quantity: 1,
-      image: "/images/art1.jpg",
-    },
-    {
-      id: 2,
-      name: "Modern Sculpture",
-      price: 5999,
-      quantity: 2,
-      image: "/images/art2.jpg",
-    },
-  ]);
+  
+  const { getCartItemCount } = useCart();
+  const { user, logout } = useAuth();
   const [showProfile, setShowProfile] = useState(false);
-  const [isSignedIn, setIsSignedIn] = useState(false);
 
   const suggestions = [
     "Modern Art",
@@ -100,27 +82,11 @@ const NavBar: React.FC = () => {
     setIsMobileMenuOpen(false);
   };
 
-  const updateQuantity = (id: number, change: number) => {
-    setCartItems((items) =>
-      items
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: Math.max(0, item.quantity + change) }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
+  // Remove local cart functions since we're using CartContext
 
-  const removeItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id));
-  };
-
-  const getTotalPrice = () => {
-    return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
+  const handleLogout = () => {
+    logout();
+    setShowProfile(false);
   };
 
   const navItems = [
@@ -256,7 +222,11 @@ const NavBar: React.FC = () => {
                   <ProfilePopUp
                     isOpen={showProfile}
                     onClose={() => setShowProfile(false)}
-                    isSignedIn={isSignedIn}
+                    isSignedIn={!!user}
+                    userName={user ? `${user.firstName} ${user.lastName}` : undefined}
+                    mobileNumber={user?.mobileNo}
+                    userEmail={user?.email}
+                    onLogout={handleLogout}
                   />
                 )}
               </div>
@@ -281,7 +251,7 @@ const NavBar: React.FC = () => {
                   <ShoppingCartOutlined className="w-5 h-5" />
                 </button>
                 <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  {cartItems.reduce((total, item) => total + item.quantity, 0)}
+                  {getCartItemCount()}
                 </span>
               </div>
             </div>
@@ -323,10 +293,6 @@ const NavBar: React.FC = () => {
       <CartDrawer
         isCartOpen={isCartOpen}
         toggleCart={toggleCart}
-        cartItems={cartItems}
-        updateQuantity={updateQuantity}
-        removeItem={removeItem}
-        getTotalPrice={getTotalPrice}
       />
 
       <div className="h-20"></div>

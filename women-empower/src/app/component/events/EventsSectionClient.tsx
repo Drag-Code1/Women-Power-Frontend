@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import EventCard from "./EventCard";
 import FeaturedEventsSlider from "./FeaturedEventsSlider";
 import EventFilters from "./EventFilters";
+import { getEventsApi, searchEventsApi, filterEventsApi } from "../../lib/api";
 
 interface Event {
   id: string;
@@ -28,11 +29,59 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const eventsPerPage = 12;
 
+  // Fetch events based on current filters and search
+  const fetchEvents = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      let eventsData;
+      
+      // If there's a search term, use search API
+      if (searchTerm.trim()) {
+        const searchResults = await searchEventsApi(searchTerm.trim());
+        setEvents(searchResults);
+        return;
+      }
+      
+      // If there are filters, use filter API
+      if (selectedStatus !== "All") {
+        const filters: any = {};
+        
+        if (selectedStatus !== "All") {
+          filters.status = selectedStatus;
+        }
+        
+        const filterResults = await filterEventsApi(filters);
+        setEvents(filterResults);
+        return;
+      }
+      
+      // Default: fetch all events
+      eventsData = await getEventsApi();
+      setEvents(eventsData);
+      
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch events');
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm, selectedStatus]);
+
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
+  // Apply client-side filtering for display
   const filteredEvents = useMemo(() => {
-    return initialEvents.filter((event) => {
+    return events.filter((event) => {
       const matchesSearch =
         event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.description.toLowerCase().includes(searchTerm.toLowerCase());
@@ -41,7 +90,7 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchTerm, selectedStatus, initialEvents]);
+  }, [searchTerm, selectedStatus, events]);
 
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
 
@@ -139,26 +188,67 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
             All Events & Workshops ({filteredEvents.length})
           </h2>
 
-          <div
-            className={`transition-opacity duration-200 ${
-              isTransitioning ? "opacity-50" : "opacity-100"
-            }`}
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {paginatedEvents.map((event) => (
-                <div key={event.id} className="animate-fadeIn">
-                  <EventCard
-                    event={event}
-                    formatDate={formatDate}
-                    formatTime={formatTime}
-                    getStatusColor={getStatusColor}
-                  />
-                </div>
-              ))}
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#61503c]"></div>
             </div>
-          </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Error loading events
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {error}
+              </p>
+              <button
+                onClick={fetchEvents}
+                className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredEvents.length > 0 ? (
+            <div
+              className={`transition-opacity duration-200 ${
+                isTransitioning ? "opacity-50" : "opacity-100"
+              }`}
+            >
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {paginatedEvents.map((event) => (
+                  <div key={event.id} className="animate-fadeIn">
+                    <EventCard
+                      event={event}
+                      formatDate={formatDate}
+                      formatTime={formatTime}
+                      getStatusColor={getStatusColor}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">📅</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No events found
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Try adjusting your search terms or filters
+              </p>
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedStatus("All");
+                }}
+                className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
+              >
+                Clear Filters
+              </button>
+            </div>
+          )}
 
-          {totalPages > 1 && (
+          {!loading && !error && totalPages > 1 && (
             <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
               <div className="text-sm text-gray-600">
                 Showing {(currentPage - 1) * eventsPerPage + 1}-

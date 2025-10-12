@@ -3,12 +3,20 @@ import ProductDetailsPage from '@/app/component/product/ProductDetailsPage'
 import RelatedProducts from '@/app/component/product/RelatedProducts'
 import ProductReviews from '../component/product/ProductReviews'
 
-function page() {
+interface PageProps {
+  searchParams: {
+    id?: string;
+  };
+}
+
+function page({ searchParams }: PageProps) {
+  const productId = searchParams.id;
+
   return (
     <div>
-      <ProductDetailsPage />
+      <ProductDetailsPage productId={productId} />
       <RelatedProducts />
-      <ProductReviews />
+      <ProductReviews productId={productId} />
     </div>
   )
 }

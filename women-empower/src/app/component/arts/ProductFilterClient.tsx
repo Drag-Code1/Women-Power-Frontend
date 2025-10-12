@@ -12,12 +12,20 @@ import { Product, CartItem, PriceRange  } from "@/app/types/product";
 import ProductCard from "./ProductCard";
 import Filters from "./Filters";
 import Pagination from "./Pagination";
+import { searchProducts, filterProducts } from "../../api/products";
+
+interface Category {
+  id: string;
+  name: string;
+  image: string;
+}
 
 interface ProductFilterClientProps {
   initialProducts: Product[];
-  initialCategories: string[];
+  initialCategories: Category[];
   initialPriceRanges: PriceRange[];
   initialSortOptions: string[];
+  error?: string | null;
 }
 
 const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
@@ -25,6 +33,7 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
   initialCategories,
   initialPriceRanges,
   initialSortOptions,
+  error,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -37,6 +46,9 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [cart, setCart] = useState<CartItem>({});
   const [wishlist, setWishlist] = useState<Set<string>>(new Set());
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   // Initialize wishlist from localStorage and product data
   useEffect(() => {
@@ -83,9 +95,61 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
     setCurrentPage(1);
   }, [searchTerm, selectedCategories, selectedPriceRanges, sortBy]);
 
-  const toggleCategory = useCallback((category: string) => {
+  // API integration for search and filtering
+  useEffect(() => {
+    const fetchFilteredProducts = async () => {
+      setIsLoading(true);
+      setApiError(null);
+      
+      try {
+        let filteredProducts: Product[] = [];
+        
+        // If we have search term, use search API
+        if (searchTerm.trim()) {
+          filteredProducts = await searchProducts(searchTerm);
+        } else {
+          // If we have filters, use filter API
+          if (selectedCategories.length > 0 || selectedPriceRanges.length > 0) {
+            const filters: any = {};
+            
+            if (selectedCategories.length > 0) {
+              filters.categories = selectedCategories;
+            }
+            
+            if (selectedPriceRanges.length > 0) {
+              const priceRange = selectedPriceRanges[0]; // Use first selected range
+              const range = initialPriceRanges.find(r => r.label === priceRange);
+              if (range) {
+                filters.price = {
+                  minPrice: range.min,
+                  maxPrice: range.max === Infinity ? 999999 : range.max
+                };
+              }
+            }
+            
+            filteredProducts = await filterProducts(filters);
+          } else {
+            // No filters, use initial products
+            filteredProducts = initialProducts;
+          }
+        }
+        
+        setProducts(filteredProducts);
+      } catch (err) {
+        console.error('Error fetching filtered products:', err);
+        setApiError(err instanceof Error ? err.message : 'Failed to fetch products');
+        setProducts(initialProducts); // Fallback to initial products
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFilteredProducts();
+  }, [searchTerm, selectedCategories, selectedPriceRanges, initialProducts, initialPriceRanges]);
+
+  const toggleCategory = useCallback((categoryId: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+      prev.includes(categoryId) ? prev.filter((c) => c !== categoryId) : [...prev, categoryId]
     );
   }, []);
 
@@ -102,24 +166,7 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
     setCurrentPage(1);
   }, []);
 
-  const addToCart = useCallback((productId: string) => {
-    setCart(prev => ({
-      ...prev,
-      [productId]: (prev[productId] || 0) + 1
-    }));
-  }, []);
-
-  const removeFromCart = useCallback((productId: string) => {
-    setCart(prev => {
-      const newCart = { ...prev };
-      if (newCart[productId] > 1) {
-        newCart[productId]--;
-      } else {
-        delete newCart[productId];
-      }
-      return newCart;
-    });
-  }, []);
+  // Remove local cart functions since we're using CartContext now
 
   const toggleWishlist = useCallback((productId: string) => {
     setWishlist(prev => {
@@ -136,25 +183,8 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
   const totalCartItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
 
   const filteredProducts = useMemo(() => {
-    let filtered = initialProducts.filter((p) => {
-      const matchesSearch = p.p_Name.toLowerCase().includes(searchTerm.toLowerCase());
-
-      const matchesCategory =
-        selectedCategories.length === 0 || selectedCategories.includes(p.category_id);
-
-      const price = parseFloat(p.price);
-      let matchesPrice = selectedPriceRanges.length === 0;
-      if (selectedPriceRanges.length > 0) {
-        matchesPrice = initialPriceRanges.some(
-          (range) =>
-            selectedPriceRanges.includes(range.label) &&
-            price >= range.min &&
-            price <= range.max
-        );
-      }
-
-      return matchesSearch && matchesCategory && matchesPrice;
-    });
+    // Since we're now using API filtering, we just need to sort the products
+    let filtered = [...products];
 
     filtered.sort((a, b) => {
       const priceA = parseFloat(a.price);
@@ -176,7 +206,7 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
     });
 
     return filtered;
-  }, [searchTerm, selectedCategories, selectedPriceRanges, sortBy, initialProducts, initialPriceRanges]);
+  }, [products, sortBy]);
 
   const productsPerPage = isMobile ? 12 : 16;
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
@@ -258,7 +288,7 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
           <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <h1 className="text-2xl font-bold text-gray-900">
-                New Items ({filteredProducts.length})
+                Arts & Crafts ({filteredProducts.length})
               </h1>
 
               <div className="flex flex-wrap items-center gap-3">
@@ -356,73 +386,107 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
 
             <div className="flex-1 bg-white">
               <div className="p-4 sm:p-6">
-                {currentProducts.length > 0 ? (
-                  <>
-                    <div
-                      className={`transition-opacity duration-300 ${
-                        isTransitioning ? 'opacity-50' : 'opacity-100'
-                      }`}
-                    >
-                      <div
-                        className={
-                          viewMode === "grid"
-                            ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
-                            : "space-y-4"
-                        }
-                      >
-                        {currentProducts.map((product, index) => (
-                          <div
-                            key={product.id}
-                            className="animate-fadeIn"
-                            style={{
-                              animationDelay: `${index * 50}ms`,
-                              animationFillMode: 'both'
-                            }}
-                          >
-                            <ProductCard 
-                              product={product}
-                              cart={cart}
-                              wishlist={wishlist}
-                              addToCart={addToCart}
-                              removeFromCart={removeFromCart}
-                              toggleWishlist={toggleWishlist}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {totalPages > 1 && (
-                      <Pagination
-                        currentPage={currentPage}
-                        totalPages={totalPages}
-                        startIndex={startIndex}
-                        endIndex={endIndex}
-                        totalItems={filteredProducts.length}
-                        isTransitioning={isTransitioning}
-                        isMobile={isMobile}
-                        goToPage={goToPage}
-                        goToPrevPage={goToPrevPage}
-                        goToNextPage={goToNextPage}
-                      />
-                    )}
-                  </>
-                ) : (
+                {/* Error State */}
+                {(error || apiError) && (
                   <div className="text-center py-16">
-                    <div className="text-6xl mb-4">🔍</div>
+                    <div className="text-6xl mb-4">⚠️</div>
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      No products found
+                      Error loading products
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Try adjusting your filters or search terms
+                      {error || apiError}
                     </p>
                     <button
-                      onClick={clearFilters}
-                      className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#695946] transition-all duration-200 transform hover:scale-105"
+                      onClick={() => window.location.reload()}
+                      className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
                     >
-                      Clear all filters
+                      Try Again
                     </button>
                   </div>
+                )}
+
+                {/* Loading State */}
+                {isLoading && (
+                  <div className="text-center py-16">
+                    <div className="text-6xl mb-4">⏳</div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      Loading products...
+                    </h3>
+                    <p className="text-gray-600">
+                      Please wait while we fetch the latest products
+                    </p>
+                  </div>
+                )}
+
+                {/* Products Content */}
+                {!isLoading && !error && !apiError && (
+                  <>
+                    {currentProducts.length > 0 ? (
+                      <>
+                        <div
+                          className={`transition-opacity duration-300 ${
+                            isTransitioning ? 'opacity-50' : 'opacity-100'
+                          }`}
+                        >
+                          <div
+                            className={
+                              viewMode === "grid"
+                                ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                                : "space-y-4"
+                            }
+                          >
+                            {currentProducts.map((product, index) => (
+                              <div
+                                key={product.id}
+                                className="animate-fadeIn"
+                                style={{
+                                  animationDelay: `${index * 50}ms`,
+                                  animationFillMode: 'both'
+                                }}
+                              >
+                                <ProductCard 
+                                  product={product}
+                                  wishlist={wishlist}
+                                  toggleWishlist={toggleWishlist}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {totalPages > 1 && (
+                          <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            startIndex={startIndex}
+                            endIndex={endIndex}
+                            totalItems={filteredProducts.length}
+                            isTransitioning={isTransitioning}
+                            isMobile={isMobile}
+                            goToPage={goToPage}
+                            goToPrevPage={goToPrevPage}
+                            goToNextPage={goToNextPage}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <div className="text-center py-16">
+                        <div className="text-6xl mb-4">🔍</div>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          No products found
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          Try adjusting your filters or search terms
+                        </p>
+                        <button
+                          onClick={clearFilters}
+                          className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#695946] transition-all duration-200 transform hover:scale-105"
+                        >
+                          Clear all filters
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>

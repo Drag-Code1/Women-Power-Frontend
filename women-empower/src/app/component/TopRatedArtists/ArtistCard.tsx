@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Briefcase, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Artist } from "@/app/types/artist";
 
 interface ArtistCardProps {
@@ -9,6 +10,7 @@ interface ArtistCardProps {
 }
 
 export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
+  const router = useRouter();
   // Use state to avoid hydration mismatch with date formatting
   const [formattedDate, setFormattedDate] = useState<string>('');
   
@@ -23,8 +25,15 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
     setFormattedDate(date);
   }, [artist.joining_date]);
 
+  const handleCardClick = () => {
+    router.push(`/artists-details?id=${artist.id}`);
+  };
+
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full h-full border border-gray-100">
+    <div 
+      onClick={handleCardClick}
+      className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full h-full border border-gray-100 cursor-pointer hover:scale-105"
+    >
       {/* Artist Photo */}
       <div className="flex-shrink-0">
         <div className="w-32 h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-amber-100 to-amber-50 ring-4 ring-amber-100">

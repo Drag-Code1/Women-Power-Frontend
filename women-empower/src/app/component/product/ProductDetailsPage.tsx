@@ -1,28 +1,105 @@
 'use client';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import type { JSX } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart } from "lucide-react";
+import { productService } from "@/app/lib/productapi";
+import { Product } from "@/app/types/product";
+import { useCart } from "@/app/contexts/CartContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 
-const ProductDetailsPage = () => {
+interface ProductDetailsPageProps {
+  productId?: string;
+}
+
+const ProductDetailsPage = ({ productId }: ProductDetailsPageProps) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [addingToCart, setAddingToCart] = useState(false);
+  
+  const { addToCart, isInCart } = useCart();
+  const { user } = useAuth();
 
-  const productData = {
-    title: "Traditional Shubh Labh",
-    subtitle: "Handcrafted Decorative Piece",
-    price: 700,
-    originalPrice: 950,
-    rating: 4.6,
-    reviews: 124,
+  // Fetch product details when component mounts or productId changes
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      if (!productId) {
+        setError('No product ID provided');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        setError(null);
+        const productData = await productService.getProductDetails(productId);
+        
+        if (productData) {
+          setProduct(productData);
+        } else {
+          setError('Product not found');
+        }
+      } catch (err) {
+        console.error('Error fetching product details:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch product details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductDetails();
+  }, [productId]);
+
+  // Fallback data for when no product is loaded
+  const fallbackData = {
+    title: "Product Not Found",
+    subtitle: "Please check the product ID",
+    price: 0,
+    originalPrice: 0,
+    rating: 0,
+    reviews: 0,
   };
 
-  const productImages = [
-    "/images/product-details.png",
-    "/images/product-details.png",
-    "/images/product-details.png",
-    "/images/product-details.png",
-  ];
+  const productData = product ? {
+    title: product.p_Name,
+    subtitle: product.description || "Handcrafted Decorative Piece",
+    price: parseFloat(product.price) - (parseFloat(product.price) * product.discount / 100),
+    originalPrice: parseFloat(product.price),
+    rating: 4.6, // Default rating since it's not in the API response
+    reviews: 124, // Default reviews since it's not in the API response
+  } : fallbackData;
+
+  const productImages = product?.p_images && product.p_images.length > 0 
+    ? product.p_images 
+    : product?.thumbnail 
+      ? [product.thumbnail]
+      : ["/images/product-details.png"];
+
+  const handleAddToCart = async () => {
+    if (!user) {
+      alert('Please login to add items to cart');
+      return;
+    }
+
+    if (!product) {
+      alert('Product not found');
+      return;
+    }
+
+    try {
+      setAddingToCart(true);
+      await addToCart(product.id, quantity);
+      alert('Item added to cart successfully!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert(error instanceof Error ? error.message : 'Failed to add item to cart');
+    } finally {
+      setAddingToCart(false);
+    }
+  };
 
   interface ProductData {
     title: string;
@@ -48,6 +125,49 @@ const ProductDetailsPage = () => {
       />
     ));
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+        <div className="min-h-screen bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-6">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#695946] mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading product details...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+        <div className="min-h-screen bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-6">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">Error Loading Product</h2>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="bg-[#695946] text-white px-6 py-2 rounded-lg hover:bg-[#5a4a3a] transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
      <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -154,8 +274,19 @@ const ProductDetailsPage = () => {
 
               {/* Action Buttons */}
               <div className="space-y-3 mb-8">
-                <button className="w-full bg-[#695946] text-white py-3 px-6 rounded-lg font-medium hover:bg-[#5a4a3a] transition-colors shadow-sm">
-                  Add to Cart
+                <button 
+                  onClick={handleAddToCart}
+                  disabled={addingToCart}
+                  className={`w-full py-3 px-6 rounded-lg font-medium transition-colors shadow-sm flex items-center justify-center gap-2 ${
+                    addingToCart 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-[#695946] hover:bg-[#5a4a3a]'
+                  } text-white`}
+                >
+                  {addingToCart && (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  )}
+                  {addingToCart ? 'Adding to Cart...' : 'Add to Cart'}
                 </button>
                 
                 <div className="flex gap-3">
@@ -208,33 +339,31 @@ const ProductDetailsPage = () => {
           </h2>
           
           <div className="text-gray-600 leading-relaxed">
-            <p className="mb-4">
-              This Traditional Shubh Labh decorative piece brings divine blessings and 
-              positive energy to your home. Meticulously handcrafted with premium materials, 
-              it features authentic traditional designs that have been passed down through 
-              generations.
-            </p>
-
-            <p className="mb-6">
-              Perfect for festivals, special occasions, or as a permanent addition to your 
-              spiritual space, this piece combines spiritual significance with aesthetic beauty.
-            </p>
+            {product?.description ? (
+              <p className="mb-4">{product.description}</p>
+            ) : (
+              <p className="mb-4">
+                This beautiful handcrafted piece brings elegance and style to your space. 
+                Meticulously crafted with attention to detail, it features authentic designs 
+                that enhance any room's aesthetic appeal.
+              </p>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <h4 className="font-medium text-gray-900 mb-3">What's Included</h4>
+                <h4 className="font-medium text-gray-900 mb-3">Product Details</h4>
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Traditional Shubh Labh piece
+                    {product?.p_Name || 'Handcrafted decorative piece'}
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Wall mounting accessories
+                    Premium quality materials
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Installation guide
+                    Authentic design
                   </li>
                 </ul>
               </div>
@@ -244,15 +373,15 @@ const ProductDetailsPage = () => {
                 <ul className="space-y-2 text-gray-600">
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Material: Premium quality
+                    {product?.specification || 'Premium quality materials'}
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Finish: Hand-painted
+                    Price: ₹{productData.originalPrice.toLocaleString()}
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Mounting: Wall hanging
+                    {product?.discount ? `${product.discount}% discount available` : 'No discount'}
                   </li>
                 </ul>
               </div>

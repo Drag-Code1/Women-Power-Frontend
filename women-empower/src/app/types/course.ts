@@ -11,3 +11,18 @@ export interface Course {
   discount: number;
   isPopular?: boolean;
 }
+
+export interface CourseApiResponse {
+  success: boolean;
+  message: string;
+  data: Course[];
+}
+
+export interface CourseFilterRequest {
+  categories?: string[];
+  levels?: string[];
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+}

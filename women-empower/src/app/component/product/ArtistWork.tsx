@@ -18,10 +18,11 @@ interface ArtworkItem {
 }
 
 interface ArtistWorkProps {
+  artistId: string;
   workImages?: string[];
 }
 
-const ArtistWork: React.FC<ArtistWorkProps> = ({ workImages = [] }) => {
+const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId, workImages = [] }) => {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);

@@ -2,6 +2,8 @@
 
 import React, { useState, useRef } from "react";
 import { Heart, ShoppingCart, Check } from "lucide-react";
+import { useCart } from "@/app/contexts/CartContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 // Product Interface - Updated to match your data structure
 export interface Product {
@@ -21,13 +23,15 @@ interface ProductCardProps {
   onAddToCart?: (product: Product) => void;
   onToggleWishlist?: (productId: string) => void;
   isInCart?: (productId: string) => boolean;
+  addingToCart?: boolean;
 }
 
 const ProductCardNew: React.FC<ProductCardProps> = ({ 
   product, 
   onAddToCart, 
   onToggleWishlist,
-  isInCart
+  isInCart,
+  addingToCart = false
 }) => {
   // Calculate prices
   const originalPrice = parseFloat(product.price);
@@ -108,13 +112,19 @@ const ProductCardNew: React.FC<ProductCardProps> = ({
           
           <button
             onClick={() => onAddToCart?.(product)}
+            disabled={addingToCart}
             className={`flex items-center gap-1 px-4 py-2 rounded text-xs font-medium transition-all duration-200 ${
               inCart 
                 ? "bg-green-600 text-white hover:bg-green-700" 
                 : "bg-[#695946] text-white hover:bg-[#61503c] active:scale-95"
-            }`}
+            } ${addingToCart ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {inCart ? (
+            {addingToCart ? (
+              <>
+                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                Adding...
+              </>
+            ) : inCart ? (
               <>
                 <Check className="w-3 h-3" />
                 In Cart
@@ -230,8 +240,11 @@ const allProducts: Product[] = [
 const RelatedProducts: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [cartItems, setCartItems] = useState<Set<string>>(new Set());
   const [products, setProducts] = useState<Product[]>(allProducts);
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
+  
+  const { addToCart, isInCart } = useCart();
+  const { user } = useAuth();
 
   // Filter only trending products
   const trendingProducts = products.filter((p) => p.isTrending);
@@ -266,10 +279,22 @@ const RelatedProducts: React.FC = () => {
     }
   };
 
-  const handleAddToCart = (product: Product) => {
-    setCartItems((prev) => new Set(prev).add(product.id));
-    console.log("Added to cart:", product);
-    // Add your cart logic here
+  const handleAddToCart = async (product: Product) => {
+    if (!user) {
+      alert('Please login to add items to cart');
+      return;
+    }
+
+    try {
+      setAddingToCart(product.id);
+      await addToCart(product.id, 1);
+      alert('Item added to cart successfully!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert(error instanceof Error ? error.message : 'Failed to add item to cart');
+    } finally {
+      setAddingToCart(null);
+    }
   };
 
   const handleToggleWishlist = (productId: string) => {
@@ -291,7 +316,7 @@ const RelatedProducts: React.FC = () => {
     }
   };
 
-  const isInCart = (productId: string) => cartItems.has(productId);
+  // Remove local isInCart function since we're using CartContext
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -372,6 +397,7 @@ const RelatedProducts: React.FC = () => {
                     onAddToCart={handleAddToCart}
                     onToggleWishlist={handleToggleWishlist}
                     isInCart={isInCart}
+                    addingToCart={addingToCart === product.id}
                   />
                 </div>
               ))}

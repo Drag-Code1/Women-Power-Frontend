@@ -1,63 +1,35 @@
 // app/courses/page.tsx (Server Component)
 import CoursesDirectoryClient from "../component/courses/CoursesDirectoryClient ";
+import { getCoursesApi, getCategoriesApi } from "../lib/api";
+import { Course } from "../types/course";
 
-interface Course {
-  id: string;
-  thumbnail: string;
-  course_coordinator: string;
-  category_id: string;
-  title: string;
-  description: string;
-  lessons: number;
-  level: string;
-  price: string;
-  discount: number;
-}
-
-interface ApiResponse {
-  success: boolean;
-  data: Course[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  filters: {
-    categories: string[];
-    levels: string[];
-  };
-}
-
-async function getCourses(): Promise<ApiResponse> {
+async function getCourses(): Promise<{
+  courses: Course[];
+  categories: string[];
+  levels: string[];
+}> {
   try {
-    // In production, this would be your actual API endpoint
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/courses?limit=1000`, {
-      cache: 'no-store', // For dynamic data
-      // Or use: next: { revalidate: 60 } for ISR
-    });
+    // Fetch courses from API
+    const courses = await getCoursesApi();
     
-    if (!res.ok) {
-      throw new Error('Failed to fetch courses');
-    }
+    // Fetch categories for filtering
+    const categoriesData = await getCategoriesApi();
+    const categories = categoriesData?.map((cat: any) => cat.name) || [];
     
-    return res.json();
+    // Extract unique levels from courses
+    const levels = [...new Set(courses.map((course: any) => course.level))];
+    
+    return {
+      courses: courses || [],
+      categories,
+      levels
+    };
   } catch (error) {
     console.error('Error fetching courses:', error);
     return {
-      success: false,
-      data: [],
-      pagination: {
-        page: 1,
-        limit: 9,
-        total: 0,
-        totalPages: 0
-      },
-      filters: {
-        categories: [],
-        levels: []
-      }
+      courses: [],
+      categories: [],
+      levels: []
     };
   }
 }
@@ -67,9 +39,9 @@ export default async function CoursesPage() {
 
   return (
     <CoursesDirectoryClient 
-      initialCourses={coursesData.data}
-      categories={coursesData.filters.categories}
-      levels={coursesData.filters.levels}
+      initialCourses={coursesData.courses}
+      categories={coursesData.categories}
+      levels={coursesData.levels}
     />
   );
 }

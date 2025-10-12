@@ -1,11 +1,11 @@
 import React from 'react';
 import { Edit, Save, Cancel } from '@mui/icons-material';
-import { User } from './ProfileSection';
+import { User } from '../../types/auth';
 
 interface ProfileTabProps {
   user: User;
-  editedUser: User;
-  setEditedUser: (user: User | ((prev: User) => User)) => void;
+  editedUser: User | null;
+  setEditedUser: (user: User | null | ((prev: User | null) => User | null)) => void;
   isEditing: boolean;
   setIsEditing: (editing: boolean) => void;
   handleSaveProfile: () => void;
@@ -23,19 +23,19 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
 }) => {
   // Type-safe event handlers
   const handleFirstNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedUser(prev => ({ ...prev, firstName: e.target.value }));
+    setEditedUser(prev => prev ? { ...prev, firstName: e.target.value } : null);
   };
 
   const handleLastNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedUser(prev => ({ ...prev, lastName: e.target.value }));
+    setEditedUser(prev => prev ? { ...prev, lastName: e.target.value } : null);
   };
 
   const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setEditedUser(prev => ({ ...prev, gender: e.target.value as 'male' | 'female' }));
+    setEditedUser(prev => prev ? { ...prev, gender: e.target.value as 'male' | 'female' } : null);
   };
 
   const handleMobileNoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditedUser(prev => ({ ...prev, mobileNo: e.target.value }));
+    setEditedUser(prev => prev ? { ...prev, mobileNo: e.target.value } : null);
   };
 
   // Format the joining date safely
@@ -93,7 +93,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           {isEditing ? (
             <input
               type="text"
-              value={editedUser.firstName}
+              value={editedUser?.firstName || ''}
               onChange={handleFirstNameChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
@@ -107,7 +107,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           {isEditing ? (
             <input
               type="text"
-              value={editedUser.lastName}
+              value={editedUser?.lastName || ''}
               onChange={handleLastNameChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
@@ -120,7 +120,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">Gender</label>
           {isEditing ? (
             <select
-              value={editedUser.gender}
+              value={editedUser?.gender || 'male'}
               onChange={handleGenderChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             >
@@ -142,7 +142,7 @@ const ProfileTab: React.FC<ProfileTabProps> = ({
           {isEditing ? (
             <input
               type="tel"
-              value={editedUser.mobileNo}
+              value={editedUser?.mobileNo || ''}
               onChange={handleMobileNoChange}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />

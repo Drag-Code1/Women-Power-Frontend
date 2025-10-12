@@ -3,6 +3,8 @@
 import React, { useState, useRef } from "react";
 import { Product } from "@/app/types/product";
 import { ProductCard } from "./ProductCard";
+import { useCart } from "@/app/contexts/CartContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 interface BestSellersClientProps {
   products: Product[];
@@ -11,11 +13,14 @@ interface BestSellersClientProps {
 export const BestSellersClient = ({ products }: BestSellersClientProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [cartItems, setCartItems] = useState<Set<string>>(new Set());
   const [productList, setProductList] = useState<Product[]>(products);
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
+  
+  const { addToCart, isInCart } = useCart();
+  const { user } = useAuth();
 
-  // Filter only trending products
-  const trendingProducts = productList.filter((p) => p.isTrending);
+  // Use all products from API (best sellers)
+  const bestSellerProducts = productList;
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -43,14 +48,26 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
         behavior: "smooth",
       });
 
-      setCurrentIndex((prev) => Math.min(trendingProducts.length - 1, prev + 1));
+      setCurrentIndex((prev) => Math.min(bestSellerProducts.length - 1, prev + 1));
     }
   };
 
-  const handleAddToCart = (product: Product) => {
-    setCartItems((prev) => new Set(prev).add(product.id));
-    console.log("Added to cart:", product);
-    // Add your cart logic here
+  const handleAddToCart = async (product: Product) => {
+    if (!user) {
+      alert('Please login to add items to cart');
+      return;
+    }
+
+    try {
+      setAddingToCart(product.id);
+      await addToCart(product.id, 1);
+      alert('Item added to cart successfully!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert(error instanceof Error ? error.message : 'Failed to add item to cart');
+    } finally {
+      setAddingToCart(null);
+    }
   };
 
   const handleToggleWishlist = (productId: string) => {
@@ -72,7 +89,7 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
     }
   };
 
-  const isInCart = (productId: string) => cartItems.has(productId);
+  // Remove local isInCart function since we're using CartContext
 
   return (
     <div className="relative">
@@ -104,9 +121,9 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
       {/* Right Navigation Button */}
       <button
         onClick={scrollRight}
-        disabled={currentIndex >= trendingProducts.length - 1}
+        disabled={currentIndex >= bestSellerProducts.length - 1}
         className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
-          currentIndex >= trendingProducts.length - 1
+          currentIndex >= bestSellerProducts.length - 1
             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
             : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
         }`}
@@ -137,7 +154,7 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
             WebkitOverflowScrolling: "touch"
           }}
         >
-          {trendingProducts.map((product: Product) => (
+          {bestSellerProducts.map((product: Product) => (
             <div 
               key={product.id} 
               className="flex-shrink-0 w-64 sm:w-72"
@@ -147,6 +164,7 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
                 onAddToCart={handleAddToCart}
                 onToggleWishlist={handleToggleWishlist}
                 isInCart={isInCart}
+                addingToCart={addingToCart === product.id}
               />
             </div>
           ))}

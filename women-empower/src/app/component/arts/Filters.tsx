@@ -4,10 +4,16 @@
 import React from "react";
 import { PriceRange } from "@/app/types/product";
 
+interface Category {
+  id: string;
+  name: string;
+  image: string;
+}
+
 interface FiltersProps {
-  categories: string[];
+  categories: Category[];
   selectedCategories: string[];
-  toggleCategory: (category: string) => void;
+  toggleCategory: (categoryId: string) => void;
   priceRanges: PriceRange[];
   selectedPriceRanges: string[];
   togglePriceRange: (range: string) => void;
@@ -31,14 +37,14 @@ const Filters: React.FC<FiltersProps> = ({
         <h3 className="text-sm font-medium text-gray-900 mb-4">Categories</h3>
         <div className="space-y-3">
           {categories.map((category) => (
-            <label key={category} className="flex items-center cursor-pointer">
+            <label key={category.id} className="flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={selectedCategories.includes(category)}
-                onChange={() => toggleCategory(category)}
+                checked={selectedCategories.includes(category.id)}
+                onChange={() => toggleCategory(category.id)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="ml-3 text-sm text-gray-700 capitalize">{category}</span>
+              <span className="ml-3 text-sm text-gray-700 capitalize">{category.name}</span>
             </label>
           ))}
         </div>

@@ -36,6 +36,9 @@ import OrdersTab from './OrdersTab';
 import AddressesTab from './AddressesTab';
 import HelpTab from './HelpTab';
 
+// Import AuthContext
+import { useAuth } from '@/app/contexts/AuthContext';
+
 // Types
 export interface User {
   id: string;
@@ -70,13 +73,16 @@ export interface Order {
 }
 
 const ProfileSection: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, isAuthenticated, isLoading, signup, sendOtp, verifyOtp, logout } = useAuth();
+  
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [emailAddress, setEmailAddress] = useState('');
   const [showOtpVerification, setShowOtpVerification] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   // Signup form states
   const [signupData, setSignupData] = useState({
@@ -84,8 +90,7 @@ const ProfileSection: React.FC = () => {
     lastName: '',
     gender: 'male' as 'male' | 'female',
     email: '',
-    mobileNo: '',
-    role: 'user' as 'user' | 'admin'
+    mobileNo: ''
   });
   
   // Address management states
@@ -124,21 +129,10 @@ const ProfileSection: React.FC = () => {
     state: '',
     landmark: '',
     mobileNo: '',
-    userId: '4cf0865c-ae9c-4381-84ce-4ddec3582db8'
+    userId: user?.id || ''
   });
   
-  const [user, setUser] = useState<User>({
-    id: '4cf0865c-ae9c-4381-84ce-4ddec3582db8',
-    firstName: 'dannyy',
-    lastName: 'sharmaaa',
-    gender: 'female',
-    email: 'danggy@xamplee.com',
-    mobileNo: '9879873212',
-    joining_date: '2025-10-04 12:17:53',
-    role: 'user'
-  });
-
-  const [editedUser, setEditedUser] = useState<User>(user);
+  const [editedUser, setEditedUser] = useState<User | null>(user);
 
   const orders: Order[] = [
     {
@@ -174,39 +168,30 @@ const ProfileSection: React.FC = () => {
     { id: 'help', label: 'Help', icon: Help },
   ];
 
-  // Load users from localStorage on component mount
+  // Update editedUser when user changes
   useEffect(() => {
-    // Only run on client side
-    if (typeof window !== 'undefined') {
-      const storedUsers = localStorage.getItem('users');
-      if (storedUsers) {
-        try {
-          const parsedUsers = JSON.parse(storedUsers);
-          // Add default user if not exists
-          if (!parsedUsers.some((u: User) => u.email === 'danggy@xamplee.com')) {
-            const defaultUser = {
-              id: '4cf0865c-ae9c-4381-84ce-4ddec3582db8',
-              firstName: 'dannyy',
-              lastName: 'sharmaaa',
-              gender: 'female',
-              email: 'danggy@xamplee.com',
-              mobileNo: '9879873212',
-              joining_date: '2025-10-04 12:17:53',
-              role: 'user'
-            };
-            localStorage.setItem('users', JSON.stringify([...parsedUsers, defaultUser]));
-          }
-        } catch (error) {
-          console.error('Error parsing stored users:', error);
-          // Initialize with default user
-          localStorage.setItem('users', JSON.stringify([user]));
-        }
-      } else {
-        // Initialize with default user
-        localStorage.setItem('users', JSON.stringify([user]));
-      }
+    if (user) {
+      setEditedUser(user);
+      setNewAddress(prev => ({ ...prev, userId: user.id }));
     }
-  }, []);
+  }, [user]);
+
+  // Debug function to check token status
+  const debugTokenStatus = () => {
+    console.log('🔍 === CURRENT AUTH STATE ===');
+    console.log('isAuthenticated:', isAuthenticated);
+    console.log('isLoading:', isLoading);
+    console.log('user:', user);
+    console.log('token exists:', !!user);
+    
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('auth_token');
+      const userData = localStorage.getItem('auth_user');
+      console.log('localStorage token:', token ? token.substring(0, 20) + '...' : 'null');
+      console.log('localStorage user:', userData ? JSON.parse(userData) : 'null');
+    }
+    console.log('🔍 === END AUTH STATE ===');
+  };
 
   // Address management functions
   const handleAddAddress = () => {
@@ -224,7 +209,7 @@ const ProfileSection: React.FC = () => {
         state: '',
         landmark: '',
         mobileNo: '',
-        userId: user.id
+        userId: user?.id || ''
       });
       setShowAddAddress(false);
     } else {
@@ -252,7 +237,7 @@ const ProfileSection: React.FC = () => {
         state: '',
         landmark: '',
         mobileNo: '',
-        userId: user.id
+        userId: user?.id || ''
       });
       setShowAddAddress(false);
     } else {
@@ -266,61 +251,46 @@ const ProfileSection: React.FC = () => {
     }
   };
 
-  const handleEmailLogin = () => {
+  const handleEmailLogin = async () => {
     if (emailAddress && emailAddress.includes('@')) {
-      // Check if user exists in localStorage
-      if (typeof window !== 'undefined') {
-        const storedUsers = localStorage.getItem('users');
-        if (storedUsers) {
-          try {
-            const users = JSON.parse(storedUsers);
-            const existingUser = users.find((u: User) => u.email === emailAddress);
-            
-            if (existingUser) {
-              setShowOtpVerification(true);
-            } else {
-              alert('User not found. Please sign up first.');
-            }
-          } catch (error) {
-            console.error('Error checking user:', error);
-            alert('An error occurred. Please try again.');
-          }
-        } else {
-          alert('User not found. Please sign up first.');
-        }
+      setError(null);
+      setSuccess(null);
+      try {
+        console.log('Sending OTP to:', emailAddress);
+        await sendOtp(emailAddress);
+        console.log('OTP sent successfully, showing verification screen');
+        setShowOtpVerification(true);
+        setSuccess('OTP sent successfully to your email!');
+      } catch (error: any) {
+        console.error('Error sending OTP:', error);
+        setError(error.message || 'Failed to send OTP. Please try again.');
       }
     } else {
-      alert('Please enter a valid email address');
+      setError('Please enter a valid email address');
     }
   };
 
-  const handleOtpVerification = () => {
+  const handleOtpVerification = async () => {
     const otpValue = otp.join('');
+    console.log('Verifying OTP:', otpValue, 'for email:', emailAddress);
     if (otpValue.length === 6) {
-      // Get user from localStorage
-      if (typeof window !== 'undefined') {
-        const storedUsers = localStorage.getItem('users');
-        if (storedUsers) {
-          try {
-            const users = JSON.parse(storedUsers);
-            const existingUser = users.find((u: User) => u.email === emailAddress);
-            
-            if (existingUser) {
-              setUser(existingUser);
-              setEditedUser(existingUser);
-              setShowOtpVerification(false);
-              setIsLoggedIn(true);
-            } else {
-              alert('User not found. Please sign up first.');
-            }
-          } catch (error) {
-            console.error('Error verifying user:', error);
-            alert('An error occurred. Please try again.');
-          }
-        }
+      setError(null);
+      setSuccess(null);
+      try {
+        console.log('Calling verifyOtp API...');
+        await verifyOtp(emailAddress, parseInt(otpValue));
+        console.log('OTP verification successful');
+        setShowOtpVerification(false);
+        setSuccess('Login successful!');
+        // Reset form
+        setEmailAddress('');
+        setOtp(['', '', '', '', '', '']);
+      } catch (error: any) {
+        console.error('OTP verification error:', error);
+        setError(error.message || 'Invalid OTP. Please try again.');
       }
     } else {
-      alert('Please enter complete OTP');
+      setError('Please enter complete OTP');
     }
   };
 
@@ -337,64 +307,41 @@ const ProfileSection: React.FC = () => {
     }
   };
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     // Validate form
     if (!signupData.firstName || !signupData.lastName || !signupData.email || !signupData.mobileNo) {
-      alert('Please fill all required fields');
+      setError('Please fill all required fields');
       return;
     }
     
     if (!signupData.email.includes('@')) {
-      alert('Please enter a valid email address');
+      setError('Please enter a valid email address');
       return;
     }
     
     if (signupData.mobileNo.length !== 10) {
-      alert('Please enter a valid 10-digit mobile number');
+      setError('Please enter a valid 10-digit mobile number');
       return;
     }
     
-    // Check if user already exists
-    if (typeof window !== 'undefined') {
-      const storedUsers = localStorage.getItem('users');
-      if (storedUsers) {
-        try {
-          const users = JSON.parse(storedUsers);
-          const existingUser = users.find((u: User) => u.email === signupData.email);
-          
-          if (existingUser) {
-            alert('User with this email already exists. Please login.');
-            return;
-          }
-        } catch (error) {
-          console.error('Error checking existing user:', error);
-        }
-      }
-      
-      // Create new user with auto-generated ID and current date
-      const newUser: User = {
-        ...signupData,
-        id: generateId(),
-        joining_date: new Date().toISOString().replace('T', ' ').substring(0, 19)
-      };
-      
-      // Save to localStorage
-      if (storedUsers) {
-        try {
-          const users = JSON.parse(storedUsers);
-          users.push(newUser);
-          localStorage.setItem('users', JSON.stringify(users));
-        } catch (error) {
-          console.error('Error saving user:', error);
-          localStorage.setItem('users', JSON.stringify([newUser]));
-        }
-      } else {
-        localStorage.setItem('users', JSON.stringify([newUser]));
-      }
-      
-      // Show OTP verification
+    setError(null);
+    setSuccess(null);
+    
+    try {
+      await signup(signupData);
+      setSuccess('Account created successfully! Please login with your email.');
+      setAuthMode('login');
       setEmailAddress(signupData.email);
-      setShowOtpVerification(true);
+      // Reset signup form
+      setSignupData({
+        firstName: '',
+        lastName: '',
+        gender: 'male',
+        email: '',
+        mobileNo: ''
+      });
+    } catch (error: any) {
+      setError(error.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -407,34 +354,90 @@ const ProfileSection: React.FC = () => {
   };
 
   const handleSaveProfile = () => {
-    setUser(editedUser);
-    setIsEditing(false);
+    if (editedUser) {
+      setEditedUser(editedUser);
+      setIsEditing(false);
+    }
   };
 
   const handleCancelEdit = () => {
-    setEditedUser(user);
-    setIsEditing(false);
+    if (user) {
+      setEditedUser(user);
+      setIsEditing(false);
+    }
   };
 
-  // Login/Signup Screen
-  if (!isLoggedIn) {
+  const handleLogout = () => {
+    logout();
+    setEmailAddress('');
+    setOtp(['', '', '', '', '', '']);
+    setShowOtpVerification(false);
+    setAuthMode('login');
+    setSignupData({
+      firstName: '',
+      lastName: '',
+      gender: 'male',
+      email: '',
+      mobileNo: ''
+    });
+    setError(null);
+    setSuccess(null);
+  };
+
+  // Show loading state
+  if (isLoading) {
+    console.log('Auth is loading...');
     return (
-      <LoginSignup
-        authMode={authMode}
-        setAuthMode={setAuthMode}
-        emailAddress={emailAddress}
-        setEmailAddress={setEmailAddress}
-        showOtpVerification={showOtpVerification}
-        setShowOtpVerification={setShowOtpVerification}
-        otp={otp}
-        setOtp={setOtp}
-        signupData={signupData}
-        setSignupData={setSignupData}
-        handleEmailLogin={handleEmailLogin}
-        handleOtpVerification={handleOtpVerification}
-        handleOtpChange={handleOtpChange}
-        handleSignup={handleSignup}
-      />
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#61503c] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Login/Signup Screen
+  if (!isAuthenticated || !user) {
+    console.log('User not authenticated. isAuthenticated:', isAuthenticated, 'user:', user, 'showOtpVerification:', showOtpVerification);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          {/* Error/Success Messages */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+              {success}
+            </div>
+          )}
+          
+          <LoginSignup
+            authMode={authMode}
+            setAuthMode={setAuthMode}
+            emailAddress={emailAddress}
+            setEmailAddress={setEmailAddress}
+            showOtpVerification={showOtpVerification}
+            setShowOtpVerification={setShowOtpVerification}
+            otp={otp}
+            setOtp={setOtp}
+            signupData={signupData}
+            setSignupData={setSignupData}
+            handleEmailLogin={handleEmailLogin}
+            handleOtpVerification={handleOtpVerification}
+            handleOtpChange={handleOtpChange}
+            handleSignup={handleSignup}
+            handleResendOtp={() => {
+              // Reset OTP and resend
+              setOtp(['', '', '', '', '', '']);
+              handleEmailLogin();
+            }}
+          />
+        </div>
+      </div>
     );
   }
 
@@ -443,7 +446,17 @@ const ProfileSection: React.FC = () => {
     <div className="min-h-screen bg-[#f1f3f6]">
       <div className="max-w-7xl mx-auto p-2 lg:p-4">
         {/* Profile Header */}
-        <ProfileHeader user={user} setIsLoggedIn={setIsLoggedIn} />
+        <ProfileHeader user={user} onLogout={handleLogout} />
+        
+        {/* Debug Button - Remove in production */}
+        <div className="mb-4 text-center">
+          <button
+            onClick={debugTokenStatus}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600"
+          >
+            Debug Token Status
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
@@ -460,7 +473,7 @@ const ProfileSection: React.FC = () => {
             <div className="bg-white rounded-sm p-4 lg:p-4">
               
               {/* Profile Tab */}
-              {activeTab === 'profile' && (
+              {activeTab === 'profile' && editedUser && (
                 <ProfileTab
                   user={user}
                   editedUser={editedUser}

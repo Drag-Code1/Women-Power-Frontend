@@ -2,12 +2,30 @@
 
 import { Suspense } from "react";
 import ArtistDirectoryContent from "./ArtistDirectoryContent";
-import { allArtists } from "@/app/api/artists/route";
+import { getArtistsPaginated, getCategoriesApi } from "@/app/lib/api";
+import { Artist } from "@/app/types/artist";
 
 async function ArtistDirectoryWrapper() {
   // Server-side data fetching
-  const artists = allArtists;
-  const categories = [...new Set(artists.map((a) => a.category).filter(Boolean))];
+  let artists: Artist[] = [];
+  let categories: string[] = [];
+  let totalPages = 1;
+  let totalArtists = 0;
+
+  try {
+    // Fetch artists with pagination
+    const artistsData = await getArtistsPaginated(1);
+    artists = artistsData.data || [];
+    totalPages = artistsData.totalPages || 1;
+    totalArtists = artistsData.totalArtists || 0;
+
+    // Fetch categories
+    const categoriesData = await getCategoriesApi();
+    categories = categoriesData?.map((cat: any) => cat.name) || [];
+  } catch (error) {
+    console.error('Error fetching initial data:', error);
+    // Fallback to empty arrays if API fails
+  }
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -15,7 +33,9 @@ async function ArtistDirectoryWrapper() {
         <Suspense fallback={<LoadingFallback />}>
           <ArtistDirectoryContent
             initialArtists={artists}
-            initialCategories={categories as string[]}
+            initialCategories={categories}
+            initialTotalPages={totalPages}
+            initialTotalArtists={totalArtists}
           />
         </Suspense>
       </div>

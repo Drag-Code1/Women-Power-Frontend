@@ -2,8 +2,10 @@
 
 "use client";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Search, Filter, ChevronLeft, ChevronRight, Calendar, Briefcase } from "lucide-react";
-import { Artist } from "@/app/api/artists/route";
+import { Artist } from "@/app/types/artist";
+import { getArtistsPaginated, searchArtistsApi, filterArtistsApi } from "@/app/lib/api";
 
 // ============================================
 // TYPES
@@ -18,6 +20,8 @@ interface ExperienceRange {
 interface ArtistDirectoryContentProps {
   initialArtists: Artist[];
   initialCategories: string[];
+  initialTotalPages: number;
+  initialTotalArtists: number;
 }
 
 // ============================================
@@ -25,17 +29,25 @@ interface ArtistDirectoryContentProps {
 // ============================================
 
 const ArtistCard: React.FC<{ artist: Artist }> = ({ artist }) => {
+  const router = useRouter();
+  
   const formattedDate = new Date(artist.joining_date).toLocaleDateString('en-IN', {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
   });
 
+  const handleCardClick = () => {
+    router.push(`/artists-details?id=${artist.id}`);
+  };
+
   return (
     <div
-      className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300 
+      onClick={handleCardClick}
+      className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 
                  p-6 flex flex-col sm:flex-row items-center sm:items-start gap-6 
-                 w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto h-full"
+                 w-full max-w-sm sm:max-w-md lg:max-w-lg mx-auto h-full
+                 cursor-pointer hover:scale-105 transform"
     >
       <div className="flex-shrink-0">
         <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-gray-100">
@@ -53,8 +65,14 @@ const ArtistCard: React.FC<{ artist: Artist }> = ({ artist }) => {
             {artist.artist_Name}
           </h3>
           <p className="text-[#61503c] text-xs sm:text-sm font-medium mb-3">
-            {artist.category}
+            {artist.category || 'Artist'}
           </p>
+          
+          {artist.introduction && (
+            <p className="text-gray-600 text-xs sm:text-sm mb-3 line-clamp-2">
+              {artist.introduction}
+            </p>
+          )}
 
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm">
@@ -83,7 +101,7 @@ const ArtistFiltersSidebar: React.FC<{
   experienceRanges: ExperienceRange[];
   selectedExperience: string[];
   toggleExperience: (range: string) => void;
-  allArtists: Artist[];
+  artists: Artist[];
   clearFilters: () => void;
 }> = ({
   categories,
@@ -92,15 +110,15 @@ const ArtistFiltersSidebar: React.FC<{
   experienceRanges,
   selectedExperience,
   toggleExperience,
-  allArtists,
+  artists,
   clearFilters,
 }) => {
   const getCategoryCount = (category: string) => {
-    return allArtists.filter((a) => a.category === category).length;
+    return artists.filter((a) => a.category === category).length;
   };
 
   const getExperienceCount = (range: ExperienceRange) => {
-    return allArtists.filter((a) => {
+    return artists.filter((a) => {
       return a.experience >= range.min && a.experience <= range.max;
     }).length;
   };
@@ -179,6 +197,8 @@ const ArtistFiltersSidebar: React.FC<{
 const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
   initialArtists,
   initialCategories,
+  initialTotalPages,
+  initialTotalArtists,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -188,6 +208,11 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [artists, setArtists] = useState<Artist[]>(initialArtists);
+  const [totalPages, setTotalPages] = useState(initialTotalPages);
+  const [totalArtists, setTotalArtists] = useState(initialTotalArtists);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -197,9 +222,73 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Fetch artists based on current filters and page
+  const fetchArtists = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      let artistsData;
+      
+      // If there's a search term, use search API
+      if (searchTerm.trim()) {
+        const searchResults = await searchArtistsApi(searchTerm.trim());
+        setArtists(searchResults);
+        setTotalPages(1);
+        setTotalArtists(searchResults.length);
+        return;
+      }
+      
+      // If there are filters, use filter API
+      if (selectedCategories.length > 0 || selectedExperience.length > 0) {
+        const filters: any = {};
+        
+        if (selectedCategories.length > 0) {
+          // Map category names to category IDs (you might need to adjust this based on your category structure)
+          filters.categories = selectedCategories;
+        }
+        
+        if (selectedExperience.length > 0) {
+          // Find the experience range from selected experience
+          const experienceRange = experienceRanges.find(range => 
+            selectedExperience.includes(range.label)
+          );
+          if (experienceRange) {
+            filters.experience = {
+              minExp: experienceRange.min,
+              maxExp: experienceRange.max
+            };
+          }
+        }
+        
+        const filterResults = await filterArtistsApi(filters);
+        setArtists(filterResults);
+        setTotalPages(1);
+        setTotalArtists(filterResults.length);
+        return;
+      }
+      
+      // Default: fetch paginated artists
+      artistsData = await getArtistsPaginated(currentPage);
+      setArtists(artistsData.data || []);
+      setTotalPages(artistsData.totalPages || 1);
+      setTotalArtists(artistsData.totalArtists || 0);
+      
+    } catch (err) {
+      console.error('Error fetching artists:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch artists');
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm, selectedCategories, selectedExperience, currentPage]);
+
+  useEffect(() => {
+    fetchArtists();
+  }, [fetchArtists]);
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategories, selectedExperience, sortBy]);
+  }, [searchTerm, selectedCategories, selectedExperience]);
 
   const experienceRanges = useMemo(
     () => [
@@ -239,54 +328,35 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
     setCurrentPage(1);
   }, []);
 
-  const filteredArtists = useMemo(() => {
-    let filtered = initialArtists.filter((artist) => {
-      const matchesSearch =
-        artist.artist_Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (artist.category && artist.category.toLowerCase().includes(searchTerm.toLowerCase()));
-
-      const matchesCategory =
-        selectedCategories.length === 0 ||
-        (artist.category && selectedCategories.includes(artist.category));
-
-      let matchesExperience = selectedExperience.length === 0;
-      if (selectedExperience.length > 0) {
-        matchesExperience = experienceRanges.some((range) => {
-          if (selectedExperience.includes(range.label)) {
-            return artist.experience >= range.min && artist.experience <= range.max;
-          }
-          return false;
-        });
-      }
-
-      return matchesSearch && matchesCategory && matchesExperience;
-    });
-
-    filtered.sort((a, b) => {
+  // Apply client-side sorting to the artists from API
+  const sortedArtists = useMemo(() => {
+    const sorted = [...artists];
+    
       switch (sortBy) {
         case "Name A-Z":
-          return a.artist_Name.localeCompare(b.artist_Name);
+        return sorted.sort((a, b) => a.artist_Name.localeCompare(b.artist_Name));
         case "Name Z-A":
-          return b.artist_Name.localeCompare(a.artist_Name);
+        return sorted.sort((a, b) => b.artist_Name.localeCompare(a.artist_Name));
         case "Experience":
-          return b.experience - a.experience;
+        return sorted.sort((a, b) => b.experience - a.experience);
         case "Newest Joined":
-          return new Date(b.joining_date).getTime() - new Date(a.joining_date).getTime();
+        return sorted.sort((a, b) => new Date(b.joining_date).getTime() - new Date(a.joining_date).getTime());
         default:
-          return 0;
-      }
-    });
+        return sorted;
+    }
+  }, [artists, sortBy]);
 
-    return filtered;
-  }, [searchTerm, selectedCategories, selectedExperience, sortBy, initialArtists, experienceRanges]);
-
-  const totalPages = Math.ceil(filteredArtists.length / itemsPerPage);
-
+  // For search and filter results, we don't need pagination as API returns all results
+  // For regular pagination, we use the API pagination
   const paginatedArtists = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return filteredArtists.slice(start, end);
-  }, [filteredArtists, currentPage]);
+    if (searchTerm.trim() || selectedCategories.length > 0 || selectedExperience.length > 0) {
+      // For search/filter results, show all results (no client-side pagination)
+      return sortedArtists;
+    } else {
+      // For regular browsing, use API pagination (artists already contain the current page data)
+      return sortedArtists;
+    }
+  }, [sortedArtists, searchTerm, selectedCategories, selectedExperience]);
 
   const goToPage = useCallback((page: number) => {
     if (page === currentPage || isTransitioning || page < 1 || page > totalPages) return;
@@ -380,7 +450,7 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
   }, [goToPrevPage, goToNextPage]);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, filteredArtists.length);
+  const endIndex = Math.min(startIndex + itemsPerPage, totalArtists);
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -388,7 +458,7 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
       <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
           <h1 className="text-2xl font-bold text-gray-900">
-            Artists ({filteredArtists.length})
+            Artists ({totalArtists})
           </h1>
 
           <div className="flex items-center gap-2 w-full lg:w-auto">
@@ -436,7 +506,7 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
             experienceRanges={experienceRanges}
             selectedExperience={selectedExperience}
             toggleExperience={toggleExperience}
-            allArtists={initialArtists}
+            artists={artists}
             clearFilters={clearFilters}
           />
         </div>
@@ -465,7 +535,7 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
           experienceRanges={experienceRanges}
           selectedExperience={selectedExperience}
           toggleExperience={toggleExperience}
-          allArtists={initialArtists}
+          artists={artists}
           clearFilters={clearFilters}
         />
       </div>
@@ -478,7 +548,27 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
 
         {/* Main Content */}
         <div className="flex-1 p-6">
-          {paginatedArtists.length > 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#61503c]"></div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Error loading artists
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {error}
+              </p>
+              <button
+                onClick={fetchArtists}
+                className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : paginatedArtists.length > 0 ? (
             <>
               <div
                 className={`transition-opacity duration-300 ${
@@ -504,7 +594,7 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
               {totalPages > 1 && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
                   <div className="text-sm text-gray-600">
-                    Showing {startIndex + 1}-{endIndex} of {filteredArtists.length} artists
+                    Showing {startIndex + 1}-{endIndex} of {totalArtists} artists
                   </div>
 
                   <div className="flex justify-center items-center gap-2">

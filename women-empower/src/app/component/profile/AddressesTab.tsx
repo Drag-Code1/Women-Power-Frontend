@@ -1,6 +1,7 @@
 import React from 'react';
 import { LocationOn, Home, Work, Add, Edit, Delete, Cancel } from '@mui/icons-material';
-import { Address, User } from './ProfileSection';
+import { Address } from './ProfileSection';
+import { User } from '../../types/auth';
 
 interface AddressesTabProps {
   addresses: Address[];

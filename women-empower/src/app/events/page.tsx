@@ -13,50 +13,47 @@ interface Event {
   banner: string;
 }
 
-interface ApiResponse {
+interface EventApiResponse {
   success: boolean;
+  message: string;
   data: Event[];
-  featured: Event[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-  filters: {
-    statuses: string[];
-  };
 }
 
-async function getEvents(): Promise<ApiResponse> {
+async function getEvents(): Promise<{
+  events: Event[];
+  featuredEvents: Event[];
+  statuses: string[];
+}> {
   try {
-    // In production, this would be your actual API endpoint
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/events?limit=1000`, {
-      cache: 'no-store', // For dynamic data
-      // Or use: next: { revalidate: 60 } for ISR
+    // Fetch events from API
+    const res = await fetch('http://localhost:5000/v1/event/', {
+      cache: 'no-store'
     });
     
     if (!res.ok) {
       throw new Error('Failed to fetch events');
     }
     
-    return res.json();
+    const response: EventApiResponse = await res.json();
+    const events = response.data || [];
+    
+    // Extract unique statuses for filtering
+    const statuses = ['All', ...new Set(events.map(event => event.status))];
+    
+    // Get featured events (first 3 events as featured)
+    const featuredEvents = events.slice(0, 3);
+    
+    return {
+      events,
+      featuredEvents,
+      statuses
+    };
   } catch (error) {
     console.error('Error fetching events:', error);
     return {
-      success: false,
-      data: [],
-      featured: [],
-      pagination: {
-        page: 1,
-        limit: 12,
-        total: 0,
-        totalPages: 0
-      },
-      filters: {
-        statuses: ['All', 'upcoming', 'ongoing', 'completed']
-      }
+      events: [],
+      featuredEvents: [],
+      statuses: ['All', 'upcoming', 'ongoing', 'completed']
     };
   }
 }
@@ -66,9 +63,9 @@ export default async function EventsPage() {
 
   return (
     <EventsSectionClient 
-      initialEvents={eventsData.data}
-      featuredEvents={eventsData.featured}
-      statuses={eventsData.filters.statuses}
+      initialEvents={eventsData.events}
+      featuredEvents={eventsData.featuredEvents}
+      statuses={eventsData.statuses}
     />
   );
 }

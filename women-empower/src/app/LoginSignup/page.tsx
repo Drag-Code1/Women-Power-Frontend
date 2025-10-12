@@ -1,6 +1,7 @@
+"use client";
+
 import React from 'react';
 import { Email, AccountCircle, Shield, ArrowBack, Phone } from '@mui/icons-material';
-import { User } from '../component/profile/ProfileSection';
 
 interface LoginSignupProps {
   authMode: 'login' | 'signup';
@@ -11,12 +12,37 @@ interface LoginSignupProps {
   setShowOtpVerification: (show: boolean) => void;
   otp: string[];
   setOtp: (otp: string[]) => void;
-  signupData: Omit<User, 'id' | 'joining_date'>;
-  setSignupData: (data: Omit<User, 'id' | 'joining_date'>) => void;
+  signupData: {
+    firstName: string;
+    lastName: string;
+    gender: 'male' | 'female';
+    email: string;
+    mobileNo: string;
+  };
+  setSignupData: (data: {
+    firstName: string;
+    lastName: string;
+    gender: 'male' | 'female';
+    email: string;
+    mobileNo: string;
+  } | ((prev: {
+    firstName: string;
+    lastName: string;
+    gender: 'male' | 'female';
+    email: string;
+    mobileNo: string;
+  }) => {
+    firstName: string;
+    lastName: string;
+    gender: 'male' | 'female';
+    email: string;
+    mobileNo: string;
+  })) => void;
   handleEmailLogin: () => void;
   handleOtpVerification: () => void;
   handleOtpChange: (index: number, value: string) => void;
   handleSignup: () => void;
+  handleResendOtp?: () => void;
 }
 
 const Login: React.FC = () => (
@@ -39,7 +65,8 @@ const LoginSignup: React.FC<LoginSignupProps> = ({
   handleEmailLogin,
   handleOtpVerification,
   handleOtpChange,
-  handleSignup
+  handleSignup,
+  handleResendOtp
 }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -75,7 +102,7 @@ const LoginSignup: React.FC<LoginSignupProps> = ({
                     : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
-                <Login className="w-4 h-4 text-gray-400" />
+                <Login />
                 <span>Login</span>
               </button>
               <button
@@ -270,7 +297,10 @@ const LoginSignup: React.FC<LoginSignupProps> = ({
               </button>
 
               <div className="text-center">
-                <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <button 
+                  onClick={handleResendOtp}
+                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                >
                   Resend OTP
                 </button>
               </div>

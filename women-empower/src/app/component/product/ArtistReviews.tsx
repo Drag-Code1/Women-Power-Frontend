@@ -1,9 +1,13 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, ArrowUpDown, Filter, Music, Palette, Camera } from 'lucide-react';
+import { getArtistReviewsApi, createArtistReviewApi } from '../../lib/artistReviewApi';
+import { ArtistReview } from '../../types/artistReview';
+import { useAuth } from '../../contexts/AuthContext';
+import { getCurrentToken, getCurrentUser } from '../../lib/authenticatedApi';
 
 interface Review {
-  id: number;
+  id: string;
   rating: number;
   title: string;
   description: string;
@@ -12,7 +16,12 @@ interface Review {
   reviewerName?: string;
 }
 
-const ArtistReviews: React.FC = () => {
+interface ArtistReviewsProps {
+  artistId: string;
+}
+
+const ArtistReviews: React.FC<ArtistReviewsProps> = ({ artistId }) => {
+  const { user, token } = useAuth();
   const [sortBy, setSortBy] = useState('Relevance');
   const [filterBy, setFilterBy] = useState('All Star');
   const [showWriteReview, setShowWriteReview] = useState(false);
@@ -21,71 +30,115 @@ const ArtistReviews: React.FC = () => {
   const [newReviewDescription, setNewReviewDescription] = useState('');
   const [reviewerName, setReviewerName] = useState('');
   const [displayCount, setDisplayCount] = useState(4);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Sample reviews data - using state to allow adding new reviews
-  const [reviews, setReviews] = useState<Review[]>([
-    {
-      id: 1,
-      rating: 5,
-      title: "Absolutely mesmerizing performance!",
-      description: "I attended their concert last week and was completely blown away. The artist's stage presence is incredible and their vocal range is phenomenal. Every song was performed with such passion and emotion. Definitely one of the best live performances I've ever witnessed.",
-      timeAgo: "2 days ago",
-      verified: true,
-      reviewerName: "Sarah M."
-    },
-    {
-      id: 2,
-      rating: 5,
-      title: "Pure artistic genius",
-      description: "This artist has a unique style that sets them apart from everyone else in the industry. Their latest work showcases incredible creativity and technical skill. I've been following their career for years and they continue to evolve and surprise me.",
-      timeAgo: "5 days ago",
-      verified: true,
-      reviewerName: "Michael R."
-    },
-    {
-      id: 3,
-      rating: 4,
-      title: "Great talent with room to grow",
-      description: "Really impressed with their artistic vision and execution. The performance was solid and engaging, though there were a few moments that could have been smoother. Overall, a very talented artist with huge potential.",
-      timeAgo: "1 week ago",
-      reviewerName: "Emma L."
-    },
-    {
-      id: 4,
-      rating: 5,
-      title: "Exceeded all expectations",
-      description: "I went in with high expectations based on all the positive reviews, and somehow they still managed to exceed them. The attention to detail, the emotional depth, and the technical mastery - everything was perfect. Can't wait to see what they create next.",
-      timeAgo: "2 weeks ago",
-      verified: true,
-      reviewerName: "David K."
-    }
-  ]);
+  // Fetch reviews from API
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!artistId) return;
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const currentToken = token || getCurrentToken();
+        const apiReviews = await getArtistReviewsApi(artistId, currentToken || undefined);
+        
+        // Transform API reviews to component format
+        const transformedReviews: Review[] = apiReviews.map((review: ArtistReview) => ({
+          id: review.id,
+          rating: review.rating,
+          title: review.rating_description.substring(0, 50) + (review.rating_description.length > 50 ? '...' : ''),
+          description: review.rating_description,
+          timeAgo: review.date ? new Date(review.date).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          }) : 'Recently',
+          verified: true,
+          reviewerName: review.user ? `${review.user.firstName} ${review.user.lastName}` : 'Anonymous'
+        }));
+        
+        setReviews(transformedReviews);
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch reviews');
+        // Fallback to empty array
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [artistId]);
 
   // Function to handle adding new review
-  const handleSubmitReview = () => {
-    if (newReviewRating > 0 && newReviewTitle.trim() && newReviewDescription.trim() && reviewerName.trim()) {
-      const newReview: Review = {
-        id: Math.max(...reviews.map(r => r.id)) + 1,
-        rating: newReviewRating,
-        title: newReviewTitle.trim(),
-        description: newReviewDescription.trim(),
-        timeAgo: "Just now",
-        verified: true,
-        reviewerName: reviewerName.trim()
-      };
-      
-      // Add new review to the beginning of the array
-      setReviews([newReview, ...reviews]);
-      
-      // Reset form
-      setNewReviewRating(0);
-      setNewReviewTitle('');
-      setNewReviewDescription('');
-      setReviewerName('');
-      setShowWriteReview(false);
-      
-      // Reset display count to show all reviews including the new one
-      setDisplayCount(4);
+  const handleSubmitReview = async () => {
+    // Get current user and token from localStorage
+    const currentUser = user || getCurrentUser();
+    const currentToken = token || getCurrentToken();
+    
+    // Debug: Log authentication status
+    console.log('🔐 User from context:', user);
+    console.log('🔐 User from localStorage:', currentUser);
+    console.log('🎫 Token from context:', token);
+    console.log('🎫 Token from localStorage:', currentToken);
+    console.log('✅ Is Authenticated:', !!currentUser && !!currentToken);
+    
+    if (!currentUser || !currentToken) {
+      alert('Please login to write a review');
+      return;
+    }
+
+    if (newReviewRating > 0 && newReviewDescription.trim()) {
+      try {
+        setSubmitting(true);
+        
+        const reviewData = {
+          artist_id: artistId,
+          user_id: currentUser.id,
+          rating: newReviewRating,
+          rating_description: newReviewDescription.trim()
+        };
+
+        await createArtistReviewApi(reviewData, currentToken || undefined);
+        
+        // Create new review for immediate UI update
+        const newReview: Review = {
+          id: Date.now().toString(), // Temporary ID
+          rating: newReviewRating,
+          title: newReviewDescription.trim().substring(0, 50) + (newReviewDescription.trim().length > 50 ? '...' : ''),
+          description: newReviewDescription.trim(),
+          timeAgo: "Just now",
+          verified: true,
+          reviewerName: `${currentUser.firstName} ${currentUser.lastName}`
+        };
+        
+        // Add new review to the beginning of the array
+        setReviews([newReview, ...reviews]);
+        
+        // Reset form
+        setNewReviewRating(0);
+        setNewReviewTitle('');
+        setNewReviewDescription('');
+        setReviewerName('');
+        setShowWriteReview(false);
+        
+        // Reset display count to show all reviews including the new one
+        setDisplayCount(4);
+        
+        alert('Review submitted successfully!');
+      } catch (err) {
+        console.error('Error submitting review:', err);
+        alert(err instanceof Error ? err.message : 'Failed to submit review');
+      } finally {
+        setSubmitting(false);
+      }
+    } else {
+      alert('Please provide a rating and review description');
     }
   };
 
@@ -225,73 +278,60 @@ const ArtistReviews: React.FC = () => {
                     <Camera className="w-6 h-6 text-gray-600" />
                     <h3 className="text-xl font-semibold text-gray-900">Write Your Artist Review</h3>
                   </div>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Rating
-                      </label>
-                      <div className="flex items-center gap-2">
-                        {renderStars(newReviewRating, 'medium', true)}
-                        <span className="text-sm text-gray-600 ml-2">
-                          {newReviewRating > 0 ? `${newReviewRating} out of 5` : 'Click to rate'}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Name
-                      </label>
-                      <input 
-                        type="text" 
-                        value={reviewerName}
-                        onChange={(e) => setReviewerName(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Enter your name"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Review Title
-                      </label>
-                      <input 
-                        type="text" 
-                        value={newReviewTitle}
-                        onChange={(e) => setNewReviewTitle(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        placeholder="Summarize your experience with this artist"
-                      />
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Your Review
-                      </label>
-                      <textarea 
-                        rows={4}
-                        value={newReviewDescription}
-                        onChange={(e) => setNewReviewDescription(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                        placeholder="Share your thoughts about this artist's work, performance, or creativity. What impressed you most?"
-                      />
-                    </div>
-                    
-                    <div className="flex gap-3 pt-2">
-                      <button 
-                        onClick={handleSubmitReview}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
-                      >
-                        Submit Review
-                      </button>
+                  {!user ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-600 mb-4">Please login to write a review</p>
                       <button 
                         onClick={() => setShowWriteReview(false)}
                         className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-medium transition-colors"
                       >
-                        Cancel
+                        Close
                       </button>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Your Rating
+                        </label>
+                        <div className="flex items-center gap-2">
+                          {renderStars(newReviewRating, 'medium', true)}
+                          <span className="text-sm text-gray-600 ml-2">
+                            {newReviewRating > 0 ? `${newReviewRating} out of 5` : 'Click to rate'}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Your Review
+                        </label>
+                        <textarea 
+                          rows={4}
+                          value={newReviewDescription}
+                          onChange={(e) => setNewReviewDescription(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          placeholder="Share your thoughts about this artist's work, performance, or creativity. What impressed you most?"
+                        />
+                      </div>
+                      
+                      <div className="flex gap-3 pt-2">
+                        <button 
+                          onClick={handleSubmitReview}
+                          disabled={submitting}
+                          className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
+                        >
+                          {submitting ? 'Submitting...' : 'Submit Review'}
+                        </button>
+                        <button 
+                          onClick={() => setShowWriteReview(false)}
+                          className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-medium transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -342,7 +382,27 @@ const ArtistReviews: React.FC = () => {
 
             {/* Reviews List */}
             <div className="px-6 sm:px-8 py-6">
-              {displayedReviews.length > 0 ? (
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#61503c]"></div>
+                </div>
+              ) : error ? (
+                <div className="text-center py-16">
+                  <div className="text-6xl mb-4">⚠️</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Error loading reviews
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {error}
+                  </p>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : displayedReviews.length > 0 ? (
                 <div className="space-y-6">
                   {displayedReviews.map((review, index) => (
                     <div key={review.id} className={`${index !== displayedReviews.length - 1 ? 'border-b border-gray-200' : ''} pb-6`}>

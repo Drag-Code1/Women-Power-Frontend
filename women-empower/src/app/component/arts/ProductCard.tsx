@@ -1,35 +1,61 @@
 // components/ProductCard.tsx
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Heart } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Product, CartItem } from "@/app/types/product";
+import { useCart } from "@/app/contexts/CartContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 interface ProductCardProps {
   product: Product;
-  cart: CartItem;
   wishlist: Set<string>;
-  addToCart: (id: string) => void;
-  removeFromCart: (id: string) => void;
   toggleWishlist: (id: string) => void;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
-  cart, 
   wishlist,
-  addToCart, 
-  removeFromCart,
   toggleWishlist
 }) => {
+  const router = useRouter();
+  const { addToCart, isInCart, getCartItemQuantity } = useCart();
+  const { user } = useAuth();
+  const [addingToCart, setAddingToCart] = useState(false);
+  
   const priceNum = parseFloat(product.price);
   const discountedPrice = priceNum - (priceNum * product.discount / 100);
-  const cartQuantity = cart[product.id] || 0;
-  const isInCart = cartQuantity > 0;
+  const cartQuantity = getCartItemQuantity(product.id);
+  const isInCartState = isInCart(product.id);
   const isInWishlist = wishlist.has(product.id);
 
+  const handleProductClick = () => {
+    router.push(`/products-details?id=${product.id}`);
+  };
+
+  const handleAddToCart = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      alert('Please login to add items to cart');
+      return;
+    }
+
+    try {
+      setAddingToCart(true);
+      await addToCart(product.id, 1);
+      alert('Item added to cart successfully!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert(error instanceof Error ? error.message : 'Failed to add item to cart');
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
   return (
-    <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden">
+    <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden cursor-pointer" onClick={handleProductClick}>
       <div className="relative">
         <img
           src={product.thumbnail}
@@ -50,7 +76,10 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
 
         <button
-          onClick={() => toggleWishlist(product.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleWishlist(product.id);
+          }}
           className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm hover:scale-110"
         >
           <Heart
@@ -85,14 +114,18 @@ const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           
           <button 
-            onClick={() => isInCart ? removeFromCart(product.id) : addToCart(product.id)}
-            className={`px-3 py-1.5 rounded text-xs transition-all duration-200 ${
-              isInCart 
+            onClick={handleAddToCart}
+            disabled={addingToCart}
+            className={`px-3 py-1.5 rounded text-xs transition-all duration-200 flex items-center gap-1 ${
+              isInCartState 
                 ? "bg-green-600 text-white hover:bg-green-700" 
                 : "bg-[#695946] text-white hover:bg-[#61503c]"
-            }`}
+            } ${addingToCart ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {isInCart ? "In Cart" : "Add to Cart"}
+            {addingToCart && (
+              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+            )}
+            {addingToCart ? "Adding..." : (isInCartState ? "In Cart" : "Add to Cart")}
           </button>
         </div>
       </div>

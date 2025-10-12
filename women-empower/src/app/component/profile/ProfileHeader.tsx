@@ -1,13 +1,13 @@
 import React from 'react';
 import { Logout } from '@mui/icons-material';
-import { User } from './ProfileSection';
+import { User } from '../../types/auth';
 
 interface ProfileHeaderProps {
   user: User;
-  setIsLoggedIn: (isLoggedIn: boolean) => void;
+  onLogout: () => void;
 }
 
-const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, setIsLoggedIn }) => {
+const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, onLogout }) => {
   return (
     <div className="bg-white rounded-sm p-2 lg:p-2 mb-4">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -24,7 +24,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({ user, setIsLoggedIn }) =>
           </div>
         </div>
         <button
-          onClick={() => setIsLoggedIn(false)}
+          onClick={onLogout}
           className="flex items-center space-x-2 px-4 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-colors"
         >
           <Logout className="w-4 h-4" />

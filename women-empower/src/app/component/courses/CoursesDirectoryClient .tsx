@@ -8,19 +8,8 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import CourseCard from "./CourseCard";
 import FiltersSidebar from "./FiltersSidebar";
-
-interface Course {
-  id: string;
-  thumbnail: string;
-  course_coordinator: string;
-  category_id: string;
-  title: string;
-  description: string;
-  lessons: number;
-  level: string;
-  price: string;
-  discount: number;
-}
+import { getCoursesApi, searchCoursesApi, filterCoursesApi } from "../../lib/api";
+import { Course } from "../../types/course";
 
 interface Props {
   initialCourses: Course[];
@@ -38,6 +27,9 @@ const CoursesDirectoryClient = ({ initialCourses, categories, levels }: Props) =
   const [isMobile, setIsMobile] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [courses, setCourses] = useState<Course[]>(initialCourses);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const itemsPerPage = 9;
 
   const sortOptions = ["Latest", "Price: Low to High", "Price: High to Low"];
@@ -49,9 +41,75 @@ const CoursesDirectoryClient = ({ initialCourses, categories, levels }: Props) =
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  // Fetch courses based on current filters and search
+  const fetchCourses = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      let coursesData;
+      
+      // If there's a search term, use search API
+      if (searchTerm.trim()) {
+        const searchResults = await searchCoursesApi(searchTerm.trim());
+        setCourses(searchResults);
+        return;
+      }
+      
+      // If there are filters, use filter API
+      if (selectedCategories.length > 0 || selectedLevels.length > 0 || priceRange) {
+        const filters: any = {};
+        
+        if (selectedCategories.length > 0) {
+          filters.categories = selectedCategories;
+        }
+        
+        if (selectedLevels.length > 0) {
+          filters.levels = selectedLevels;
+        }
+        
+        if (priceRange) {
+          // Convert price range string to min/max values
+          switch (priceRange) {
+            case "Under ₹100":
+              filters.priceRange = { min: 0, max: 100 };
+              break;
+            case "₹100 - ₹250":
+              filters.priceRange = { min: 100, max: 250 };
+              break;
+            case "₹250 - ₹500":
+              filters.priceRange = { min: 250, max: 500 };
+              break;
+            case "Above ₹500":
+              filters.priceRange = { min: 500, max: Infinity };
+              break;
+          }
+        }
+        
+        const filterResults = await filterCoursesApi(filters);
+        setCourses(filterResults);
+        return;
+      }
+      
+      // Default: fetch all courses
+      coursesData = await getCoursesApi();
+      setCourses(coursesData);
+      
+    } catch (err) {
+      console.error('Error fetching courses:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch courses');
+    } finally {
+      setLoading(false);
+    }
+  }, [searchTerm, selectedCategories, selectedLevels, priceRange]);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
+
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategories, selectedLevels, priceRange, sortBy]);
+  }, [searchTerm, selectedCategories, selectedLevels, priceRange]);
 
   const toggleCategory = useCallback((c: string) => {
     setSelectedCategories((prev) => (prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]));
@@ -69,49 +127,27 @@ const CoursesDirectoryClient = ({ initialCourses, categories, levels }: Props) =
     setCurrentPage(1);
   }, []);
 
-  const filteredCourses = useMemo(() => {
-    let filtered = initialCourses.filter((course) => {
-      const matchesSearch =
-        course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.course_coordinator.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        course.description.toLowerCase().includes(searchTerm.toLowerCase());
+  // Apply client-side sorting to the courses from API
+  const sortedCourses = useMemo(() => {
+    const sorted = [...courses];
+    
+    switch (sortBy) {
+      case "Price: Low to High":
+        return sorted.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+      case "Price: High to Low":
+        return sorted.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+      case "Latest":
+      default:
+        return sorted;
+    }
+  }, [courses, sortBy]);
 
-      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(course.category_id);
-      const matchesLevel = selectedLevels.length === 0 || selectedLevels.includes(course.level);
-
-      let matchesPrice = true;
-      if (priceRange) {
-        const price = parseFloat(course.price);
-        if (priceRange === "Under ₹100") matchesPrice = price < 100;
-        else if (priceRange === "₹100 - ₹250") matchesPrice = price >= 100 && price <= 250;
-        else if (priceRange === "₹250 - ₹500") matchesPrice = price >= 250 && price <= 500;
-        else if (priceRange === "Above ₹500") matchesPrice = price > 500;
-      }
-
-      return matchesSearch && matchesCategory && matchesLevel && matchesPrice;
-    });
-
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case "Price: Low to High":
-          return parseFloat(a.price) - parseFloat(b.price);
-        case "Price: High to Low":
-          return parseFloat(b.price) - parseFloat(a.price);
-        case "Latest":
-        default:
-          return 0;
-      }
-    });
-
-    return filtered;
-  }, [searchTerm, selectedCategories, selectedLevels, priceRange, sortBy, initialCourses]);
-
-  const totalPages = Math.ceil(filteredCourses.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedCourses.length / itemsPerPage);
 
   const paginatedCourses = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
-    return filteredCourses.slice(start, start + itemsPerPage);
-  }, [filteredCourses, currentPage]);
+    return sortedCourses.slice(start, start + itemsPerPage);
+  }, [sortedCourses, currentPage]);
 
   const goToPage = useCallback((page: number) => {
     if (page === currentPage || isTransitioning || page < 1 || page > totalPages) return;
@@ -139,7 +175,7 @@ const CoursesDirectoryClient = ({ initialCourses, categories, levels }: Props) =
   }, [totalPages, currentPage, isMobile]);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, filteredCourses.length);
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedCourses.length);
 
   return (
     <div className="bg-[#f1f2f4] py-2 px-2 sm:py-2 sm:px-4 min-h-screen">
@@ -150,7 +186,7 @@ const CoursesDirectoryClient = ({ initialCourses, categories, levels }: Props) =
               <div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Online Courses</h1>
                 <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                  {filteredCourses.length} courses available
+                  {sortedCourses.length} courses available
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3 sm:gap-4">
@@ -198,7 +234,7 @@ const CoursesDirectoryClient = ({ initialCourses, categories, levels }: Props) =
                 toggleLevel={toggleLevel}
                 setPriceRange={setPriceRange}
                 clearFilters={clearFilters}
-                allCourses={initialCourses}
+                allCourses={courses}
                 showFilters={true}
               />
             </div>
@@ -221,14 +257,34 @@ const CoursesDirectoryClient = ({ initialCourses, categories, levels }: Props) =
                   toggleLevel={toggleLevel}
                   setPriceRange={setPriceRange}
                   clearFilters={clearFilters}
-                  allCourses={initialCourses}
+                  allCourses={courses}
                   showFilters={true}
                 />
               </DialogContent>
             </Dialog>
 
             <div className="flex-1 p-6">
-              {paginatedCourses.length > 0 ? (
+              {loading ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#61503c]"></div>
+                </div>
+              ) : error ? (
+                <div className="text-center py-16">
+                  <div className="text-6xl mb-4">⚠️</div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    Error loading courses
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {error}
+                  </p>
+                  <button
+                    onClick={fetchCourses}
+                    className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              ) : paginatedCourses.length > 0 ? (
                 <>
                   <div className={`transition-opacity duration-300 ${isTransitioning ? "opacity-50" : "opacity-100"}`}>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-max">
@@ -243,7 +299,7 @@ const CoursesDirectoryClient = ({ initialCourses, categories, levels }: Props) =
                   {totalPages > 1 && (
                     <div className="flex flex-col sm:flex-row justify-between items-center mt-8 gap-4">
                       <div className="text-sm text-gray-600 order-2 sm:order-1">
-                        Showing {startIndex + 1}-{endIndex} of {filteredCourses.length} courses
+                        Showing {startIndex + 1}-{endIndex} of {sortedCourses.length} courses
                       </div>
                       <div className="flex justify-center items-center gap-2 order-1 sm:order-2">
                         <button

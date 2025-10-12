@@ -12,6 +12,26 @@ export const getCategoriesApi = async () => {
   return body.data;
 };
 
+// Get category details by ID
+export const getCategoryDetailsApi = async (categoryId: string) => {
+  const res = await fetch(`http://localhost:5000/v1/category/${categoryId}`, { cache: 'no-store' });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to fetch category details (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed?.data;
+};
+
 export const createCategory = async (payload: { name: string; image: string }) => {
   const res = await fetch('http://localhost:5000/v1/category/', {
     method: 'POST',
@@ -60,7 +80,81 @@ export const getArtistsApi = async (page: number = 1) => {
     (error as any).details = parsed;
     throw error;
   }
-  // Maintain existing return (paginated container object)
+  // Return the artists array from the nested data structure
+  return parsed?.data?.data || [];
+};
+
+// Search artists by name
+export const searchArtistsApi = async (query: string) => {
+  const url = `http://localhost:5000/v1/artist/${encodeURIComponent(query)}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to search artists (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed?.data || [];
+};
+
+// Filter artists by categories and experience
+export const filterArtistsApi = async (filters: {
+  categories?: string[];
+  experience?: {
+    minExp: number;
+    maxExp: number;
+  };
+}) => {
+  const url = 'http://localhost:5000/v1/artist/filter';
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(filters),
+    cache: 'no-store'
+  });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to filter artists (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed?.data || [];
+};
+
+// Get artist details by ID
+export const getArtistDetailsApi = async (id: string) => {
+  const url = `http://localhost:5000/v1/artist/details/${encodeURIComponent(id)}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to fetch artist details (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
   return parsed?.data;
 };
 
@@ -110,6 +204,60 @@ export const getCoursesApi = async () => {
     throw error;
   }
   return parsed.data;
+};
+
+// Search courses by title, coordinator, or description
+export const searchCoursesApi = async (query: string) => {
+  const res = await fetch(`http://localhost:5000/v1/course/search?q=${encodeURIComponent(query)}`, { 
+    cache: 'no-store' 
+  });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to search courses (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed.data || [];
+};
+
+// Filter courses by categories, levels, and price range
+export const filterCoursesApi = async (filters: {
+  categories?: string[];
+  levels?: string[];
+  priceRange?: {
+    min: number;
+    max: number;
+  };
+}) => {
+  const res = await fetch('http://localhost:5000/v1/course/filter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(filters),
+    cache: 'no-store'
+  });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to filter courses (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed.data || [];
 };
 
 export const deleteCourse = async (id: string) => {
@@ -302,6 +450,76 @@ export const getEventsV1 = async () => {
     keywords: typeof it.keywords === 'string' ? it.keywords.split(',').map((k: string) => k.trim()).filter(Boolean) : Array.isArray(it.keywords) ? it.keywords : [],
     banner: it.banner || undefined,
   }));
+};
+
+// Get all events for events page
+export const getEventsApi = async () => {
+  const res = await fetch('http://localhost:5000/v1/event/', { cache: 'no-store' });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to fetch events (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed.data || [];
+};
+
+// Search events by title, description, or keywords
+export const searchEventsApi = async (query: string) => {
+  const res = await fetch(`http://localhost:5000/v1/event/search?q=${encodeURIComponent(query)}`, { 
+    cache: 'no-store' 
+  });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to search events (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed.data || [];
+};
+
+// Filter events by status and category
+export const filterEventsApi = async (filters: {
+  status?: string;
+  category_id?: string;
+}) => {
+  const res = await fetch('http://localhost:5000/v1/event/filter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(filters),
+    cache: 'no-store'
+  });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to filter events (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed.data || [];
 };
 
 // Get latest events for dashboard (limited to 4)
@@ -515,4 +733,213 @@ export const clearWishlist = async () => {
     console.error('Error fetching cart items:', error);
     return []; 
   }
+};
+
+// Authentication API functions
+export const signupUser = async (userData: {
+  firstName: string;
+  lastName: string;
+  gender: 'male' | 'female';
+  email: string;
+  mobileNo: string;
+}) => {
+  const res = await fetch('http://localhost:5000/v1/user/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(userData),
+  });
+  
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to create user (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  
+  return parsed;
+};
+
+export const sendOTP = async (email: string) => {
+  const res = await fetch('http://localhost:5000/v1/login/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to send OTP (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  
+  return parsed;
+};
+
+export const verifyOTP = async (email: string, otp: number) => {
+  const res = await fetch('http://localhost:5000/v1/login/otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, otp }),
+  });
+  
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to verify OTP (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  
+  return parsed;
+};
+
+// Best Seller Products API
+export const getBestSellerProducts = async () => {
+  const res = await fetch('http://localhost:5000/v1/product/best-seller', { 
+    cache: 'no-store' 
+  });
+  
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to fetch best seller products (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  
+  return parsed.data || [];
+};
+
+// Trending Products API
+export const getTrendingProducts = async () => {
+  const res = await fetch('http://localhost:5000/v1/product/trending', { 
+    cache: 'no-store' 
+  });
+  
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to fetch trending products (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  
+  return parsed.data || [];
+};
+
+// Products API - Get all products with pagination
+export const getProductsApi = async (page: number = 1) => {
+  const url = `http://localhost:5000/v1/product/?page=${encodeURIComponent(page)}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to fetch products (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  // Return the products array from the nested data structure
+  return parsed?.data?.data || [];
+};
+
+// Search products by name
+export const searchProductsApi = async (query: string) => {
+  const url = `http://localhost:5000/v1/product/search/${encodeURIComponent(query)}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to search products (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed?.data || [];
+};
+
+// Filter products by categories and price range
+export const filterProductsApi = async (filters: {
+  categories?: string[];
+  price?: {
+    minPrice: number;
+    maxPrice: number;
+  };
+}) => {
+  const res = await fetch('http://localhost:5000/v1/product/filter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(filters),
+    cache: 'no-store'
+  });
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to filter products (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed?.data || [];
 };

@@ -3,6 +3,8 @@
 import React, { useState, useRef } from "react";
 import { Product } from "@/app/types/product";
 import { ProductCard } from "./ProductCard";
+import { useCart } from "@/app/contexts/CartContext";
+import { useAuth } from "@/app/contexts/AuthContext";
 
 interface TrendingProductsClientProps {
   products: Product[];
@@ -11,8 +13,11 @@ interface TrendingProductsClientProps {
 export const TrendingProductsClient = ({ products }: TrendingProductsClientProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [cartItems, setCartItems] = useState<Set<string>>(new Set());
   const [productList, setProductList] = useState<Product[]>(products);
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
+  
+  const { addToCart, isInCart } = useCart();
+  const { user } = useAuth();
 
   // Filter only trending products
   const trendingProducts = productList.filter((p) => p.isTrending);
@@ -47,10 +52,22 @@ export const TrendingProductsClient = ({ products }: TrendingProductsClientProps
     }
   };
 
-  const handleAddToCart = (product: Product) => {
-    setCartItems((prev) => new Set(prev).add(product.id));
-    console.log("Added to cart:", product);
-    // Add your cart logic here
+  const handleAddToCart = async (product: Product) => {
+    if (!user) {
+      alert('Please login to add items to cart');
+      return;
+    }
+
+    try {
+      setAddingToCart(product.id);
+      await addToCart(product.id, 1);
+      alert('Item added to cart successfully!');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert(error instanceof Error ? error.message : 'Failed to add item to cart');
+    } finally {
+      setAddingToCart(null);
+    }
   };
 
   const handleToggleWishlist = (productId: string) => {
@@ -72,7 +89,7 @@ export const TrendingProductsClient = ({ products }: TrendingProductsClientProps
     }
   };
 
-  const isInCart = (productId: string) => cartItems.has(productId);
+  // Remove local isInCart function since we're using CartContext
 
   return (
     <div className="relative">
@@ -147,6 +164,7 @@ export const TrendingProductsClient = ({ products }: TrendingProductsClientProps
                 onAddToCart={handleAddToCart}
                 onToggleWishlist={handleToggleWishlist}
                 isInCart={isInCart}
+                addingToCart={addingToCart === product.id}
               />
             </div>
           ))}

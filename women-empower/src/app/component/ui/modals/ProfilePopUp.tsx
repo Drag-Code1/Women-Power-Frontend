@@ -11,6 +11,7 @@ interface ProfilePopUpProps {
   isSignedIn: boolean;
   userName?: string;
   mobileNumber?: string;
+  userEmail?: string;
   onLogout?: () => void;
 }
  
@@ -18,7 +19,9 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
   isOpen,
   onClose,
   isSignedIn,
+  userName,
   mobileNumber,
+  userEmail,
   onLogout,
 }) => {
   const popupRef = useRef<HTMLDivElement>(null);
@@ -59,7 +62,12 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
               className="rounded-full"
             />
             <div>
-              <h2 className="font-semibold text-gray-800">Hey User 👋</h2>
+              <h2 className="font-semibold text-gray-800">
+                Hey {userName || 'User'} 👋
+              </h2>
+              {userEmail && (
+                <p className="text-sm text-gray-500">{userEmail}</p>
+              )}
               {mobileNumber && (
                 <p className="text-sm text-gray-500">{mobileNumber}</p>
               )}

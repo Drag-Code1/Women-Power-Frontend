@@ -9,13 +9,15 @@ interface ProductCardProps {
   onAddToCart?: (product: Product) => void;
   onToggleWishlist?: (productId: string) => void;
   isInCart?: (productId: string) => boolean;
+  addingToCart?: boolean;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
   onAddToCart, 
   onToggleWishlist,
-  isInCart
+  isInCart,
+  addingToCart = false
 }) => {
   // Calculate prices
   const originalPrice = parseFloat(product.price);
@@ -96,13 +98,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           
           <button
             onClick={() => onAddToCart?.(product)}
+            disabled={addingToCart}
             className={`flex items-center gap-1 px-4 py-2 rounded text-xs font-medium transition-all duration-200 ${
               inCart 
                 ? "bg-green-600 text-white hover:bg-green-700" 
                 : "bg-[#695946] text-white hover:bg-[#61503c] active:scale-95"
-            }`}
+            } ${addingToCart ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            {inCart ? (
+            {addingToCart ? (
+              <>
+                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                Adding...
+              </>
+            ) : inCart ? (
               <>
                 <Check className="w-3 h-3" />
                 In Cart

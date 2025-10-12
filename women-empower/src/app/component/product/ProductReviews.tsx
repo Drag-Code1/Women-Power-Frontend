@@ -1,17 +1,26 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, StarBorder, Sort, FilterList } from '@mui/icons-material';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { getProductReviewsApi, createProductReviewApi, ProductReview } from '@/app/lib/productReviewApi';
+import { getCurrentToken, getCurrentUser } from '@/app/lib/authenticatedApi';
 
 interface Review {
-  id: number;
+  id: string;
   rating: number;
   title: string;
   description: string;
   timeAgo: string;
   verified?: boolean;
+  reviewerName?: string;
 }
 
-const ProductReviews: React.FC = () => {
+interface ProductReviewsProps {
+  productId?: string;
+}
+
+const ProductReviews: React.FC<ProductReviewsProps> = ({ productId }) => {
+  const { user, token } = useAuth();
   const [sortBy, setSortBy] = useState('Relevance');
   const [filterBy, setFilterBy] = useState('All Star');
   const [showWriteReview, setShowWriteReview] = useState(false);
@@ -19,52 +28,95 @@ const ProductReviews: React.FC = () => {
   const [newReviewTitle, setNewReviewTitle] = useState('');
   const [newReviewDescription, setNewReviewDescription] = useState('');
   const [displayCount, setDisplayCount] = useState(4);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Sample reviews data - using state to allow adding new reviews
-  const [reviews, setReviews] = useState<Review[]>([
-    {
-      id: 1,
-      rating: 5,
-      title: "Love these Skincare ! Really amazing",
-      description: "I really wanted to love this but it doesn't look quite right on me. The serum that should sit under the bust area feels comfortable and the results are visible within a week.",
-      timeAgo: "3 days ago",
-      verified: true
-    },
-    {
-      id: 2,
-      rating: 5,
-      title: "Perfect hydration for my skin",
-      description: "This serum has completely transformed my skincare routine. My skin feels so much more hydrated and looks glowing. The texture is lightweight yet deeply moisturizing.",
-      timeAgo: "1 week ago",
-      verified: true
-    },
-    {
-      id: 3,
-      rating: 5,
-      title: "Best serum I've ever used",
-      description: "Amazing results! My fine lines are less visible and my skin texture has improved significantly. Worth every penny and I'll definitely repurchase.",
-      timeAgo: "2 weeks ago"
-    },
-    {
-      id: 4,
-      rating: 4,
-      title: "Great value for money",
-      description: "Quality product at a reasonable price. The packaging is elegant and the serum absorbs quickly without leaving any sticky residue on the skin.",
-      timeAgo: "1 month ago",
-      verified: true
-    }
-  ]);
+  // Fetch reviews when component mounts or productId changes
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!productId) {
+        setError('No product ID provided');
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        setLoading(true);
+        setError(null);
+        const currentToken = token || getCurrentToken();
+        const apiReviews = await getProductReviewsApi(productId, currentToken || undefined);
+        
+        // Transform API reviews to component format
+        const transformedReviews: Review[] = apiReviews.map((review: ProductReview) => ({
+          id: review.id,
+          rating: review.rating,
+          title: review.rating_description.substring(0, 50) + (review.rating_description.length > 50 ? '...' : ''),
+          description: review.rating_description,
+          timeAgo: review.date ? new Date(review.date).toLocaleDateString('en-IN', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          }) : 'Recently',
+          verified: true,
+          reviewerName: review.user ? `${review.user.firstName} ${review.user.lastName}` : 'Anonymous'
+        }));
+        
+        setReviews(transformedReviews);
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch reviews');
+        // Fallback to empty array
+        setReviews([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [productId, token]);
 
   // Function to handle adding new review
-  const handleSubmitReview = () => {
-    if (newReviewRating > 0 && newReviewTitle.trim() && newReviewDescription.trim()) {
+  const handleSubmitReview = async () => {
+    // Get current user and token from localStorage
+    const currentUser = user || getCurrentUser();
+    const currentToken = token || getCurrentToken();
+    
+    // Debug: Log authentication status
+    console.log('🔐 User from context:', user);
+    console.log('🔐 User from localStorage:', currentUser);
+    console.log('🎫 Token from context:', token);
+    console.log('🎫 Token from localStorage:', currentToken);
+    console.log('✅ Is Authenticated:', !!currentUser && !!currentToken);
+    
+    if (!currentUser || !currentToken) {
+      alert('Please login to write a review');
+      return;
+    }
+
+    if (newReviewRating > 0 && newReviewDescription.trim()) {
+      try {
+        setSubmitting(true);
+        
+        const reviewData = {
+          product_id: productId!,
+          user_id: currentUser.id,
+          rating: newReviewRating,
+          rating_description: newReviewDescription.trim()
+        };
+
+        await createProductReviewApi(reviewData, currentToken || undefined);
+        
+        // Create new review for immediate UI update
       const newReview: Review = {
-        id: Math.max(...reviews.map(r => r.id)) + 1,
+          id: Date.now().toString(), // Temporary ID
         rating: newReviewRating,
-        title: newReviewTitle.trim(),
+          title: newReviewDescription.trim().substring(0, 50) + (newReviewDescription.trim().length > 50 ? '...' : ''),
         description: newReviewDescription.trim(),
         timeAgo: "Just now",
-        verified: true
+          verified: true,
+          reviewerName: `${currentUser.firstName} ${currentUser.lastName}`
       };
       
       // Add new review to the beginning of the array
@@ -78,6 +130,16 @@ const ProductReviews: React.FC = () => {
       
       // Reset display count to show all reviews including the new one
       setDisplayCount(4);
+        
+        alert('Review submitted successfully!');
+      } catch (err) {
+        console.error('Error submitting review:', err);
+        alert(err instanceof Error ? err.message : 'Failed to submit review');
+      } finally {
+        setSubmitting(false);
+      }
+    } else {
+      alert('Please provide a rating and review description');
     }
   };
 
@@ -133,7 +195,50 @@ const ProductReviews: React.FC = () => {
     );
   };
 
-  const averageRating = (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1);
+  const averageRating = reviews.length > 0 ? (reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length).toFixed(1) : '0.0';
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+        <div className="min-h-screen bg-white rounded-sm">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#695946] mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading reviews...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
+        <div className="min-h-screen bg-white rounded-sm">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex items-center justify-center min-h-[400px]">
+              <div className="text-center">
+                <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                <h2 className="text-2xl font-semibold text-gray-900 mb-2">Error Loading Reviews</h2>
+                <p className="text-gray-600 mb-4">{error}</p>
+                <button 
+                  onClick={() => window.location.reload()} 
+                  className="bg-[#695946] text-white px-6 py-2 rounded-lg hover:bg-[#5a4a3a] transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -205,6 +310,16 @@ const ProductReviews: React.FC = () => {
             <div className="px-6 sm:px-8 py-6 bg-blue-50 border-b border-gray-200">
               <div className="max-w-2xl">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Write Your Review</h3>
+                
+                {/* Authentication Check */}
+                {(!user && !getCurrentUser()) && (
+                  <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-yellow-800 text-sm">
+                      Please login to write a review.
+                    </p>
+                  </div>
+                )}
+                
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -247,13 +362,18 @@ const ProductReviews: React.FC = () => {
                   <div className="flex gap-3 pt-2">
                     <button 
                       onClick={handleSubmitReview}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
+                      disabled={submitting}
+                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-2.5 rounded-lg font-medium transition-colors flex items-center gap-2"
                     >
-                      Submit Review
+                      {submitting && (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      )}
+                      {submitting ? 'Submitting...' : 'Submit Review'}
                     </button>
                     <button 
                       onClick={() => setShowWriteReview(false)}
-                      className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-medium transition-colors"
+                      disabled={submitting}
+                      className="bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg font-medium transition-colors"
                     >
                       Cancel
                     </button>

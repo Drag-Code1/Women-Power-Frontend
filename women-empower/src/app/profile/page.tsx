@@ -1,5 +1,10 @@
 import ProfileSection from "../component/profile/ProfileSection";
+import { AuthProvider } from "../contexts/AuthContext";
 
 export default function ProfilePage() {
-  return <ProfileSection />;
+  return (
+    <AuthProvider>
+      <ProfileSection />
+    </AuthProvider>
+  );
 }
