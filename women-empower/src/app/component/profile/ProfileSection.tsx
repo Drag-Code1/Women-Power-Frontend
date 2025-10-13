@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { 
   Person, 
   Phone, 
@@ -75,6 +76,9 @@ export interface Order {
 
 const ProfileSection: React.FC = () => {
   const { user, isAuthenticated, isLoading, signup, sendOtp, verifyOtp, logout } = useAuth();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const returnUrl = searchParams?.get('returnUrl');
   const { addToCart } = useCart();
   
   const [activeTab, setActiveTab] = useState('profile');
@@ -300,8 +304,15 @@ const ProfileSection: React.FC = () => {
             window.location.href = "/dashboardmaintab";
           }, 100);
         } else {
-          console.log('👤 Regular user detected, staying on profile page');
-          console.log('ℹ️ User is already on profile page, no redirect needed');
+          const target = returnUrl && returnUrl.startsWith('/') ? returnUrl : null;
+          if (target) {
+            console.log('👤 Regular user detected, redirecting to returnUrl:', target);
+            setTimeout(() => {
+              router.push(target);
+            }, 100);
+          } else {
+            console.log('👤 Regular user detected, staying on profile page');
+          }
         }
       } catch (error: any) {
         console.error('OTP verification error:', error);
@@ -387,6 +398,9 @@ const ProfileSection: React.FC = () => {
 
   const handleLogout = () => {
     logout();
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
     setEmailAddress('');
     setOtp(['', '', '', '', '', '']);
     setShowOtpVerification(false);

@@ -106,13 +106,20 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
             </p>
           </div>
  
-        <Link
-  href="/profile"
-  onClick={onClose}   // ✅ yaha add kar diya
-  className="block w-full text-center bg-[#efb200] text-white font-medium py-2 rounded-md mt-5 hover:bg-[#cf9f00] transition"
->
-  Sign Up
-</Link>
+        {(() => {
+          const target = typeof window !== 'undefined' 
+            ? `/profile?returnUrl=${encodeURIComponent(window.location.pathname + window.location.search)}`
+            : '/profile';
+          return (
+            <Link
+              href={target}
+              onClick={onClose}
+              className="block w-full text-center bg-[#efb200] text-white font-medium py-2 rounded-md mt-5 hover:bg-[#cf9f00] transition"
+            >
+              Sign Up
+            </Link>
+          );
+        })()}
 
         </>
       )}

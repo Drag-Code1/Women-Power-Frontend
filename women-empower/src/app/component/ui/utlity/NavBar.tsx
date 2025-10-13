@@ -86,6 +86,7 @@ const NavBar: React.FC = () => {
 
   const handleLogout = () => {
     logout();
+    router.push("/");
     setShowProfile(false);
   };
 

@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import LoginSignup from "@/app/LoginSignup/page";
 import { useAuth } from "@/app/contexts/AuthContext";
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams?.get("returnUrl") || null;
   const { login, verifyOtp, sendOtp, isLoading } = useAuth();
 
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
@@ -59,8 +61,9 @@ const LoginPage: React.FC = () => {
         console.log('🔐 Admin user detected, redirecting to admin dashboard');
         router.push("/dashboardmaintab");
       } else {
-        console.log('👤 Regular user detected, redirecting to profile');
-        router.push("/profile");
+        const target = returnUrl && returnUrl.startsWith('/') ? returnUrl : "/profile";
+        console.log('👤 Regular user detected, redirecting to', target);
+        router.push(target);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "OTP verification failed");
