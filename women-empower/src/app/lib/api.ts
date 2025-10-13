@@ -270,7 +270,11 @@ export const filterCoursesApi = async (filters: {
 };
 
 export const deleteCourse = async (id: string) => {
-  const res = await fetch(`http://localhost:5000/v1/course/${id}`, { method: 'DELETE' });
+  const { getAuthHeaders } = await import('./authApi');
+  const res = await fetch(`http://localhost:5000/v1/course/${id}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders(),
+  });
   if (!res.ok) {
     let message = `Failed to delete course (status ${res.status})`;
     try {
@@ -293,9 +297,10 @@ export const createCourse = async (payload: {
   price: number | string;
   discount: number;
 }) => {
+  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch('http://localhost:5000/v1/course/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(payload),
   });
   const contentType = res.headers.get('content-type') || '';
@@ -329,9 +334,10 @@ export const updateCourse = async (
     discount: number;
   }
 ) => {
+  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`http://localhost:5000/v1/course/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(payload),
   });
   const contentType = res.headers.get('content-type') || '';
