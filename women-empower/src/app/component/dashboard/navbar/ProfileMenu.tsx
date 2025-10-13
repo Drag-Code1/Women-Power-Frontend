@@ -2,6 +2,8 @@
 "use client";
 import React, { useState } from "react";
 import { User, LogOut, ChevronDown } from "lucide-react";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface UserInfo {
   name: string;
@@ -11,6 +13,17 @@ interface UserInfo {
 
 const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { logout, user } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   return (
     <div className="relative">
@@ -72,21 +85,27 @@ const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
                   <p className="text-sm text-gray-500 truncate">
                     {userInfo.email}
                   </p>
+                  {user && (
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        {user.role === 'admin' ? '👑 Admin' : '👤 User'}
+                      </span>
+                      {user.joining_date && (
+                        <span className="text-xs text-gray-400">
+                          Joined {new Date(user.joining_date).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
             <div className="py-2">
-              <button className="flex items-center w-full px-6 py-3.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 group">
-                <div className="p-2 rounded-lg bg-gray-100 group-hover:bg-gray-200 transition-colors mr-4">
-                  <User className="h-4 w-4 text-gray-600" />
-                </div>
-                <p className="font-medium">My Profile</p>
-              </button>
-            </div>
-
-            <div className="border-t border-gray-200 py-2">
-              <button className="flex items-center w-full px-6 py-3.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 group">
+              <button 
+                onClick={handleLogout}
+                className="flex items-center w-full px-6 py-3.5 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150 group"
+              >
                 <div className="p-2 rounded-lg bg-red-100 group-hover:bg-red-200 transition-colors mr-4">
                   <LogOut className="h-4 w-4 text-red-600" />
                 </div>
