@@ -610,10 +610,15 @@ export const createEventV1 = async (
     banner?: string;
   }
 ) => {
+  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch('http://localhost:5000/v1/event/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify(payload),
+    headers: getAuthHeaders(),
+    // Force a hardcoded image value regardless of input
+    body: JSON.stringify({
+      ...payload,
+      e_image: 'cloudeflair/r2/ooj/event1.jpg'
+    }),
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -645,10 +650,15 @@ export const updateEventV1 = async (
     banner?: string;
   }
 ) => {
+  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`http://localhost:5000/v1/event/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify(payload),
+    headers: getAuthHeaders(),
+    // Keep image hardcoded as requested
+    body: JSON.stringify({
+      ...payload,
+      e_image: 'cloudeflair/r2/ooj/event1.jpg'
+    }),
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -674,8 +684,10 @@ export const updateEventV1 = async (
 };
 
 export const deleteEventV1 = async (id: string) => {
+  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`http://localhost:5000/v1/event/${id}`, {
     method: 'DELETE',
+    headers: getAuthHeaders(),
   });
   if (!res.ok) {
     let parsed: any = {};

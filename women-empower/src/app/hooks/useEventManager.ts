@@ -97,9 +97,16 @@ export const useEventManager = (initialEvents: Event[]) => {
 
   const handleAdd = async () => {
     try {
+      // Resolve category_id from selected category (accepts id or name)
+      const resolvedCategoryId = (() => {
+        const raw = String(formData.category || '');
+        const found = categoryOptions.find(c => c.id === raw || c.name === raw);
+        return found?.id || raw;
+      })();
+
       const payload = {
         e_image: String(formData.thumbnail || ''),
-        category_id: String(formData.category || ''),
+        category_id: resolvedCategoryId,
         title: String(formData.title || ''),
         description: String(formData.description || ''),
         date_time: String(formData.dateTime || ''),

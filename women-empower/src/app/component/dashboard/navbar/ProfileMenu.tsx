@@ -82,21 +82,6 @@ const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
                   <p className="text-lg font-semibold text-gray-900 truncate">
                     {userInfo.name}
                   </p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {userInfo.email}
-                  </p>
-                  {user && (
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {user.role === 'admin' ? '👑 Admin' : '👤 User'}
-                      </span>
-                      {user.joining_date && (
-                        <span className="text-xs text-gray-400">
-                          Joined {new Date(user.joining_date).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
