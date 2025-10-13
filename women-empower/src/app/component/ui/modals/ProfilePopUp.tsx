@@ -65,12 +65,6 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
               <h2 className="font-semibold text-gray-800">
                 Hey {userName || 'User'} 👋
               </h2>
-              {userEmail && (
-                <p className="text-sm text-gray-500">{userEmail}</p>
-              )}
-              {mobileNumber && (
-                <p className="text-sm text-gray-500">{mobileNumber}</p>
-              )}
             </div>
           </div>
  
