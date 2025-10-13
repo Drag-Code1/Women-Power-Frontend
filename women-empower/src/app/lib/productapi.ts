@@ -238,9 +238,10 @@ export const productService = {
         isTrending: productData.isTrending || false,
       };
 
+      const { getAuthHeaders } = await import('./authApi');
       const response = await fetch(`${API_BASE_URL}/product/`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(cleanData),
       });
 
@@ -293,9 +294,10 @@ export const productService = {
       if (productData.isTrending !== undefined)
         cleanData.isTrending = productData.isTrending;
 
+      const { getAuthHeaders } = await import('./authApi');
       const response = await fetch(`${API_BASE_URL}/product/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify(cleanData),
       });
 
@@ -325,9 +327,10 @@ export const productService = {
   // 🔹 Delete product
   deleteProduct: async (id: string): Promise<boolean> => {
     try {
+      const { getAuthHeaders } = await import('./authApi');
       const response = await fetch(`${API_BASE_URL}/product/${id}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok) {
@@ -354,9 +357,10 @@ export const productService = {
     isTrending: boolean
   ): Promise<Product | null> => {
     try {
+      const { getAuthHeaders } = await import('./authApi');
       const response = await fetch(`${API_BASE_URL}/product/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ isTrending }),
       });
 

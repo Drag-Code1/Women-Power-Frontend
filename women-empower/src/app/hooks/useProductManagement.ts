@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { Product, ProductFormData, DrawerMode } from "@/app/types/dashboardproduct";
 import { INITIAL_FORM_DATA, DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import { productService } from "@/app/lib/productapi";
 
 export const useProductManagement = (initialProducts: Product[]) => {
   const [products, setProducts] = useState<Product[]>(initialProducts);
@@ -47,53 +48,59 @@ export const useProductManagement = (initialProducts: Product[]) => {
     }, 300);
   }, []);
 
-  const handleSave = useCallback((thumbnailPreview: string, imagePreview: string[]) => {
+  const handleSave = useCallback(async (thumbnailPreview: string, imagePreview: string[]) => {
     const finalThumbnail = thumbnailPreview.trim() !== "" ? thumbnailPreview : DEFAULT_THUMBNAIL;
     const validImages = imagePreview.filter(img => img.trim() !== "");
 
-    if (drawerMode === "add") {
-      const newProduct: Product = {
-        ...formData,
-        id: Date.now().toString(),
-        thumbnail: finalThumbnail,
-        p_images: validImages,
-        review_id: "",
-        sell_count: 0,
-        isTrending: false,
-      };
-      setProducts(prev => [...prev, newProduct]);
-    } else if (drawerMode === "edit" && selectedProduct) {
-      setProducts(prev =>
-        prev.map((p) =>
-          p.id === selectedProduct.id
-            ? {
-                ...p,
-                ...formData,
-                thumbnail: finalThumbnail,
-                p_images: validImages,
-              }
-            : p
-        )
-      );
+    try {
+      if (drawerMode === "add") {
+        const created = await productService.createProduct({
+          ...formData,
+          thumbnail: finalThumbnail,
+          p_images: validImages,
+        });
+        if (created) setProducts(prev => [...prev, created]);
+      } else if (drawerMode === "edit" && selectedProduct) {
+        const updated = await productService.updateProduct(selectedProduct.id, {
+          ...formData,
+          thumbnail: finalThumbnail,
+          p_images: validImages,
+        });
+        if (updated) setProducts(prev => prev.map(p => p.id === selectedProduct.id ? updated : p));
+      }
+      closeDrawer();
+    } catch (e) {
+      console.error('Failed to save product', e);
+      alert('Failed to save product. Please try again.');
     }
-    closeDrawer();
   }, [drawerMode, formData, selectedProduct, closeDrawer]);
 
-  const handleDelete = useCallback((id: string) => {
+  const handleDelete = useCallback(async (id: string) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      setProducts(prev => prev.filter((p) => p.id !== id));
+      try {
+        await productService.deleteProduct(id);
+        setProducts(prev => prev.filter((p) => p.id !== id));
+      } catch (e) {
+        console.error('Failed to delete product', e);
+        alert('Failed to delete product. Please try again.');
+      }
       setShowDropdown(null);
     }
   }, []);
 
-  const toggleTrending = useCallback((id: string) => {
-    setProducts(prev =>
-      prev.map((p) =>
-        p.id === id ? { ...p, isTrending: !p.isTrending } : p
-      )
-    );
+  const toggleTrending = useCallback(async (id: string) => {
+    try {
+      const target = products.find(p => p.id === id);
+      if (!target) return;
+      const next = !target.isTrending;
+      const updated = await productService.toggleTrending(id, next);
+      if (updated) setProducts(prev => prev.map(p => (p.id === id ? updated : p)));
+    } catch (e) {
+      console.error('Failed to update trending', e);
+      alert('Failed to update trending status.');
+    }
     setShowDropdown(null);
-  }, []);
+  }, [products]);
 
   const handleInputChange = useCallback((field: keyof ProductFormData, value: string | number) => {
     setFormData((prev) => ({

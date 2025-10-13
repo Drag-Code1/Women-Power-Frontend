@@ -32,20 +32,27 @@ export const getCategoryDetailsApi = async (categoryId: string) => {
   return parsed?.data;
 };
 
-export const createCategory = async (payload: { name: string; image: string }) => {
+export const createCategory = async (payload: { name: string; image?: string }) => {
+  // Use auth header for admin-only endpoint and force static image URL
+  const { getAuthHeaders } = await import('./authApi');
+  const STATIC_IMAGE_URL = 'https://mybucket.r2.cloudflarestorage.com/images/dance/dance.jpg';
   const res = await fetch('http://localhost:5000/v1/category/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      name: payload.name,
+      image: STATIC_IMAGE_URL,
+    }),
   });
   const body = await res.json();
   return body.data;
 };
 
 export const updateCategory = async (id: string, payload: { name: string; image: string }) => {
+  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`http://localhost:5000/v1/category/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify(payload),
   });
   const body = await res.json();
@@ -53,8 +60,10 @@ export const updateCategory = async (id: string, payload: { name: string; image:
 };
 
 export const deleteCategory = async (id: string) => {
+  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`http://localhost:5000/v1/category/${id}`, {
     method: 'DELETE',
+    headers: getAuthHeaders(),
   });
   if (!res.ok) {
     throw new Error('Failed to delete category');
@@ -351,10 +360,18 @@ export const createArtist = async (
     experience: number;
   }
 ) => {
+  const { getAuthHeaders } = await import('./authApi');
+  const STATIC_IMAGE_URL = 'https://example.com/images/john_doe.jpg';
   const res = await fetch('http://localhost:5000/v1/artist/', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      artist_Name: payload.artist_Name,
+      artist_profile_pic: STATIC_IMAGE_URL,
+      category_id: payload.category_id,
+      introduction: payload.introduction,
+      experience: payload.experience,
+    }),
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -388,18 +405,28 @@ export const updateArtist = async (
     experience: number;
   }
 ) => {
+  const { getAuthHeaders } = await import('./authApi');
+  const STATIC_IMAGE_URL = 'https://example.com/images/john_doe.jpg';
   const res = await fetch(`http://localhost:5000/v1/artist/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    headers: getAuthHeaders(),
+    body: JSON.stringify({
+      artist_Name: payload.artist_Name,
+      artist_profile_pic: STATIC_IMAGE_URL,
+      category_id: payload.category_id,
+      introduction: payload.introduction,
+      experience: payload.experience,
+    }),
   });
   const body = await res.json();
   return body.data;
 };
 
 export const deleteArtist = async (id: string) => {
+  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`http://localhost:5000/v1/artist/${id}`, {
     method: 'DELETE',
+    headers: getAuthHeaders(),
   });
   if (!res.ok) {
     throw new Error('Failed to delete artist');

@@ -5,8 +5,7 @@ import { Plus } from 'lucide-react';
 import { Category, ModalType, CategoryFormData } from '@/app/types/dashboardcategory';
 import CategoryCard from './CategoryCard';
 import CategoryModal from './CategoryModal';
-import { updateCategory } from '@/app/lib/api';
-import { deleteCategory } from '@/app/lib/api';
+import { updateCategory, deleteCategory, createCategory } from '@/app/lib/api';
 
 interface CategoryListProps {
   initialCategories: Category[];
@@ -31,12 +30,12 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
 
   const handleSubmit = async (data: CategoryFormData) => {
     if (modalType === 'create') {
-      const newCategory: Category = {
-        id: String(Date.now()),
-        name: data.name,
-        image: data.image,
-      };
-      setCategories([...categories, newCategory]);
+      try {
+        const created = await createCategory({ name: data.name });
+        setCategories([...categories, created as Category]);
+      } catch (e) {
+        console.error('Failed to create category', e);
+      }
     } else if (modalType === 'edit' && selectedCategory) {
       try {
         const updated = await updateCategory(selectedCategory.id, { name: data.name, image: data.image });

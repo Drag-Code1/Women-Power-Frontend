@@ -3,10 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Artist,ModalType, ArtistFormData  } from '../types/dashboard-artist-tab';
 import { validateFormData, readFileAsDataURL  } from '../lib/utils/dashboardartist-utils';
-import { updateArtist } from '../lib/api';
-import { deleteArtist } from '../lib/api';
-import { createArtist, getCategoriesApi } from '../lib/api';
-import { uploadImageApi } from '../lib/bannerApi';
+import { createArtist, updateArtist, deleteArtist, getCategoriesApi } from '../lib/api';
 
 const initialFormData: ArtistFormData = {
   artist_name: '',
@@ -104,19 +101,7 @@ export function useArtistManager(initialArtists: Artist[]) {
         }
         const created = await createArtist({
           artist_Name: formData.artist_name,
-          artist_profile_pic: formData.image && formData.image.startsWith('data:')
-            ? await (async () => {
-                try {
-                  // Convert data URL to File
-                  const res = await fetch(formData.image);
-                  const blob = await res.blob();
-                  const file = new File([blob], 'artist-image', { type: blob.type || 'image/jpeg' });
-                  return await uploadImageApi(file);
-                } catch {
-                  return formData.image;
-                }
-              })()
-            : formData.image,
+          artist_profile_pic: '', // ignored by API (hardcoded server-side)
           category_id: categoryId,
           introduction: formData.intro,
           experience: Number(formData.experience)
@@ -146,18 +131,7 @@ export function useArtistManager(initialArtists: Artist[]) {
         }
         const updatedServer = await updateArtist(selectedArtist.id as unknown as string, {
           artist_Name: formData.artist_name,
-          artist_profile_pic: formData.image && formData.image.startsWith('data:')
-            ? await (async () => {
-                try {
-                  const res = await fetch(formData.image);
-                  const blob = await res.blob();
-                  const file = new File([blob], 'artist-image', { type: blob.type || 'image/jpeg' });
-                  return await uploadImageApi(file);
-                } catch {
-                  return formData.image;
-                }
-              })()
-            : formData.image,
+          artist_profile_pic: '', // ignored by API (hardcoded server-side)
           category_id: categoryId,
           introduction: formData.intro,
           experience: Number(formData.experience)

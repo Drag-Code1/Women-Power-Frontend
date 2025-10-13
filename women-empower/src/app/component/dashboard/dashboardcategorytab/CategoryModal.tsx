@@ -148,7 +148,8 @@ export default function CategoryModal({
             {modalType !== 'view' && (
               <button
                 onClick={handleSubmit}
-                disabled={!formData.name || !formData.image}
+                // backend uses a static image URL; only require name here
+                disabled={!formData.name}
                 className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {modalType === 'create' ? 'Create' : 'Update'}
