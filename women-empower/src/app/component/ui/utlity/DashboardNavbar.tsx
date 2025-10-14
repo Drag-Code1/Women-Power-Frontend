@@ -40,7 +40,7 @@ const DashboardNavbar = ({
               </div>
               <div>
                 <h1 className="font-serif font-bold text-lg sm:text-xl text-blue-800 tracking-wide leading-none">
-                  Women Empower
+                  Woman Empower
                 </h1>
                 <p className="text-[10px] sm:text-xs text-purple-600 font-semibold tracking-widest mt-0.5">
                   JOURNEY

@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from "react";
-import type { JSX } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart } from "lucide-react";
 import { productService } from "@/app/lib/productapi";
 import { Product } from "@/app/types/product";
@@ -11,21 +10,21 @@ interface ProductDetailsPageProps {
   productId?: string;
 }
 
-const ProductDetailsPage = ({ productId }: ProductDetailsPageProps) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) => {
+  const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
+  const [selectedImage, setSelectedImage] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
   const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [addingToCart, setAddingToCart] = useState(false);
+  const [addingToCart, setAddingToCart] = useState<boolean>(false);
   
   const { addToCart, isInCart } = useCart();
   const { user } = useAuth();
 
   // Fetch product details when component mounts or productId changes
   useEffect(() => {
-    const fetchProductDetails = async () => {
+    const fetchProductDetails = async (): Promise<void> => {
       if (!productId) {
         setError('No product ID provided');
         setLoading(false);
@@ -38,11 +37,17 @@ const ProductDetailsPage = ({ productId }: ProductDetailsPageProps) => {
         const productData = await productService.getProductDetails(productId);
         
         if (productData) {
-          setProduct(productData);
+          // Ensure price is a string for compatibility
+          const normalizedProduct: Product = {
+            ...productData,
+            price: productData.price?.toString() ?? "0",
+            isTrending: productData.isTrending ?? false
+          };
+          setProduct(normalizedProduct);
         } else {
           setError('Product not found');
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error fetching product details:', err);
         setError(err instanceof Error ? err.message : 'Failed to fetch product details');
       } finally {
@@ -53,32 +58,13 @@ const ProductDetailsPage = ({ productId }: ProductDetailsPageProps) => {
     fetchProductDetails();
   }, [productId]);
 
-  // Fallback data for when no product is loaded
-  const fallbackData = {
-    title: "Product Not Found",
-    subtitle: "Please check the product ID",
-    price: 0,
-    originalPrice: 0,
-    rating: 0,
-    reviews: 0,
-  };
-
-  const productData = product ? {
-    title: product.p_Name,
-    subtitle: product.description || "Handcrafted Decorative Piece",
-    price: parseFloat(product.price) - (parseFloat(product.price) * product.discount / 100),
-    originalPrice: parseFloat(product.price),
-    rating: 4.6, // Default rating since it's not in the API response
-    reviews: 124, // Default reviews since it's not in the API response
-  } : fallbackData;
-
-  const productImages = product?.p_images && product.p_images.length > 0 
+  const productImages: string[] = product?.p_images && product.p_images.length > 0 
     ? product.p_images 
     : product?.thumbnail 
       ? [product.thumbnail]
-      : ["/images/product-details.png"];
+      : [];
 
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (): Promise<void> => {
     if (!user) {
       alert('Please login to add items to cart');
       return;
@@ -93,37 +79,12 @@ const ProductDetailsPage = ({ productId }: ProductDetailsPageProps) => {
       setAddingToCart(true);
       await addToCart(product.id, quantity);
       alert('Item added to cart successfully!');
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error adding to cart:', error);
       alert(error instanceof Error ? error.message : 'Failed to add item to cart');
     } finally {
       setAddingToCart(false);
     }
-  };
-
-  interface ProductData {
-    title: string;
-    subtitle: string;
-    price: number;
-    originalPrice: number;
-    rating: number;
-    reviews: number;
-  }
-
-  type RenderStarsFn = (rating: number) => JSX.Element[];
-
-  const renderStars: RenderStarsFn = (rating) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <Star
-        key={i}
-        size={14}
-        className={`${
-          i < Math.floor(rating) 
-            ? "fill-amber-400 text-amber-400" 
-            : "text-gray-200"
-        }`}
-      />
-    ));
   };
 
   // Loading state
@@ -169,80 +130,104 @@ const ProductDetailsPage = ({ productId }: ProductDetailsPageProps) => {
     );
   }
 
+  // If no product, return null
+  if (!product) {
+    return null;
+  }
+
+  const discountedPrice: number = parseFloat(product.price) - (parseFloat(product.price) * product.discount / 100);
+
+  // Split specification by comma and create array
+  const specificationItems: string[] = product.specification 
+    ? product.specification.split(',').map(item => item.trim()).filter(item => item !== '')
+    : [
+        "Premium quality roses sourced from the finest gardens",
+        "Long-lasting freshness with proper care instructions included",
+        "Eco-friendly packaging with sustainable materials"
+      ];
+
   return (
      <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
     <div className="min-h-screen bg-white">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 lg:py-6">
         
         {/* Main Product Grid */}
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2">
             
-            {/* Image Section */}
-            <div className="p-6 lg:p-8">
-              {/* Main Image */}
-              <div className="aspect-square bg-gray-50 rounded-lg overflow-hidden border border-gray-100 mb-4">
-                <img
-                  src={productImages[selectedImage]}
-                  alt={productData.title}
-                  className="w-full h-full object-cover"
-                />
+            {/* Image Section - Modified Layout */}
+            {productImages.length > 0 && (
+              <div className="p-6 lg:p-8">
+                <div className="flex flex-col lg:flex-row gap-4">
+                  {/* Thumbnail Images - Left Side */}
+                  {productImages.length > 1 && (
+                    <div className="flex lg:flex-col gap-2 order-2 lg:order-1">
+                      {productImages.map((image: string, index: number) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedImage(index)}
+                          className={`w-20 h-20 lg:w-24 lg:h-24 rounded-lg overflow-hidden border transition-all duration-200 ${
+                            selectedImage === index 
+                              ? "border-[#695946] border-2 ring-2 ring-[#695946]/20" 
+                              : "border-gray-200 hover:border-[#695946]"
+                          }`}
+                        >
+                          <img
+                            src={image}
+                            alt={`View ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Main Image - Right Side */}
+                  <div className="flex-1 order-1 lg:order-2">
+                    <div className="relative aspect-[4/5] lg:aspect-square bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
+                      {/* Trending Badge */}
+                      <div className="absolute top-4 left-4 z-10 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium">
+                        Trending
+                      </div>
+                      <img
+                        src={productImages[selectedImage]}
+                        alt={product.p_Name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-              
-              {/* Thumbnail Images */}
-              <div className="grid grid-cols-4 gap-3">
-                {productImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square rounded-lg overflow-hidden border transition-all duration-200 ${
-                      selectedImage === index 
-                        ? "border-[#695946] border-2 ring-2 ring-[#695946]/20" 
-                        : "border-gray-200 hover:border-[#695946]"
-                    }`}
-                  >
-                    <img
-                      src={image}
-                      alt={`View ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
 
             {/* Product Details */}
-            <div className="p-6 lg:p-8 lg:border-l border-gray-100">
+            <div className="p-6 lg:p-8">
               
-              {/* Title & Rating */}
+              {/* Title */}
               <div className="mb-6">
-                <h1 className="text-2xl lg:text-3xl  text-gray-900 mb-2">
-                  {productData.title}
+                <h1 className="text-2xl lg:text-3xl text-gray-900 mb-2">
+                  {product.p_Name}
                 </h1>
-                <p className="text-gray-600 mb-3">{productData.subtitle}</p>
-                
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-0.5">{renderStars(productData.rating)}</div>
-                  <span className="text-sm text-gray-500">
-                    {productData.rating} • {productData.reviews} reviews
-                  </span>
-                </div>
               </div>
 
               {/* Price */}
               <div className="mb-6">
                 <div className="flex items-baseline gap-3 mb-1">
-                  <span className="text-3xl  text-gray-900">
-                    ₹{productData.price.toLocaleString()}
+                  <span className="text-3xl text-gray-900">
+                    ₹{discountedPrice.toLocaleString()}
                   </span>
                   <span className="text-lg text-gray-400 line-through">
-                    ₹{productData.originalPrice.toLocaleString()}
+                    ₹{parseFloat(product.price).toLocaleString()}
                   </span>
-                  <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">
-                    {Math.round(((productData.originalPrice - productData.price) / productData.originalPrice) * 100)}% OFF
-                  </span>
+                  {product.discount > 0 && (
+                    <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">
+                      {product.discount}% OFF
+                    </span>
+                  )}
                 </div>
-                <p className="text-sm text-green-600 font-medium">Free shipping above ₹500</p>
+                <p className="text-sm text-gray-500">
+                  You save: ₹{(parseFloat(product.price) - discountedPrice).toLocaleString()}
+                </p>
               </div>
 
               {/* Quantity */}
@@ -266,9 +251,6 @@ const ProductDetailsPage = ({ productId }: ProductDetailsPageProps) => {
                       <Plus size={16} />
                     </button>
                   </div>
-                  <span className="bg-green-50 text-green-700 text-sm px-3 py-1 rounded-full font-medium">
-                    ✓ In Stock
-                  </span>
                 </div>
               </div>
 
@@ -307,83 +289,53 @@ const ProductDetailsPage = ({ productId }: ProductDetailsPageProps) => {
                   </button>
                 </div>
               </div>
-
-              {/* Quick Features */}
-              <div className="grid grid-cols-2 gap-4 pt-6 border-t border-gray-100">
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Key Features</h3>
-                  <ul className="space-y-1 text-sm text-gray-600">
-                    <li>• Premium materials</li>
-                    <li>• Authentic design</li>
-                    <li>• Easy mounting</li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="font-medium text-gray-900 mb-2">Care Tips</h3>
-                  <ul className="space-y-1 text-sm text-gray-600">
-                    <li>• Dust with soft cloth</li>
-                    <li>• Avoid direct sunlight</li>
-                    <li>• Keep in dry place</li>
-                  </ul>
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Description Section */}
-        <div className="bg-white rounded-xl shadow-sm mt-6 p-6 lg:p-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Product Description
+        {/* Product Details Section - Single Page Layout */}
+        <div className="bg-white rounded-xl  mt-6 p-6 lg:p-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">
+            Product Details
           </h2>
           
-          <div className="text-gray-600 leading-relaxed">
-            {product?.description ? (
-              <p className="mb-4">{product.description}</p>
-            ) : (
-              <p className="mb-4">
-                This beautiful handcrafted piece brings elegance and style to your space. 
-                Meticulously crafted with attention to detail, it features authentic designs 
-                that enhance any room's aesthetic appeal.
-              </p>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Description Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Description</h3>
+            <div className="text-gray-600 leading-relaxed">
+              {product.description ? (
+                <p>{product.description}</p>
+              ) : (
+                <p>Sunset Overdrive flowers2 is a beautiful arrangement of vibrant roses that capture the warm hues of a sunset. Each flower is carefully selected and arranged to create a stunning visual display that brings the beauty of nature into your space. Perfect for special occasions or as a thoughtful gift to brighten someone's day.</p>
+              )}
+            </div>
+          </div>
+          
+          {/* Specifications Section */}
+          <div className="mb-8">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Specifications</h3>
+            <ul className="list-disc pl-5 space-y-2 text-gray-600">
+              {specificationItems.map((item: string, index: number) => (
+                <li key={index}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          
+          {/* Product Information Section */}
+          <div className="border-t border-gray-200 pt-6">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Product Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <h4 className="font-medium text-gray-900 mb-3">Product Details</h4>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    {product?.p_Name || 'Handcrafted decorative piece'}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Premium quality materials
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Authentic design
-                  </li>
-                </ul>
+                <p className="text-sm text-gray-500 mb-1">Product ID</p>
+                <p className="text-gray-900 font-medium">{product.id || 'PRD-2023-0547'}</p>
               </div>
-
               <div>
-                <h4 className="font-medium text-gray-900 mb-3">Specifications</h4>
-                <ul className="space-y-2 text-gray-600">
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    {product?.specification || 'Premium quality materials'}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    Price: ₹{productData.originalPrice.toLocaleString()}
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 bg-[#695946] rounded-full mt-2 flex-shrink-0"></span>
-                    {product?.discount ? `${product.discount}% discount available` : 'No discount'}
-                  </li>
-                </ul>
+                <p className="text-sm text-gray-500 mb-1">Category ID</p>
+                <p className="text-gray-900 font-medium">{product.category_id || 'CAT-FLW-001'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500 mb-1">Artist ID</p>
+                <p className="text-gray-900 font-medium">{product.artist_id || 'ART-FLW-017'}</p>
               </div>
             </div>
           </div>

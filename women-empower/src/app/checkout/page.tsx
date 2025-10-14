@@ -1,7 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import {
-  LocalShipping,
   Home,
   Work,
   Business,
@@ -33,12 +32,12 @@ interface CartItem {
 interface DeliveryAddress {
   id: string;
   type: 'home' | 'work' | 'other';
-  name: string;
-  street: string;
+  address: string;
   city: string;
   state: string;
   pincode: string;
-  phone: string;
+  landmark: string;
+  mobileNo: string;
   isDefault: boolean;
 }
 
@@ -51,24 +50,22 @@ interface PaymentMethod {
 
 const CheckoutFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<'delivery' | 'payment' | 'confirmation'>('delivery');
-  const [selectedDeliveryOption, setSelectedDeliveryOption] = useState('standard');
   const [selectedAddress, setSelectedAddress] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [showCardForm, setShowCardForm] = useState(false);
   const [showUpiForm, setShowUpiForm] = useState(false);
-  const [pincodeServiceable, setPincodeServiceable] = useState<boolean | null>(null);
-  const [isCheckingPincode, setIsCheckingPincode] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<string | null>(null);
 
   // Form states
   const [newAddress, setNewAddress] = useState({
-    type: 'home' as 'home' | 'work' | 'other',
-    name: '',
-    street: '',
+    type: 'work' as 'home' | 'work' | 'other',
+    address: '',
     city: '',
     state: '',
     pincode: '',
-    phone: '',
+    landmark: '',
+    mobileNo: '',
     isDefault: false
   });
 
@@ -97,41 +94,17 @@ const CheckoutFlow: React.FC = () => {
 
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([
     {
-      id: '1',
-      type: 'home',
-      name: 'Samarth Suhas',
-      street: 'majaleshaha shaharataki shevgaon ahamadnaar',
-      city: 'Shevgaon',
+      id: '2a9d8bd1-30b4-42c0-8e0b-441c581c71c2',
+      type: 'work',
+      address: '456 Business Park, Bandra Kurla Complex',
+      pincode: '400051',
+      city: 'Mumbai',
       state: 'Maharashtra',
-      pincode: '414502',
-      phone: '+91 9921576550',
+      landmark: 'Near Metro Station',
+      mobileNo: '9876543210',
       isDefault: true
     }
   ]);
-
-  const deliveryOptions = [
-    {
-      id: 'standard',
-      name: 'Standard Delivery',
-      description: 'Typically delivers between 3-5 days*',
-      price: 0,
-      icon: LocalShipping
-    },
-    {
-      id: 'express',
-      name: 'Express Delivery',
-      description: 'Delivers within 1-2 days*',
-      price: 99,
-      icon: LocalShipping
-    },
-    {
-      id: 'pickup',
-      name: 'Express Store Pickup',
-      description: 'Pickup from nearest store',
-      price: 0,
-      icon: Business
-    }
-  ];
 
   const paymentMethods = [
     { id: 'card', name: 'Credit / Debit Card', icon: CreditCard },
@@ -141,29 +114,13 @@ const CheckoutFlow: React.FC = () => {
   ];
 
   const totalMRP = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const deliveryFee = selectedDeliveryOption === 'express' ? 99 : 0;
-  const totalAmount = totalMRP + deliveryFee;
-
-  // Check pincode serviceability
-  const checkPincode = async (pincode: string) => {
-    if (pincode.length === 6) {
-      setIsCheckingPincode(true);
-      // Simulate API call
-      setTimeout(() => {
-        // Mock validation - consider most pincodes serviceable
-        const serviceable = Math.random() > 0.1; // 90% chance of being serviceable
-        setPincodeServiceable(serviceable);
-        setIsCheckingPincode(false);
-      }, 1000);
-    }
-  };
+  const totalAmount = totalMRP;
 
   useEffect(() => {
     if (addresses.length > 0) {
       const defaultAddress = addresses.find(addr => addr.isDefault);
       if (defaultAddress) {
         setSelectedAddress(defaultAddress.id);
-        checkPincode(defaultAddress.pincode);
       }
     }
   }, [addresses]);
@@ -177,33 +134,81 @@ const CheckoutFlow: React.FC = () => {
   };
 
   const handleAddAddress = () => {
-    if (newAddress.name && newAddress.street && newAddress.city && newAddress.state && newAddress.pincode && newAddress.phone) {
-      const address: DeliveryAddress = {
-        ...newAddress,
-        id: Date.now().toString()
-      };
-      
-      // If this is set as default, update existing addresses
-      if (newAddress.isDefault) {
-        setAddresses(prev => prev.map(addr => ({ ...addr, isDefault: false })));
+    if (newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo) {
+      if (editingAddress) {
+        // Update existing address
+        setAddresses(prev => prev.map(addr => {
+          if (addr.id === editingAddress) {
+            return {
+              ...newAddress,
+              id: editingAddress
+            };
+          }
+          // If this is set as default, update other addresses
+          if (newAddress.isDefault) {
+            return { ...addr, isDefault: false };
+          }
+          return addr;
+        }));
+        setSelectedAddress(editingAddress);
+      } else {
+        // Add new address
+        const address: DeliveryAddress = {
+          ...newAddress,
+          id: Date.now().toString()
+        };
+        
+        // If this is set as default, update existing addresses
+        if (newAddress.isDefault) {
+          setAddresses(prev => prev.map(addr => ({ ...addr, isDefault: false })));
+        }
+        
+        setAddresses(prev => [...prev, address]);
+        setSelectedAddress(address.id);
       }
       
-      setAddresses(prev => [...prev, address]);
-      setSelectedAddress(address.id);
-      checkPincode(address.pincode);
+      // Reset form
       setNewAddress({
-        type: 'home',
-        name: '',
-        street: '',
+        type: 'work',
+        address: '',
         city: '',
         state: '',
         pincode: '',
-        phone: '',
+        landmark: '',
+        mobileNo: '',
         isDefault: false
       });
       setShowAddAddress(false);
+      setEditingAddress(null);
     } else {
       alert('Please fill all required fields');
+    }
+  };
+
+  const handleEditAddress = (addressId: string) => {
+    const address = addresses.find(addr => addr.id === addressId);
+    if (address) {
+      setNewAddress({
+        type: address.type,
+        address: address.address,
+        city: address.city,
+        state: address.state,
+        pincode: address.pincode,
+        landmark: address.landmark,
+        mobileNo: address.mobileNo,
+        isDefault: address.isDefault
+      });
+      setEditingAddress(addressId);
+      setShowAddAddress(true);
+    }
+  };
+
+  const handleDeleteAddress = (addressId: string) => {
+    if (confirm('Are you sure you want to delete this address?')) {
+      setAddresses(prev => prev.filter(addr => addr.id !== addressId));
+      if (selectedAddress === addressId) {
+        setSelectedAddress('');
+      }
     }
   };
 
@@ -242,10 +247,6 @@ const CheckoutFlow: React.FC = () => {
       alert('Please select a delivery address');
       return;
     }
-    if (pincodeServiceable === false) {
-      alert('Delivery not available for selected pincode');
-      return;
-    }
     setCurrentStep('payment');
   };
 
@@ -269,6 +270,27 @@ const CheckoutFlow: React.FC = () => {
     setUpiDetails(prev => ({ ...prev, showQr: true }));
   };
 
+  // Handle back to delivery
+  const handleBackToDelivery = () => {
+    // Reset payment method when going back
+    setSelectedPaymentMethod('');
+    setShowCardForm(false);
+    setShowUpiForm(false);
+    // Reset form data
+    setCardDetails({
+      number: '',
+      name: '',
+      expiry: '',
+      cvv: ''
+    });
+    setUpiDetails({
+      upiId: '',
+      showQr: false
+    });
+    // Go back to delivery step
+    setCurrentStep('delivery');
+  };
+
   // Delivery Address Step
   if (currentStep === 'delivery') {
     return (
@@ -277,36 +299,6 @@ const CheckoutFlow: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Delivery Options */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">DELIVERY OPTIONS AVAILABLE</h2>
-                <div className="space-y-4">
-                  {deliveryOptions.map((option) => {
-                    const Icon = option.icon;
-                    return (
-                      <label key={option.id} className="flex items-center space-x-4 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="delivery"
-                          value={option.id}
-                          checked={selectedDeliveryOption === option.id}
-                          onChange={(e) => setSelectedDeliveryOption(e.target.value)}
-                          className="w-5 h-5 text-blue-600"
-                        />
-                        <Icon className="w-8 h-8 text-gray-600" />
-                        <div className="flex-1">
-                          <div className="font-semibold text-gray-900">{option.name}</div>
-                          <div className="text-sm text-gray-600">{option.description}</div>
-                        </div>
-                        {option.price > 0 && (
-                          <div className="text-green-600 font-semibold">₹{option.price}</div>
-                        )}
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
               {/* Address Selection */}
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">SELECT DELIVERY ADDRESS</h2>
@@ -335,31 +327,30 @@ const CheckoutFlow: React.FC = () => {
                               </span>
                             )}
                           </div>
-                          <div className="font-semibold text-gray-900 mb-1">{address.name}</div>
                           <div className="text-gray-600 text-sm mb-1">
-                            {address.street}, {address.city} {address.pincode}
+                            {address.address}
                           </div>
-                          <div className="text-gray-600 text-sm">Phone: {address.phone}</div>
-                          
-                          {selectedAddress === address.id && (
-                            <div className="mt-2">
-                              {isCheckingPincode && (
-                                <div className="text-blue-600 text-sm">Checking serviceability...</div>
-                              )}
-                              {pincodeServiceable === true && (
-                                <div className="text-green-600 text-sm">✓ Delivery available</div>
-                              )}
-                              {pincodeServiceable === false && (
-                                <div className="text-red-600 text-sm">✗ Delivery not available for this pincode</div>
-                              )}
+                          {address.landmark && (
+                            <div className="text-gray-600 text-sm mb-1">
+                              Landmark: {address.landmark}
                             </div>
                           )}
+                          <div className="text-gray-600 text-sm mb-1">
+                            {address.city}, {address.state} - {address.pincode}
+                          </div>
+                          <div className="text-gray-600 text-sm">Mobile: {address.mobileNo}</div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <button className="text-blue-600 hover:text-blue-700 text-sm">
+                          <button 
+                            onClick={() => handleEditAddress(address.id)}
+                            className="text-blue-600 hover:text-blue-700 text-sm"
+                          >
                             <Edit className="w-4 h-4" />
                           </button>
-                          <button className="text-red-600 hover:text-red-700 text-sm">
+                          <button 
+                            onClick={() => handleDeleteAddress(address.id)}
+                            className="text-red-600 hover:text-red-700 text-sm"
+                          >
                             <Delete className="w-4 h-4" />
                           </button>
                         </div>
@@ -369,7 +360,20 @@ const CheckoutFlow: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={() => setShowAddAddress(true)}
+                  onClick={() => {
+                    setEditingAddress(null);
+                    setNewAddress({
+                      type: 'work',
+                      address: '',
+                      city: '',
+                      state: '',
+                      pincode: '',
+                      landmark: '',
+                      mobileNo: '',
+                      isDefault: false
+                    });
+                    setShowAddAddress(true);
+                  }}
                   className="w-full border-2 border-dashed border-gray-300 rounded-lg p-4 text-gray-600 hover:border-gray-400 hover:text-gray-700 transition-colors"
                 >
                   <Add className="w-5 h-5 inline mr-2" />
@@ -381,11 +385,8 @@ const CheckoutFlow: React.FC = () => {
             {/* Price Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4">
                   <h3 className="text-lg font-bold text-gray-900">PRICE DETAILS</h3>
-                  <button className="text-blue-600 text-sm hover:underline">
-                    View {cartItems.length} Item
-                  </button>
                 </div>
                 
                 <div className="space-y-3 text-sm">
@@ -395,9 +396,7 @@ const CheckoutFlow: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Delivery Fee</span>
-                    <span className="font-semibold">
-                      {deliveryFee === 0 ? 'Free' : `₹${deliveryFee}`}
-                    </span>
+                    <span className="font-semibold">Free</span>
                   </div>
                   <hr />
                   <div className="flex justify-between text-lg font-bold">
@@ -416,138 +415,164 @@ const CheckoutFlow: React.FC = () => {
             </div>
           </div>
 
-          {/* Add Address Modal */}
+          {/* Add/Edit Address Modal - Right Side Slide-in */}
           {showAddAddress && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-bold text-gray-900">Add New Address</h3>
-                  <button
-                    onClick={() => setShowAddAddress(false)}
-                    className="p-2 hover:bg-gray-100 rounded-full"
-                  >
-                    <ArrowBack className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Address Type</label>
-                    <select
-                      value={newAddress.type}
-                      onChange={(e) => setNewAddress(prev => ({ ...prev, type: e.target.value as any }))}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="home">Home</option>
-                      <option value="work">Work</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
-                    <input
-                      type="text"
-                      value={newAddress.name}
-                      onChange={(e) => setNewAddress(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Enter full name"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Street Address *</label>
-                    <textarea
-                      value={newAddress.street}
-                      onChange={(e) => setNewAddress(prev => ({ ...prev, street: e.target.value }))}
-                      placeholder="House no, Building, Street, Area"
-                      rows={3}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
-                      <input
-                        type="text"
-                        value={newAddress.city}
-                        onChange={(e) => setNewAddress(prev => ({ ...prev, city: e.target.value }))}
-                        placeholder="City"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
-                      <input
-                        type="text"
-                        value={newAddress.state}
-                        onChange={(e) => setNewAddress(prev => ({ ...prev, state: e.target.value }))}
-                        placeholder="State"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
-                    <input
-                      type="text"
-                      value={newAddress.pincode}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, '').slice(0, 6);
-                        setNewAddress(prev => ({ ...prev, pincode: value }));
-                        if (value.length === 6) {
-                          checkPincode(value);
-                        }
+            <>
+              {/* Backdrop with blur effect */}
+              <div 
+                className="fixed inset-0 backdrop-blur-sm z-40"
+                onClick={() => {
+                  setShowAddAddress(false);
+                  setEditingAddress(null);
+                }}
+              />
+              
+              {/* Modal - Sliding from right with increased width */}
+              <div className={`fixed top-0 right-0 h-full w-full sm:w-[450px] lg:w-[500px] bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out ${
+                showAddAddress ? 'translate-x-0' : 'translate-x-full'
+              }`}>
+                <div className="flex flex-col h-full">
+                  {/* Header */}
+                  <div className="flex items-center justify-between p-4 border-b">
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {editingAddress ? 'Edit Address' : 'Add New Address'}
+                    </h3>
+                    <button
+                      onClick={() => {
+                        setShowAddAddress(false);
+                        setEditingAddress(null);
                       }}
-                      placeholder="6-digit pincode"
-                      maxLength={6}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    />
+                      className="p-2 hover:bg-gray-100 rounded-full"
+                    >
+                      <ArrowBack className="w-5 h-5" />
+                    </button>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-                    <input
-                      type="tel"
-                      value={newAddress.phone}
-                      onChange={(e) => setNewAddress(prev => ({ ...prev, phone: e.target.value }))}
-                      placeholder="+91 9876543210"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    />
+                  {/* Form Content */}
+                  <div className="flex-1 overflow-y-auto p-4 scrollbar-hide">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Address Type</label>
+                        <select
+                          value={newAddress.type}
+                          onChange={(e) => setNewAddress(prev => ({ ...prev, type: e.target.value as any }))}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        >
+                          <option value="home">Home</option>
+                          <option value="work">Work</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                        <textarea
+                          value={newAddress.address}
+                          onChange={(e) => setNewAddress(prev => ({ ...prev, address: e.target.value }))}
+                          placeholder="House no, Building, Street, Area"
+                          rows={3}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Landmark</label>
+                        <input
+                          type="text"
+                          value={newAddress.landmark}
+                          onChange={(e) => setNewAddress(prev => ({ ...prev, landmark: e.target.value }))}
+                          placeholder="Near Metro Station, Mall, etc."
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                          <input
+                            type="text"
+                            value={newAddress.city}
+                            onChange={(e) => setNewAddress(prev => ({ ...prev, city: e.target.value }))}
+                            placeholder="City"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+                          <input
+                            type="text"
+                            value={newAddress.state}
+                            onChange={(e) => setNewAddress(prev => ({ ...prev, state: e.target.value }))}
+                            placeholder="State"
+                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
+                        <input
+                          type="text"
+                          value={newAddress.pincode}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                            setNewAddress(prev => ({ ...prev, pincode: value }));
+                          }}
+                          placeholder="6-digit pincode"
+                          maxLength={6}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
+                        <input
+                          type="tel"
+                          value={newAddress.mobileNo}
+                          onChange={(e) => setNewAddress(prev => ({ ...prev, mobileNo: e.target.value }))}
+                          placeholder="+91 9876543210"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        />
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id="isDefault"
+                          checked={newAddress.isDefault}
+                          onChange={(e) => setNewAddress(prev => ({ ...prev, isDefault: e.target.checked }))}
+                          className="w-4 h-4 text-blue-600 rounded"
+                        />
+                        <label htmlFor="isDefault" className="text-sm text-gray-700">
+                          Make this my default address
+                        </label>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="isDefault"
-                      checked={newAddress.isDefault}
-                      onChange={(e) => setNewAddress(prev => ({ ...prev, isDefault: e.target.checked }))}
-                      className="w-4 h-4 text-blue-600 rounded"
-                    />
-                    <label htmlFor="isDefault" className="text-sm text-gray-700">
-                      Make this my default address
-                    </label>
+                  {/* Footer with Buttons */}
+                  <div className="p-4 border-t">
+                    <div className="flex space-x-3">
+                      <button
+                        onClick={handleAddAddress}
+                        className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                      >
+                        {editingAddress ? 'Update Address' : 'Save Address'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShowAddAddress(false);
+                          setEditingAddress(null);
+                        }}
+                        className="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex space-x-3 mt-6">
-                  <button
-                    onClick={handleAddAddress}
-                    className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                  >
-                    Save Address
-                  </button>
-                  <button
-                    onClick={() => setShowAddAddress(false)}
-                    className="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg font-medium hover:bg-gray-200 transition-colors"
-                  >
-                    Cancel
-                  </button>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
@@ -561,8 +586,8 @@ const CheckoutFlow: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           <div className="mb-4">
             <button
-              onClick={() => setCurrentStep('delivery')}
-              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
+              onClick={handleBackToDelivery}
+              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors"
             >
               <ArrowBack className="w-5 h-5" />
               <span>Back to Delivery</span>
@@ -779,11 +804,8 @@ const CheckoutFlow: React.FC = () => {
             {/* Price Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4">
                   <h3 className="text-lg font-bold text-gray-900">PRICE DETAILS</h3>
-                  <button className="text-blue-600 text-sm hover:underline">
-                    View {cartItems.length} Item
-                  </button>
                 </div>
                 
                 <div className="space-y-3 text-sm">
@@ -793,9 +815,7 @@ const CheckoutFlow: React.FC = () => {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Delivery Fee</span>
-                    <span className="font-semibold">
-                      {deliveryFee === 0 ? 'Free' : `₹${deliveryFee}`}
-                    </span>
+                    <span className="font-semibold">Free</span>
                   </div>
                   <hr />
                   <div className="flex justify-between text-lg font-bold">
@@ -829,33 +849,23 @@ const CheckoutFlow: React.FC = () => {
               <div className="text-left space-y-2">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Order ID:</span>
-                  <span className="font-semibold">#ORD{Date.now().toString().slice(-6)}</span>
+                  <span className="font-semibold">#ORD415181</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Total Amount:</span>
-                  <span className="font-semibold">₹{totalAmount.toLocaleString()}</span>
+                  <span className="font-semibold">₹3,999</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Payment Method:</span>
                   <span className="font-semibold capitalize">{selectedPaymentMethod}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Estimated Delivery:</span>
-                  <span className="font-semibold">
-                    {selectedDeliveryOption === 'standard' ? '3-5 days' : 
-                     selectedDeliveryOption === 'express' ? '1-2 days' : 'Available for pickup'}
-                  </span>
-                </div>
               </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                Track Order
-              </button>
+            <div className="flex justify-center">
               <button 
                 onClick={() => setCurrentStep('delivery')}
-                className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
               >
                 Continue Shopping
               </button>

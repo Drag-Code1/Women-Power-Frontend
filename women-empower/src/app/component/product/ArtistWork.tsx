@@ -4,104 +4,88 @@ import {
   ChevronLeft,
   ChevronRight,
   Visibility,
-  Star as StarIcon,
 } from "@mui/icons-material";
 import "@/app/globals.css";
 
 interface ArtworkItem {
-  id: number;
-  title: string;
-  image: string;
-  rating: number;
-  likes: number;
-  category: string;
+  p_Name: string;
+  thumbnail: string;
+  category_id: string;
+  artist_id: string;
+  price: string;
+  discount: number;
+  isTrending: boolean;
 }
 
 interface ArtistWorkProps {
   artistId: string;
-  workImages?: string[];
+  artworks?: ArtworkItem[];
 }
 
-const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId, workImages = [] }) => {
+const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId, artworks = [] }) => {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  // Sample artwork data
-  const sampleArtworks: ArtworkItem[] = [
-    {
-      id: 1,
-      title: "Beautiful Rangoli Design",
-      image:
-        "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=400&h=300&fit=crop",
-      rating: 4.8,
-      likes: 125,
-      category: "Traditional",
-    },
-    {
-      id: 2,
-      title: "Floral Rangoli Art",
-      image:
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-      rating: 4.9,
-      likes: 89,
-      category: "Floral",
-    },
-    {
-      id: 3,
-      title: "Geometric Pattern",
-      image:
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&sat=-100",
-      rating: 4.7,
-      likes: 156,
-      category: "Geometric",
-    },
-    {
-      id: 4,
-      title: "Festival Special",
-      image:
-        "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=400&h=300&fit=crop&hue=rotate-90",
-      rating: 5.0,
-      likes: 203,
-      category: "Festival",
-    },
-    {
-      id: 5,
-      title: "Modern Rangoli",
-      image:
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&hue=rotate-180",
-      rating: 4.6,
-      likes: 97,
-      category: "Modern",
-    },
-    {
-      id: 6,
-      title: "Peacock Design",
-      image:
-        "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=400&h=300&fit=crop&hue=rotate-45",
-      rating: 4.9,
-      likes: 178,
-      category: "Traditional",
-    },
-    {
-      id: 7,
-      title: "Lotus Rangoli",
-      image:
-        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&hue=rotate-270",
-      rating: 4.8,
-      likes: 134,
-      category: "Spiritual",
-    },
-    {
-      id: 8,
-      title: "Abstract Art",
-      image:
-        "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=400&h=300&fit=crop&brightness=1.2",
-      rating: 4.7,
-      likes: 112,
-      category: "Abstract",
-    },
-  ];
+  // If no artworks provided, use sample data with your structure
+  const sampleArtworks: ArtworkItem[] = artworks.length > 0 
+    ? artworks 
+    : [
+      {
+        p_Name: "beautiful",
+        thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdQBESsb7kwEVAH_xogjxKLR-YoBummE1-rA&s",
+        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6886",
+        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
+        price: "400.00",
+        discount: 5,
+        isTrending: false
+      },
+      {
+        p_Name: "traditional art",
+        thumbnail: "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=400&h=300&fit=crop",
+        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6887",
+        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
+        price: "500.00",
+        discount: 10,
+        isTrending: true
+      },
+      {
+        p_Name: "floral design",
+        thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
+        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6888",
+        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
+        price: "350.00",
+        discount: 0,
+        isTrending: false
+      },
+      {
+        p_Name: "geometric pattern",
+        thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&sat=-100",
+        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6889",
+        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
+        price: "450.00",
+        discount: 15,
+        isTrending: true
+      },
+      {
+        p_Name: "festival special",
+        thumbnail: "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=400&h=300&fit=crop&hue=rotate-90",
+        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6890",
+        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
+        price: "600.00",
+        discount: 20,
+        isTrending: true
+      },
+      {
+        p_Name: "modern rangoli",
+        thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&hue=rotate-180",
+        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6891",
+        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
+        price: "550.00",
+        discount: 5,
+        isTrending: false
+      }
+    ];
 
   const checkScrollButtons = () => {
     if (scrollContainerRef.current) {
@@ -126,24 +110,19 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId, workImages = [] }) =>
     }
   };
 
-  const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, i) => (
-      <StarIcon
-        key={i}
-        fontSize="small"
-        className={`${
-          i < Math.floor(rating) ? "text-yellow-500" : "text-gray-300"
-        }`}
-      />
-    ));
-  };
-
   useEffect(() => {
     checkScrollButtons();
     const container = scrollContainerRef.current;
     container?.addEventListener("scroll", checkScrollButtons);
     return () => container?.removeEventListener("scroll", checkScrollButtons);
   }, []);
+
+  // Calculate discounted price
+  const calculateDiscountedPrice = (price: string, discount: number) => {
+    const originalPrice = parseFloat(price);
+    const discountAmount = originalPrice * (discount / 100);
+    return (originalPrice - discountAmount).toFixed(2);
+  };
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -182,22 +161,22 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId, workImages = [] }) =>
             className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {sampleArtworks.map((artwork) => (
+            {sampleArtworks.map((artwork, index) => (
               <div
-                key={artwork.id}
+                key={index}
                 className="flex-shrink-0 w-64 bg-white rounded-2xl shadow-sm hover:shadow-xl 
                          transition-all duration-300 overflow-hidden group"
               >
                 {/* Image Container */}
                 <div className="relative overflow-hidden">
                   <img
-                    src={artwork.image}
-                    alt={artwork.title}
+                    src={artwork.thumbnail}
+                    alt={artwork.p_Name}
                     className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                   />
 
                   {/* Overlay Actions */}
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 
+                  <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-30 
                                transition-all duration-300 flex items-center justify-center">
                     <button
                       className="opacity-0 group-hover:opacity-100 bg-white text-gray-800 
@@ -209,29 +188,47 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId, workImages = [] }) =>
                     </button>
                   </div>
 
-                  {/* Category Badge */}
-                  <div className="absolute top-3 left-3">
-                    <span className="bg-white bg-opacity-90 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
-                      {artwork.category}
-                    </span>
-                  </div>
+                  {/* Trending Badge */}
+                  {artwork.isTrending && (
+                    <div className="absolute top-3 left-3">
+                      <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                        Trending
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Discount Badge */}
+                  {artwork.discount > 0 && (
+                    <div className="absolute top-3 right-3">
+                      <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                        {artwork.discount}% OFF
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Content */}
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-800 text-lg mb-1 line-clamp-1">
-                    {artwork.title}
+                    {artwork.p_Name}
                   </h3>
-                  <p className="text-gray-600 text-sm mb-3">by Artist Name</p>
 
-                  {/* Rating */}
+                  {/* Price */}
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="flex items-center gap-1">
-                      {renderStars(artwork.rating)}
-                    </div>
-                    <span className="text-sm text-gray-600">
-                      {artwork.rating} ({artwork.likes})
-                    </span>
+                    {artwork.discount > 0 ? (
+                      <>
+                        <span className="text-lg font-bold text-gray-900">
+                          ₹{calculateDiscountedPrice(artwork.price, artwork.discount)}
+                        </span>
+                        <span className="text-sm text-gray-500 line-through">
+                          ₹{artwork.price}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-lg font-bold text-gray-900">
+                        ₹{artwork.price}
+                      </span>
+                    )}
                   </div>
 
                   {/* Actions */}
