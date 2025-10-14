@@ -14,7 +14,7 @@ interface UserInfo {
 const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { logout, user } = useAuth();
-  const router = useRouter();
+  const router = useRouter() ;
 
   const handleLogout = async () => {
     try {
