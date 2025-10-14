@@ -1,12 +1,53 @@
 // ==================== app/dashboard/contacts/page.tsx ====================
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { getContacts } from "@/app/lib/contactapi";
 import ContactsTable from "@/app/component/dashboard/dashboardcontacttab/ContactsTable";
+import type { Contact } from "@/app/types/dashboardcontacttab";
 
-export const dynamic = "force-dynamic";
+export default function ContactsPage() {
+  const [contacts, setContacts] = useState<Contact[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-export default async function ContactsPage() {
-  const contacts = await getContacts();
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const data = await getContacts();
+        if (isMounted) setContacts(data);
+      } catch (e: any) {
+        if (isMounted) setError(e?.message || "Failed to load contacts");
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#f2f3f5] p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow p-8 text-center text-red-600">
+            {error}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!contacts) {
+    return (
+      <div className="min-h-screen bg-[#f2f3f5] p-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+            Loading contacts...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#f2f3f5] p-4">

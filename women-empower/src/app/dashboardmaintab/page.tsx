@@ -1,5 +1,6 @@
-// app/dashboard/page.tsx (Server Component)
+"use client";
 
+import React, { useEffect, useState } from 'react';
 import { getDashboardData } from '@/app/data/dashboardmaintabdata';
 import { getDashboardCounts } from '@/app/lib/api';
 import { StatsCard } from '../component/dashboard/dashboardmaintab/StatsCard';
@@ -7,11 +8,48 @@ import { RecentOrdersCard } from '../component/dashboard/dashboardmaintab/Recent
 import { UpcomingEventsCard } from '../component/dashboard/dashboardmaintab/UpcomingEventsCard';
 import { QuickActionsCard } from '../component/dashboard/dashboardmaintab/QuickActionsCard';
 
-export default async function DashboardPage() {
-  const [dashboardData, counts] = await Promise.all([
-    getDashboardData(),
-    getDashboardCounts().catch(() => ({ productCount: 0, artistCount: 0, courseCount: 0, eventCount: 0 }))
-  ]);
+export default function DashboardPage() {
+  const [counts, setCounts] = useState({ productCount: 0, artistCount: 0, courseCount: 0, eventCount: 0 });
+  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const [data, countData] = await Promise.all([
+          getDashboardData(),
+          getDashboardCounts()
+        ]);
+        if (!isMounted) return;
+        setDashboardData(data);
+        setCounts(countData);
+      } catch (e: any) {
+        if (isMounted) setError(e?.message || 'Failed to load dashboard');
+      }
+    })();
+    return () => { isMounted = false; };
+  }, []);
+
+  if (error) {
+    return (
+      <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow p-8 text-center text-red-600">{error}</div>
+        </div>
+      </main>
+    );
+  }
+
+  if (!dashboardData) {
+    return (
+      <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">Loading dashboard...</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex-1 p-6 bg-gray-100 overflow-y-auto">
@@ -38,5 +76,3 @@ export default async function DashboardPage() {
     </main>
   );
 }
-
-export const revalidate = 60;

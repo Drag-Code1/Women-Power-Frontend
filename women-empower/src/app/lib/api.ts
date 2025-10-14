@@ -740,7 +740,11 @@ export const getDashboardCounts = async (): Promise<{
   courseCount: number;
   eventCount: number;
 }> => {
-  const res = await fetch('http://localhost:5000/v1/dashboard/', { cache: 'no-store' });
+  const { getAuthHeaders } = await import('./authApi');
+  const res = await fetch('http://localhost:5000/v1/dashboard/', { 
+    cache: 'no-store',
+    headers: getAuthHeaders(),
+  });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
