@@ -93,7 +93,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (response.success) {
         const { user, token } = response.data.info;
         
-        // Save token and user to localStorage
+        // Save token and user to localStorage and update state
         saveToken(token);
         saveUser(user);
         

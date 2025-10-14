@@ -9,7 +9,7 @@ async function getCourses(): Promise<{
   levels: string[];
 }> {
   try {
-    // Fetch courses from API
+    // Fetch courses from API get all cource data
     const courses = await getCoursesApi();
     
     // Fetch categories for filtering
