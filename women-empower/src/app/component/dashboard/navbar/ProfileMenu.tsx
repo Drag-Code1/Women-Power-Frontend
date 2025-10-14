@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 interface UserInfo {
   name: string;
   email: string;
-  avatar?: string;
+  avatar?: string ;
 }
 
 const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
