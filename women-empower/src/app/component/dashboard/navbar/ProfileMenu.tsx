@@ -6,7 +6,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 
 interface UserInfo {
-  name: string;
+  name: string ;
   email: string ;
   avatar?: string ;
 }
