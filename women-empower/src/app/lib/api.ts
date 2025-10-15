@@ -992,3 +992,29 @@ export const filterProductsApi = async (filters: {
   }
   return parsed?.data || [];
 };
+
+// src/app/lib/api.ts
+export async function postcontactForm(formData: any) {
+  try {
+    const response = await fetch("http://localhost:5000/v1/contact-details/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    // Check if response is not OK
+    if (!response.ok) {
+      const errorData = await response.text(); // to see server response
+      throw new Error(`Failed to submit contact form: ${errorData}`);
+    }
+
+    // Parse and return JSON response
+    const data = await response.json();
+    return data;
+  } catch (error: any) {
+    console.error("Error posting contact form:", error.message);
+    throw new Error("Something went wrong while submitting the form");
+  }
+}
