@@ -53,10 +53,10 @@ export default function ContactsPage() {
     <div className="min-h-screen bg-[#f2f3f5] p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl text-gray-900">Contact Messages</h1>
-          <p className="text-gray-600 mt-1">Total contacts: {contacts.length}</p>
-        </div>
+      <div className="mb-6 bg-white shadow-md rounded-lg p-4 md:p-6">
+  <h1 className="text-2xl sm:text-3xl text-gray-900">Contact Messages</h1>
+  <p className="text-gray-600 mt-1">Total contacts: {contacts.length}</p>
+</div>
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">

@@ -64,17 +64,16 @@ export const EventDashboardClient: React.FC<EventDashboardClientProps> = ({ init
       `}</style>
 
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl md:text-3xl text-gray-800">Event Dashboard</h1>
-          <button
-            onClick={() => openModal('add')}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <Plus size={20} />
-            <span className="hidden sm:inline">Add Event</span>
-          </button>
-        </div>
-
+      <div className="flex justify-between items-center mb-8 bg-white shadow-md rounded-lg p-4 md:p-6">
+  <h1 className="text-2xl md:text-3xl text-gray-800">Event Dashboard</h1>
+  <button
+    onClick={() => openModal('add')}
+    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+  >
+    <Plus size={20} />
+    <span className="hidden sm:inline">Add Event</span>
+  </button>
+</div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event) => (
             <EventCard
