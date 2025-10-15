@@ -173,16 +173,6 @@ export const allProducts: Product[] = [
     "is_in_wishlist": false
   },
   {
-    "id": "17",
-    "p_Name": "Spiritual Incense Holder",
-    "thumbnail": "https://images.pexels.com/photos/1051838/pexels-photo-1051838.jpeg",
-    "category_id": "spiritual",
-    "price": "299.00",
-    "discount": 15,
-    "isTrending": false,
-    "is_in_wishlist": true
-  },
-  {
     "id": "18",
     "p_Name": "Kalash Decorative Set",
     "thumbnail": "https://images.pexels.com/photos/169198/pexels-photo-169198.jpeg",
