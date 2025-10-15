@@ -5,7 +5,7 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Filter, ChevronLeft, ChevronRight, Calendar, Briefcase } from "lucide-react";
 import { Artist } from "@/app/types/artist";
-import { getArtistsPaginated, searchArtistsApi, filterArtistsApi } from "@/app/lib/api";
+import { getArtistsPaginated, searchArtistsApi, filterArtistsApi, getCategoriesApi } from "@/app/lib/api";
 
 // ============================================
 // TYPES
@@ -208,7 +208,42 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
   const [totalArtists, setTotalArtists] = useState(initialTotalArtists);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [categoryMap, setCategoryMap] = useState<{ [key: string]: string }>({});
+  const [categoryIdMap, setCategoryIdMap] = useState<{ [key: string]: string }>({});
   const itemsPerPage = 12;
+
+  // Function to map category names to artists
+  const mapCategoriesToArtists = useCallback((artists: Artist[]) => {
+    return artists.map(artist => ({
+      ...artist,
+      category: categoryMap[artist.category_id] || 'Unknown Category'
+    }));
+  }, [categoryMap]);
+
+  // Function to map category names to IDs for filtering
+  const getCategoryIdsFromNames = useCallback((categoryNames: string[]) => {
+    return categoryNames.map(name => categoryIdMap[name]).filter(Boolean);
+  }, [categoryIdMap]);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categoriesData = await getCategoriesApi();
+        const idToNameMap: { [key: string]: string } = {};
+        const nameToIdMap: { [key: string]: string } = {};
+        categoriesData?.forEach((cat: any) => {
+          idToNameMap[cat.id] = cat.name;
+          nameToIdMap[cat.name] = cat.id;
+        });
+        setCategoryMap(idToNameMap);
+        setCategoryIdMap(nameToIdMap);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -228,9 +263,10 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
       // If there's a search term, use search API
       if (searchTerm.trim()) {
         const searchResults = await searchArtistsApi(searchTerm.trim());
-        setArtists(searchResults);
+        const mappedResults = mapCategoriesToArtists(searchResults);
+        setArtists(mappedResults);
         setTotalPages(1);
-        setTotalArtists(searchResults.length);
+        setTotalArtists(mappedResults.length);
         return;
       }
       
@@ -239,8 +275,11 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
         const filters: any = {};
         
         if (selectedCategories.length > 0) {
-          // Map category names to category IDs (you might need to adjust this based on your category structure)
-          filters.categories = selectedCategories;
+          // Convert category names to category IDs for the API
+          const categoryIds = getCategoryIdsFromNames(selectedCategories);
+          if (categoryIds.length > 0) {
+            filters.categories = categoryIds;
+          }
         }
         
         if (selectedExperience.length > 0) {
@@ -257,15 +296,17 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
         }
         
         const filterResults = await filterArtistsApi(filters);
-        setArtists(filterResults);
+        const mappedResults = mapCategoriesToArtists(filterResults);
+        setArtists(mappedResults);
         setTotalPages(1);
-        setTotalArtists(filterResults.length);
+        setTotalArtists(mappedResults.length);
         return;
       }
       
       // Default: fetch paginated artists
       artistsData = await getArtistsPaginated(currentPage);
-      setArtists(artistsData.data || []);
+      const mappedResults = mapCategoriesToArtists(artistsData.data || []);
+      setArtists(mappedResults);
       setTotalPages(artistsData.totalPages || 1);
       setTotalArtists(artistsData.totalArtists || 0);
       
@@ -275,7 +316,7 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, selectedCategories, selectedExperience, currentPage]);
+  }, [searchTerm, selectedCategories, selectedExperience, currentPage, mapCategoriesToArtists, getCategoryIdsFromNames]);
 
   useEffect(() => {
     fetchArtists();

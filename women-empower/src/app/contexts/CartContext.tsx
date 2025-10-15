@@ -1,7 +1,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useAuth } from "./AuthContext";
-// Cart API functions
+// Cart API functions ok
 import { addToCartApi, getCartItemsApi, updateCartItemApi, removeFromCartApi, CartItem } from "../lib/cartApi";
 import { getToken, getUser } from "../lib/authApi";
 

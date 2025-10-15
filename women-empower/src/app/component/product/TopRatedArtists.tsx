@@ -1,6 +1,7 @@
 import { getTopRatedArtists } from "@/app/api/topratedartist";
 import { TopRatedArtistsClient } from '../TopRatedArtists/TopRatedArtistsClient';
 import { Artist } from '@/app/types/artist';
+import { getCategoriesApi } from '@/app/lib/api';
 
 export const TopRatedArtists = async () => {
   // Fetch data on the server
@@ -9,6 +10,20 @@ export const TopRatedArtists = async () => {
 
   try {
     artists = await getTopRatedArtists();
+    
+    // Fetch categories and map them to artists
+    const categoriesData = await getCategoriesApi();
+    const categoryMap: { [key: string]: string } = {};
+    categoriesData?.forEach((cat: any) => {
+      categoryMap[cat.id] = cat.name;
+    });
+    
+    // Map category names to artists
+    artists = artists.map(artist => ({
+      ...artist,
+      category: categoryMap[artist.category_id] || 'Unknown Category'
+    }));
+    
   } catch (err) {
     console.error('Error fetching top rated artists:', err);
     error = err instanceof Error ? err.message : 'Failed to fetch top rated artists';

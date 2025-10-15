@@ -22,6 +22,19 @@ async function ArtistDirectoryWrapper() {
     // Fetch categories
     const categoriesData = await getCategoriesApi();
     categories = categoriesData?.map((cat: any) => cat.name) || [];
+    
+    // Create a category mapping object
+    const categoryMap: { [key: string]: string } = {};
+    categoriesData?.forEach((cat: any) => {
+      categoryMap[cat.id] = cat.name;
+    });
+    
+    // Map category names to artists
+    artists = artists.map(artist => ({
+      ...artist,
+      category: categoryMap[artist.category_id] || 'Unknown Category'
+    }));
+    
   } catch (error) {
     console.error('Error fetching initial data:', error);
     // Fallback to empty arrays if API fails

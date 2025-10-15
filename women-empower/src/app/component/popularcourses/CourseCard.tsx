@@ -3,6 +3,7 @@
 import React from 'react';
 import { Play, BookOpen } from 'lucide-react';
 import { Course } from '@/app/types/course';
+import { useCategoryDetails } from "../../hooks/useCategoryDetails";
 
 interface CourseCardProps {
   course: Course;
@@ -11,6 +12,7 @@ interface CourseCardProps {
 export const CourseCard = ({ course }: CourseCardProps) => {
   const originalPrice = parseFloat(course.price);
   const discountedPrice = (originalPrice * (1 - course.discount / 100)).toFixed(2);
+  const { details, loading } = useCategoryDetails(course.category_id);
 
   return (
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group h-full flex flex-col">
@@ -57,7 +59,7 @@ export const CourseCard = ({ course }: CourseCardProps) => {
       <div className="p-4 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-2 gap-2">
           <span className="text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full truncate">
-            {course.category_id}
+            {loading ? "Loading..." : (details?.name || course.category_id)}
           </span>
           <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full flex-shrink-0">
             {course.level.charAt(0).toUpperCase() + course.level.slice(1)}
