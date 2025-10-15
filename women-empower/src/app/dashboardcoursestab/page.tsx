@@ -66,16 +66,16 @@ export default function CoursesPage() {
       <div className="min-h-screen bg-[#f3f4f6] p-6">
         <div className="max-w-7xl mx-auto">
           {/* Header Section */}
-          <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">Courses</h1>
-            <button
-              onClick={() => openModal('add')}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              <Plus size={20} />
-              <span className="hidden sm:inline">Add New</span>
-            </button>
-          </div>
+          <div className="flex items-center justify-between mb-6 bg-white shadow-md rounded-lg p-4 md:p-6">
+  <h1 className="text-2xl font-bold text-gray-900">Course Management</h1>
+  <button
+    onClick={() => openModal('add')}
+    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+  >
+    <Plus size={20} />
+    <span className="hidden sm:inline">Add New</span>
+  </button>
+</div>
 
           {/* Courses Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

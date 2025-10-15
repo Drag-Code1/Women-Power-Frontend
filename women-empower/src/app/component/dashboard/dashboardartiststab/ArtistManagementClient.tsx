@@ -35,16 +35,16 @@ export default function ArtistManagementClient({ initialArtists, pagination }: A
   return (
     <div className="min-h-screen bg-[#f2f3f5] p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl md:text-3xl text-gray-900">Artist Management</h1>
-          <button
-            onClick={() => openModal('create')}
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          >
-            <Plus size={20} />
-            <span className="hidden sm:inline">Add Artist</span>
-          </button>
-        </div>
+      <div className="flex justify-between items-center mb-8 bg-white shadow-md rounded-lg p-4 md:p-6">
+  <h1 className="text-3xl md:text-3xl text-gray-900">Artist Management</h1>
+  <button
+    onClick={() => openModal('create')}
+    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+  >
+    <Plus size={20} />
+    <span className="hidden sm:inline">Add Artist</span>
+  </button>
+</div>
 
         <ArtistTable
           artists={artists}

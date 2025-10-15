@@ -108,13 +108,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
                 ₹{product.price.toLocaleString()}
               </span>
             )}
-          </div>
-          
-          {/* Stock Status or Rating */}
-          <div className="flex items-center gap-1 text-yellow-500">
-            <Star className="w-4 h-4 fill-current" />
-            <span className="text-sm font-medium text-gray-700">4.5</span>
-          </div>
+          </div>      
         </div>
       </div>
 

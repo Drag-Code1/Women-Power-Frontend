@@ -1,69 +1,66 @@
 'use client';
-
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Mail, Clock } from 'lucide-react';
-import { useState } from 'react';
+import { postcontactForm } from '@/app/lib/api';
 
 const Contact = () => {
   type FormFields = {
-    firstName: string;
-    lastName: string;
-    mobile: string;
-    email: string;
-    message: string;
+    first_name: string;
+    last_name: string;
+    mobileNo: string;
+    mail: string;
+    msg: string;
   };
 
-  type Errors = {
-    [K in keyof FormFields]: string;
-  };
-
-  type Touched = {
-    [K in keyof FormFields]: boolean;
-  };
+  type Errors = { [K in keyof FormFields]: string };
+  type Touched = { [K in keyof FormFields]: boolean };
 
   const [formData, setFormData] = useState<FormFields>({
-    firstName: '',
-    lastName: '',
-    mobile: '',
-    email: '',
-    message: ''
+    first_name: '',
+    last_name: '',
+    mobileNo: '',
+    mail: '',
+    msg: '',
   });
 
   const [errors, setErrors] = useState<Errors>({
-    firstName: '',
-    lastName: '',
-    mobile: '',
-    email: '',
-    message: ''
+    first_name: '',
+    last_name: '',
+    mobileNo: '',
+    mail: '',
+    msg: '',
   });
+
   const [touched, setTouched] = useState<Touched>({
-    firstName: false,
-    lastName: false,
-    mobile: false,
-    email: false,
-    message: false
+    first_name: false,
+    last_name: false,
+    mobileNo: false,
+    mail: false,
+    msg: false,
   });
+
+  const [loading, setLoading] = useState(false);
 
   const validateField = (name: string, value: string) => {
     switch (name) {
-      case 'firstName':
+      case 'first_name':
         return !value ? 'First name is required' : '';
-      case 'lastName':
+      case 'last_name':
         return !value ? 'Last name is required' : '';
-      case 'mobile':
+      case 'mobileNo':
         return !value
-          ? 'Mobile number is required'
+          ? 'mobileNo number is required'
           : !/^[0-9]{10}$/.test(value)
-          ? 'Enter a valid 10-digit mobile number'
+          ? 'Enter a valid 10-digit mobileNo number'
           : '';
-      case 'email':
+      case 'mail':
         return !value
-          ? 'Email is required'
+          ? 'mail is required'
           : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-          ? 'Invalid email address'
+          ? 'Invalid mail address'
           : '';
-      case 'message':
-        return !value ? 'Message is required' : '';
+      case 'msg':
+        return !value ? 'msg is required' : '';
       default:
         return '';
     }
@@ -72,7 +69,7 @@ const Contact = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
+
     if (touched[name as keyof FormFields]) {
       setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
     }
@@ -84,36 +81,61 @@ const Contact = () => {
     setErrors(prev => ({ ...prev, [name]: validateField(name, value) }));
   };
 
-  interface SubmitEvent extends React.MouseEvent<HTMLButtonElement> {}
-
-  interface NewErrors {
-    [key: string]: string;
-  }
-
-  interface NewTouched {
-    [key: string]: boolean;
-  }
-
-  const handleSubmit = (e: SubmitEvent) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    const newErrors: NewErrors = {};
-    Object.keys(formData).forEach(key => {
-      newErrors[key] = validateField(key, formData[key as keyof typeof formData]);
-    });
+    const newErrors: Errors = Object.keys(formData).reduce((acc, key) => {
+      acc[key as keyof FormFields] = validateField(key, formData[key as keyof FormFields]);
+      return acc;
+    }, {} as Errors);
 
-    setErrors(newErrors as Errors);
-    setTouched(
-      Object.keys(formData).reduce(
-        (acc, key) => ({ ...acc, [key]: true }),
-        {} as NewTouched
-      ) as Touched
-    );
+    setErrors(newErrors);
+    setTouched({
+      first_name: true,
+      last_name: true,
+      mobileNo: true,
+      mail: true,
+      msg: true,
+    });
 
     const isValid = Object.values(newErrors).every(error => !error);
 
     if (isValid) {
-      alert('Form submitted: ' + JSON.stringify(formData, null, 2));
+      try {
+        setLoading(true);
+        const res = await postcontactForm(formData);
+        console.log("✅ API Response:", res);
+
+        alert("Form submitted successfully!");
+
+        // reset form
+        setFormData({
+          first_name: '',
+          last_name: '',
+          mobileNo: '',
+          mail: '',
+          msg: '',
+        });
+        setTouched({
+          first_name: false,
+          last_name: false,
+          mobileNo: false,
+          mail: false,
+          msg: false,
+        });
+        setErrors({
+          first_name: '',
+          last_name: '',
+          mobileNo: '',
+          mail: '',
+          msg: '',
+        });
+      } catch (err) {
+        console.error("❌ Error:", err);
+        alert("Something went wrong while submitting the form!");
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -138,7 +160,7 @@ const Contact = () => {
 
           <div>
             <h3 className="flex items-center font-semibold mb-1">
-              <Mail className="mr-2 text-black w-4 h-4" /> Email
+              <Mail className="mr-2 text-black w-4 h-4" /> mail
             </h3>
             <a
               href="mailto:womanempoweringjourney@gmail.com"
@@ -162,100 +184,103 @@ const Contact = () => {
           <h2 className="text-2xl font-bold mb-6">Get in Touch</h2>
           <div className="space-y-5">
             
-            {/* First Name and Last Name - Side by Side */}
+            {/* First Name + Last Name */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* First Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   First name *
                 </label>
                 <input
-                  name="firstName"
+                  name="first_name"
                   type="text"
                   placeholder="First name"
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  value={formData.firstName}
+                  value={formData.first_name}
                   className="w-full border border-gray-300 rounded-md px-4 py-3 focus:ring-1 focus:ring-[#5C452B] focus:outline-none text-sm"
                 />
-                {touched.firstName && errors.firstName && (
-                  <p className="text-red-600 text-xs mt-1">{errors.firstName}</p>
+                {touched.first_name && errors.first_name && (
+                  <p className="text-red-600 text-xs mt-1">{errors.first_name}</p>
                 )}
               </div>
 
-              {/* Last Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Last name *
                 </label>
                 <input
-                  name="lastName"
+                  name="last_name"
                   type="text"
                   placeholder="Last name"
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  value={formData.lastName}
+                  value={formData.last_name}
                   className="w-full border border-gray-300 rounded-md px-4 py-3 focus:ring-1 focus:ring-[#5C452B] focus:outline-none text-sm"
                 />
-                {touched.lastName && errors.lastName && (
-                  <p className="text-red-600 text-xs mt-1">{errors.lastName}</p>
+                {touched.last_name && errors.last_name && (
+                  <p className="text-red-600 text-xs mt-1">{errors.last_name}</p>
                 )}
               </div>
             </div>
 
-            {/* Mobile */}
+            {/* mobileNo */}
             <div>
               <input
-                name="mobile"
+                name="mobileNo"
                 type="tel"
-                placeholder="Mobile Number *"
+                placeholder="mobileNo Number *"
                 onChange={handleChange}
                 onBlur={handleBlur}
-                value={formData.mobile}
+                value={formData.mobileNo}
                 className="w-full border border-gray-300 rounded-md px-4 py-3 focus:ring-1 focus:ring-[#5C452B] focus:outline-none text-sm"
               />
-              {touched.mobile && errors.mobile && (
-                <p className="text-red-600 text-xs mt-1">{errors.mobile}</p>
+              {touched.mobileNo && errors.mobileNo && (
+                <p className="text-red-600 text-xs mt-1">{errors.mobileNo}</p>
               )}
             </div>
 
-            {/* Email */}
+            {/* mail */}
             <div>
               <input
-                name="email"
-                type="email"
-                placeholder="Email *"
+                name="mail"
+                type="mail"
+                placeholder="mail *"
                 onChange={handleChange}
                 onBlur={handleBlur}
-                value={formData.email}
+                value={formData.mail}
                 className="w-full border border-gray-300 rounded-md px-4 py-3 focus:ring-1 focus:ring-[#5C452B] focus:outline-none text-sm"
               />
-              {touched.email && errors.email && (
-                <p className="text-red-600 text-xs mt-1">{errors.email}</p>
+              {touched.mail && errors.mail && (
+                <p className="text-red-600 text-xs mt-1">{errors.mail}</p>
               )}
             </div>
 
-            {/* Message */}
+            {/* msg */}
             <div>
               <textarea
-                name="message"
+                name="msg"
                 rows={4}
-                placeholder="Your Message *"
+                placeholder="Your msg *"
                 onChange={handleChange}
                 onBlur={handleBlur}
-                value={formData.message}
+                value={formData.msg}
                 className="w-full border border-gray-300 rounded-md px-4 py-3 focus:ring-1 focus:ring-[#5C452B] focus:outline-none text-sm resize-none"
               />
-              {touched.message && errors.message && (
-                <p className="text-red-600 text-xs mt-1">{errors.message}</p>
+              {touched.msg && errors.msg && (
+                <p className="text-red-600 text-xs mt-1">{errors.msg}</p>
               )}
             </div>
 
             <button
               onClick={handleSubmit}
-              className="w-full bg-[#5C452B] text-white text-sm font-semibold py-3 rounded-md hover:bg-[#4a361f] transition duration-300 cursor-pointer"
+              disabled={loading}
+              className={`w-full text-sm font-semibold py-3 rounded-md transition duration-300 cursor-pointer ${
+                loading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-[#5C452B] text-white hover:bg-[#4a361f]'
+              }`}
             >
-              Submit
+              {loading ? 'Submitting...' : 'Submit'}
             </button>
           </div>
         </div>

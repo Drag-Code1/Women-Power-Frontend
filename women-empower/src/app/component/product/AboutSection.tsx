@@ -75,7 +75,7 @@ export default function AboutSection() {
                 <p className="text-lg text-[#5C452B]/80 max-w-3xl mx-auto">
                   Founded by{" "}
                   <span className="font-semibold text-[#7A5C3D]">
-                    Sonalli Thaakkar
+                    Sonali Thakkar 
                   </span>
                 </p>
               </div>
@@ -102,7 +102,7 @@ export default function AboutSection() {
                     </h3>
                     <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed">
                       Sometimes we choose the path, and sometimes the path
-                      chooses us. Sonalli Thaakkar is one of the fortunate few
+                      chooses us. Sonali Thakkar is one of the fortunate few
                       who never let her journey pause and transformed it into a
                       new identity.
                     </p>

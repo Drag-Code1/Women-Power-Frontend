@@ -67,16 +67,16 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
     <>
       <div className="min-h-screen bg-[#f2f3f5] p-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl md:text-3xl text-gray-900">Category Management</h1>
-            <button
-              onClick={() => openModal('create')}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-            >
-              <Plus size={20} />
-              <span className="hidden sm:inline">Add Category</span>
-            </button>
-          </div>
+          <div className="flex justify-between items-center mb-8 bg-white shadow-md rounded-lg p-4 md:p-6">
+  <h1 className="text-3xl md:text-3xl text-gray-900">Category Management</h1>
+  <button
+    onClick={() => openModal('create')}
+    className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+  >
+    <Plus size={20} />
+    <span className="hidden sm:inline">Add Category</span>
+  </button>
+</div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {categories.map((category) => (
