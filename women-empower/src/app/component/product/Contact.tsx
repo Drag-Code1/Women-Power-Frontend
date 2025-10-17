@@ -40,6 +40,7 @@ const Contact = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const validateField = (name: string, value: string) => {
     switch (name) {
@@ -103,12 +104,15 @@ const Contact = () => {
     if (isValid) {
       try {
         setLoading(true);
+        setSubmitSuccess(false);
+        
         const res = await postcontactForm(formData);
         console.log("✅ API Response:", res);
 
-        alert("Form submitted successfully!");
-
-        // reset form
+        // Show success message
+        setSubmitSuccess(true);
+        
+        // Reset form after successful submission
         setFormData({
           first_name: '',
           last_name: '',
@@ -130,9 +134,15 @@ const Contact = () => {
           mail: '',
           msg: '',
         });
-      } catch (err) {
+
+        // Hide success message after 5 seconds
+        setTimeout(() => {
+          setSubmitSuccess(false);
+        }, 5000);
+
+      } catch (err: any) {
         console.error("❌ Error:", err);
-        alert("Something went wrong while submitting the form!");
+        alert(err.message || "Something went wrong while submitting the form!");
       } finally {
         setLoading(false);
       }
@@ -182,6 +192,20 @@ const Contact = () => {
         {/* Right: Form */}
         <div className="p-8 flex flex-col justify-center">
           <h2 className="text-2xl font-bold mb-6">Get in Touch</h2>
+          
+          {/* Success Message */}
+          {submitSuccess && (
+            <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium">Message sent successfully!</span>
+              </div>
+              <p className="text-sm mt-1">Thank you for contacting us. We'll get back to you soon.</p>
+            </div>
+          )}
+          
           <div className="space-y-5">
             
             {/* First Name + Last Name */}
@@ -274,13 +298,20 @@ const Contact = () => {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className={`w-full text-sm font-semibold py-3 rounded-md transition duration-300 cursor-pointer ${
+              className={`w-full text-sm font-semibold py-3 rounded-md transition duration-300 cursor-pointer flex items-center justify-center gap-2 ${
                 loading
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-[#5C452B] text-white hover:bg-[#4a361f]'
               }`}
             >
-              {loading ? 'Submitting...' : 'Submit'}
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Submitting...
+                </>
+              ) : (
+                'Submit Message'
+              )}
             </button>
           </div>
         </div>

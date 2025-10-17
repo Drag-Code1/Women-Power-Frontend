@@ -993,28 +993,45 @@ export const filterProductsApi = async (filters: {
   return parsed?.data || [];
 };
 
-// src/app/lib/api.ts
-export async function postcontactForm(formData: any) {
+// Contact Form API
+export async function postcontactForm(formData: {
+  first_name: string;
+  last_name: string;
+  mobileNo: string;
+  mail: string;
+  msg: string;
+}) {
   try {
+    const { getAuthHeaders } = await import('./authApi');
+    
     const response = await fetch("http://localhost:5000/v1/contact-details/", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(formData),
     });
 
     // Check if response is not OK
     if (!response.ok) {
-      const errorData = await response.text(); // to see server response
-      throw new Error(`Failed to submit contact form: ${errorData}`);
+      const contentType = response.headers.get('content-type') || '';
+      let errorData: any = null;
+      try {
+        errorData = contentType.includes('application/json') 
+          ? await response.json() 
+          : { message: await response.text() };
+      } catch {
+        errorData = { message: `HTTP error! status: ${response.status}` };
+      }
+      
+      const errorMessage = errorData?.message || errorData?.error || `Failed to submit contact form (status ${response.status})`;
+      throw new Error(errorMessage);
     }
 
     // Parse and return JSON response
     const data = await response.json();
+    console.log("✅ Contact form submitted successfully:", data);
     return data;
   } catch (error: any) {
-    console.error("Error posting contact form:", error.message);
-    throw new Error("Something went wrong while submitting the form");
+    console.error("❌ Error posting contact form:", error.message);
+    throw error;
   }
 }
