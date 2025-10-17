@@ -15,6 +15,7 @@ import { usePathname, useRouter } from "next/navigation";
 import ProfilePopUp from "../modals/ProfilePopUp";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { useWishlist } from "@/app/contexts/WishlistContext";
 
 // Remove local CartItem interface since we're using CartContext
 interface ProfilePopUpProps {
@@ -35,6 +36,7 @@ const NavBar: React.FC = () => {
   
   const { getCartItemCount } = useCart();
   const { user, logout } = useAuth();
+  const { wishlistCount } = useWishlist();
   const [showProfile, setShowProfile] = useState(false);
 
   const suggestions = [
@@ -240,7 +242,7 @@ const NavBar: React.FC = () => {
                   <FavoriteBorder className="w-5 h-5" />
                 </button>
                 <span className="absolute -top-1 -right-1 bg-yellow-400 text-gray-900 text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                  0
+                  {wishlistCount}
                 </span>
               </div>
 

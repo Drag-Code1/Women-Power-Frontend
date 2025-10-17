@@ -3,6 +3,7 @@
 import React from "react";
 import { Heart, ShoppingCart, Check } from "lucide-react";
 import { Product } from "@/app/types/product";
+import { useWishlist } from "@/app/contexts/WishlistContext";
 
 interface ProductCardProps {
   product: Product;
@@ -19,12 +20,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   isInCart,
   addingToCart = false
 }) => {
+  const { isInWishlist } = useWishlist();
+  
   // Calculate prices
   const originalPrice = parseFloat(product.price);
   const discountAmount = originalPrice * (product.discount / 100);
   const finalPrice = originalPrice - discountAmount;
   
   const inCart = isInCart ? isInCart(product.id) : false;
+  const inWishlist = isInWishlist(product.id) || product.is_in_wishlist;
 
   return (
     <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden h-full flex flex-col">
@@ -57,11 +61,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <button
           onClick={() => onToggleWishlist?.(product.id)}
           className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm hover:scale-110"
-          aria-label={product.is_in_wishlist ? "Remove from wishlist" : "Add to wishlist"}
+          aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
-              product.is_in_wishlist ? "text-red-500 fill-red-500" : "text-gray-600"
+              inWishlist ? "text-red-500 fill-red-500" : "text-gray-600"
             }`}
           />
         </button>

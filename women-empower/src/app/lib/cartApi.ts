@@ -126,8 +126,22 @@ export const getCartItemsApi = async (userId: string, token?: string) => {
   
   // Debug: Log the API response
   console.log('🛒 Get Cart Items API Response:', parsed);
-  
-  return parsed.data || [];
+
+  const apiItems = (parsed?.data || []) as Array<{
+    id: string;
+    product: { id: string; p_Name: string; thumbnail: string; price: string; discount: number };
+    quantity: number;
+  }>;
+
+  // Map API response to our CartItem shape
+  const mapped: CartItem[] = apiItems.map((it) => ({
+    id: it.id, // cart item id
+    productId: it.product?.id,
+    quantity: it.quantity ?? 1,
+    product: it.product
+  }));
+
+  return mapped;
 };
 
 // Update cart item quantity

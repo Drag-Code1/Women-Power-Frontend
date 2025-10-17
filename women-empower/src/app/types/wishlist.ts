@@ -1,5 +1,6 @@
 export interface WishListItem {
-  id: string;
+  id: string; // Product ID
+  wishlistItemId?: string; // Wishlist item ID for deletion
   p_Name: string;
   thumbnail: string;
   category_id: string;

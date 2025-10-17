@@ -10,6 +10,7 @@ import ScrollToTopButton from "./component/ui/utlity/ScrollToTopButton";
 import DashboardLayout from "./DashboardLayout";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+import { WishlistProvider } from "./contexts/WishlistContext";
 import LayoutWrapper from "./component/layout/LayoutWrapper";
 import "./lib/tokenDebugger"; // Import token debugger
 
@@ -41,9 +42,11 @@ export default function RootLayout({
       >
         <AuthProvider>
           <CartProvider>
-            <LayoutWrapper>
-              {children}
-            </LayoutWrapper>
+            <WishlistProvider>
+              <LayoutWrapper>
+                {children}
+              </LayoutWrapper>
+            </WishlistProvider>
           </CartProvider>
         </AuthProvider>
       </body>

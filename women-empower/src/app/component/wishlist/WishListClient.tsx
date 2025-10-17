@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { WishListItem } from "@/app/types/wishlist";
 import { WishListHeader } from "./WishListHeader";
 import { WishListCard } from "./WishListCard";
 import { WishListEmpty } from "./WishListEmpty";
 import { WishListSkeleton } from "./WishListSkeleton";
+import { useWishlist } from "@/app/contexts/WishlistContext";
 
 interface WishListClientProps {
   initialItems: WishListItem[];
@@ -16,36 +17,36 @@ export const WishListClient: React.FC<WishListClientProps> = ({
   initialItems,
   loading = false
 }) => {
-  const [wishListItems, setWishListItems] = useState<WishListItem[]>(initialItems);
+  const { wishlistItems, removeFromWishlist } = useWishlist();
 
-  const removeFromWishList = (id: string) => {
-    setWishListItems((items) => items.filter((item) => item.id !== id));
+  const handleRemoveFromWishList = async (productId: string) => {
+    await removeFromWishlist(productId);
   };
 
-  const removeAllItems = () => {
-    setWishListItems([]);
+  const removeAllItems = async () => {
+    // Remove all items from wishlist
+    const removePromises = wishlistItems.map(item => removeFromWishlist(item.id));
+    await Promise.all(removePromises);
   };
 
   const addToCart = (item: WishListItem) => {
     console.log("Adding to cart:", item);
-    setWishListItems((items) =>
-      items.map((i) => (i.id === item.id ? { ...i, inCart: true } : i))
-    );
+    // TODO: Implement add to cart functionality
   };
 
-  const moveToCart = (item: WishListItem) => {
+  const moveToCart = async (item: WishListItem) => {
     addToCart(item);
-    setTimeout(() => {
-      removeFromWishList(item.id);
+    setTimeout(async () => {
+      await handleRemoveFromWishList(item.id);
     }, 500);
   };
 
   return (
     <div className="min-h-screen px-0 bg-gray-50">
       {/* Header - Only show when items exist */}
-      {!loading && wishListItems.length > 0 && (
+      {!loading && wishlistItems.length > 0 && (
         <WishListHeader 
-          itemCount={wishListItems.length} 
+          itemCount={wishlistItems.length} 
           onRemoveAll={removeAllItems}
         />
       )}
@@ -58,18 +59,18 @@ export const WishListClient: React.FC<WishListClientProps> = ({
               <WishListSkeleton key={index} />
             ))}
           </div>
-        ) : wishListItems.length === 0 ? (
+        ) : wishlistItems.length === 0 ? (
           // Empty Wishlist State
           <WishListEmpty />
         ) : (
           // Wishlist Items Grid
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-none">
-            {wishListItems.map((item, index) => (
+            {wishlistItems.map((item, index) => (
               <WishListCard
                 key={item.id}
                 item={item}
                 index={index}
-                onRemove={removeFromWishList}
+                onRemove={handleRemoveFromWishList}
                 onMoveToCart={moveToCart}
               />
             ))}

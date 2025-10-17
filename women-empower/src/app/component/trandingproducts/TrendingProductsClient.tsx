@@ -5,6 +5,7 @@ import { Product } from "@/app/types/product";
 import { ProductCard } from "./ProductCard";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { useWishlist } from "@/app/contexts/WishlistContext";
 
 interface TrendingProductsClientProps {
   products: Product[];
@@ -18,6 +19,7 @@ export const TrendingProductsClient = ({ products }: TrendingProductsClientProps
   
   const { addToCart, isInCart } = useCart();
   const { user } = useAuth();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   // Filter only trending products
   const trendingProducts = productList.filter((p) => p.isTrending);
@@ -65,22 +67,38 @@ export const TrendingProductsClient = ({ products }: TrendingProductsClientProps
     }
   };
 
-  const handleToggleWishlist = (productId: string) => {
-    setProductList((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === productId
-          ? { ...product, is_in_wishlist: !product.is_in_wishlist }
-          : product
-      )
-    );
-    
+  const handleToggleWishlist = async (productId: string) => {
     const product = productList.find(p => p.id === productId);
-    if (product) {
-      console.log(
-        product.is_in_wishlist 
-          ? `Removed from wishlist: ${product.p_Name}` 
-          : `Added to wishlist: ${product.p_Name}`
-      );
+    if (!product) return;
+
+    try {
+      if (isInWishlist(productId)) {
+        const success = await removeFromWishlist(productId);
+        if (success) {
+          setProductList((prevProducts) =>
+            prevProducts.map((product) =>
+              product.id === productId
+                ? { ...product, is_in_wishlist: false }
+                : product
+            )
+          );
+          console.log(`Removed from wishlist: ${product.p_Name}`);
+        }
+      } else {
+        const success = await addToWishlist(productId);
+        if (success) {
+          setProductList((prevProducts) =>
+            prevProducts.map((product) =>
+              product.id === productId
+                ? { ...product, is_in_wishlist: true }
+                : product
+            )
+          );
+          console.log(`Added to wishlist: ${product.p_Name}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
     }
   };
 
