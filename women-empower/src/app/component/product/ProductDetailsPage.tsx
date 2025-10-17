@@ -5,6 +5,7 @@ import { productService } from "@/app/lib/productapi";
 import { Product } from "@/app/types/product";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
+import { useWishlist } from "@/app/contexts/WishlistContext";
 
 interface ProductDetailsPageProps {
   productId?: string;
@@ -21,6 +22,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
   
   const { addToCart, isInCart } = useCart();
   const { user } = useAuth();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   // Fetch product details when component mounts or productId changes
   useEffect(() => {
@@ -58,6 +60,13 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
     fetchProductDetails();
   }, [productId]);
 
+  // Update wishlist state when product changes
+  useEffect(() => {
+    if (product) {
+      setIsWishlisted(isInWishlist(product.id));
+    }
+  }, [product, isInWishlist]);
+
   const productImages: string[] = product?.p_images && product.p_images.length > 0 
     ? product.p_images 
     : product?.thumbnail 
@@ -84,6 +93,33 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
       alert(error instanceof Error ? error.message : 'Failed to add item to cart');
     } finally {
       setAddingToCart(false);
+    }
+  };
+
+  const handleToggleWishlist = async (): Promise<void> => {
+    if (!user) {
+      alert('Please login to manage wishlist');
+      return;
+    }
+
+    if (!product) {
+      alert('Product not found');
+      return;
+    }
+
+    try {
+      if (isInWishlist(product.id)) {
+        await removeFromWishlist(product.id);
+        setIsWishlisted(false);
+        console.log('Product removed from wishlist');
+      } else {
+        await addToWishlist(product.id);
+        setIsWishlisted(true);
+        console.log('Product added to wishlist');
+      }
+    } catch (error: unknown) {
+      console.error('Error toggling wishlist:', error);
+      alert(error instanceof Error ? error.message : 'Failed to update wishlist');
     }
   };
 
@@ -278,7 +314,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
                   </button>
                   
                   <button
-                    onClick={() => setIsWishlisted(!isWishlisted)}
+                    onClick={handleToggleWishlist}
                     className={`px-4 py-3 rounded-lg border transition-all duration-200 ${
                       isWishlisted
                         ? "border-red-200 bg-red-50 text-red-600"

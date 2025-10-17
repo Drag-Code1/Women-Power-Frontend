@@ -5,7 +5,13 @@ import {
   ChevronRight,
   Visibility,
 } from "@mui/icons-material";
+import { Heart, ShoppingCart } from "lucide-react";
 import "@/app/globals.css";
+import { getArtistProducts, ArtistProduct } from "@/app/lib/artistApi";
+import { useCart } from "@/app/contexts/CartContext";
+import { useWishlist } from "@/app/contexts/WishlistContext";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface ArtworkItem {
   p_Name: string;
@@ -19,73 +25,83 @@ interface ArtworkItem {
 
 interface ArtistWorkProps {
   artistId: string;
-  artworks?: ArtworkItem[];
 }
 
-const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId, artworks = [] }) => {
+const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId }) => {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [artworks, setArtworks] = useState<ArtistProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [addingToCart, setAddingToCart] = useState<string | null>(null);
+  
+  const { addToCart, isInCart } = useCart();
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
-  // If no artworks provided, use sample data with your structure
-  const sampleArtworks: ArtworkItem[] = artworks.length > 0 
-    ? artworks 
-    : [
-      {
-        p_Name: "beautiful",
-        thumbnail: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQdQBESsb7kwEVAH_xogjxKLR-YoBummE1-rA&s",
-        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6886",
-        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
-        price: "400.00",
-        discount: 5,
-        isTrending: false
-      },
-      {
-        p_Name: "traditional art",
-        thumbnail: "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=400&h=300&fit=crop",
-        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6887",
-        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
-        price: "500.00",
-        discount: 10,
-        isTrending: true
-      },
-      {
-        p_Name: "floral design",
-        thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop",
-        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6888",
-        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
-        price: "350.00",
-        discount: 0,
-        isTrending: false
-      },
-      {
-        p_Name: "geometric pattern",
-        thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&sat=-100",
-        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6889",
-        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
-        price: "450.00",
-        discount: 15,
-        isTrending: true
-      },
-      {
-        p_Name: "festival special",
-        thumbnail: "https://images.unsplash.com/photo-1604594849809-dfedbc827105?w=400&h=300&fit=crop&hue=rotate-90",
-        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6890",
-        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
-        price: "600.00",
-        discount: 20,
-        isTrending: true
-      },
-      {
-        p_Name: "modern rangoli",
-        thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400&h=300&fit=crop&hue=rotate-180",
-        category_id: "3ed5e785-e7e9-439c-b7a8-1f84b6fb6891",
-        artist_id: "98a1befd-f06f-45ee-aedf-17fbdf15e2f4",
-        price: "550.00",
-        discount: 5,
-        isTrending: false
+  // Fetch artist products on component mount
+  useEffect(() => {
+    const fetchArtistProducts = async () => {
+      try {
+        setLoading(true);
+        const products = await getArtistProducts(artistId);
+        setArtworks(products);
+      } catch (error) {
+        console.error('Error fetching artist products:', error);
+        setArtworks([]);
+      } finally {
+        setLoading(false);
       }
-    ];
+    };
+
+    if (artistId) {
+      fetchArtistProducts();
+    }
+  }, [artistId]);
+
+  // Handle add to cart
+  const handleAddToCart = async (product: ArtistProduct) => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      setAddingToCart(product.id);
+      await addToCart(product.id, 1);
+      console.log('Product added to cart successfully');
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+    } finally {
+      setAddingToCart(null);
+    }
+  };
+
+  // Handle wishlist toggle
+  const handleToggleWishlist = async (product: ArtistProduct) => {
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      if (isInWishlist(product.id)) {
+        await removeFromWishlist(product.id);
+        console.log('Product removed from wishlist');
+      } else {
+        await addToWishlist(product.id);
+        console.log('Product added to wishlist');
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+    }
+  };
+
+  // Handle view details
+  const handleViewDetails = (productId: string) => {
+    router.push(`/products-details?id=${productId}`);
+  };
 
   const checkScrollButtons = () => {
     if (scrollContainerRef.current) {
@@ -161,85 +177,142 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId, artworks = [] }) => {
             className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {sampleArtworks.map((artwork, index) => (
-              <div
-                key={index}
-                className="flex-shrink-0 w-64 bg-white rounded-2xl shadow-sm hover:shadow-xl 
-                         transition-all duration-300 overflow-hidden group"
-              >
-                {/* Image Container */}
-                <div className="relative overflow-hidden">
-                  <img
-                    src={artwork.thumbnail}
-                    alt={artwork.p_Name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-
-                  {/* Overlay Actions */}
-                  <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-30 
-                               transition-all duration-300 flex items-center justify-center">
-                    <button
-                      className="opacity-0 group-hover:opacity-100 bg-white text-gray-800 
-                               px-4 py-2 rounded-full font-semibold flex items-center gap-2
-                               transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
-                    >
-                      <Visibility fontSize="small" />
-                      View Details
-                    </button>
+            {loading ? (
+              // Loading skeleton
+              Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={index}
+                  className="flex-shrink-0 w-64 bg-white rounded-2xl shadow-sm overflow-hidden animate-pulse"
+                >
+                  <div className="w-full h-48 bg-gray-200"></div>
+                  <div className="p-4">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-6 bg-gray-200 rounded mb-3"></div>
+                    <div className="h-8 bg-gray-200 rounded"></div>
                   </div>
-
-                  {/* Trending Badge */}
-                  {artwork.isTrending && (
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                        Trending
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Discount Badge */}
-                  {artwork.discount > 0 && (
-                    <div className="absolute top-3 right-3">
-                      <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                        {artwork.discount}% OFF
-                      </span>
-                    </div>
-                  )}
                 </div>
+              ))
+            ) : artworks.length === 0 ? (
+              // Empty state
+              <div className="flex-shrink-0 w-full text-center py-8">
+                <p className="text-gray-500">No artworks found for this artist.</p>
+              </div>
+            ) : (
+              artworks.map((artwork, index) => (
+                <div
+                  key={artwork.id}
+                  className="flex-shrink-0 w-64 bg-white rounded-2xl shadow-sm hover:shadow-xl 
+                           transition-all duration-300 overflow-hidden group"
+                >
+                  {/* Image Container */}
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={artwork.thumbnail}
+                      alt={artwork.p_Name}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
 
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-800 text-lg mb-1 line-clamp-1">
-                    {artwork.p_Name}
-                  </h3>
+                    {/* Wishlist Button */}
+                    <button
+                      onClick={() => handleToggleWishlist(artwork)}
+                      className="absolute top-3 right-3 bg-white rounded-full p-1.5 shadow-sm hover:scale-110 transition-all"
+                      aria-label={isInWishlist(artwork.id) ? "Remove from wishlist" : "Add to wishlist"}
+                    >
+                      <Heart
+                        className={`w-4 h-4 transition-colors ${
+                          isInWishlist(artwork.id) ? "text-red-500 fill-red-500" : "text-gray-600"
+                        }`}
+                      />
+                    </button>
 
-                  {/* Price */}
-                  <div className="flex items-center gap-2 mb-3">
-                    {artwork.discount > 0 ? (
-                      <>
-                        <span className="text-lg font-bold text-gray-900">
-                          ₹{calculateDiscountedPrice(artwork.price, artwork.discount)}
+                    {/* Overlay Actions */}
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 
+                                 transition-all duration-300 flex items-center justify-center">
+                      <button
+                        onClick={() => handleViewDetails(artwork.id)}
+                        className="opacity-0 group-hover:opacity-100 bg-white text-gray-800 
+                                 px-4 py-2 rounded-full font-semibold flex items-center gap-2
+                                 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
+                      >
+                        <Visibility fontSize="small" />
+                        View Details
+                      </button>
+                    </div>
+
+                    {/* Trending Badge */}
+                    {artwork.isTrending && (
+                      <div className="absolute top-3 left-3">
+                        <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                          Trending
                         </span>
-                        <span className="text-sm text-gray-500 line-through">
-                          ₹{artwork.price}
+                      </div>
+                    )}
+
+                    {/* Discount Badge */}
+                    {artwork.discount > 0 && (
+                      <div className="absolute bottom-3 left-3">
+                        <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                          {artwork.discount}% OFF
                         </span>
-                      </>
-                    ) : (
-                      <span className="text-lg font-bold text-gray-900">
-                        ₹{artwork.price}
-                      </span>
+                      </div>
                     )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex items-center justify-center">
-                    <button className="bg-[#695946] hover:bg-[#61503c] text-white px-6 py-2 rounded-full text-sm font-semibold transition-all w-full">
-                      Order Now
-                    </button>
+                  {/* Content */}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-800 text-lg mb-1 line-clamp-1">
+                      {artwork.p_Name}
+                    </h3>
+
+                    {/* Price */}
+                    <div className="flex items-center gap-2 mb-3">
+                      {artwork.discount > 0 ? (
+                        <>
+                          <span className="text-lg font-bold text-gray-900">
+                            ₹{calculateDiscountedPrice(artwork.price, artwork.discount)}
+                          </span>
+                          <span className="text-sm text-gray-500 line-through">
+                            ₹{artwork.price}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-lg font-bold text-gray-900">
+                          ₹{artwork.price}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleAddToCart(artwork)}
+                        disabled={addingToCart === artwork.id}
+                        className={`flex-1 bg-[#695946] hover:bg-[#61503c] text-white px-4 py-2 rounded-full text-sm font-semibold transition-all flex items-center justify-center gap-1 ${
+                          addingToCart === artwork.id ? 'opacity-50 cursor-not-allowed' : ''
+                        } ${isInCart(artwork.id) ? 'bg-green-600 hover:bg-green-700' : ''}`}
+                      >
+                        {addingToCart === artwork.id ? (
+                          <>
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                            Adding...
+                          </>
+                        ) : isInCart(artwork.id) ? (
+                          <>
+                            <ShoppingCart className="w-3 h-3" />
+                            In Cart
+                          </>
+                        ) : (
+                          <>
+                            <ShoppingCart className="w-3 h-3" />
+                            Add to Cart
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>

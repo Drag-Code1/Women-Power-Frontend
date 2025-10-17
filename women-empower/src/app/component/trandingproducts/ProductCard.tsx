@@ -4,6 +4,7 @@ import React from "react";
 import { Heart, ShoppingCart, Check } from "lucide-react";
 import { Product } from "@/app/types/product";
 import { useWishlist } from "@/app/contexts/WishlistContext";
+import { useRouter } from "next/navigation";
 
 interface ProductCardProps {
   product: Product;
@@ -21,6 +22,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   addingToCart = false
 }) => {
   const { isInWishlist } = useWishlist();
+  const router = useRouter();
   
   // Calculate prices
   const originalPrice = parseFloat(product.price);
@@ -30,8 +32,25 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   const inCart = isInCart ? isInCart(product.id) : false;
   const inWishlist = isInWishlist(product.id) || product.is_in_wishlist;
 
+  const handleProductClick = () => {
+    router.push(`/products-details?id=${product.id}`);
+  };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onToggleWishlist?.(product.id);
+  };
+
+  const handleAddToCartClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onAddToCart?.(product);
+  };
+
   return (
-    <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden h-full flex flex-col">
+    <div 
+      className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden h-full flex flex-col cursor-pointer"
+      onClick={handleProductClick}
+    >
       {/* Product Image */}
       <div className="relative">
         <img
@@ -59,7 +78,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
         {/* Wishlist Button */}
         <button
-          onClick={() => onToggleWishlist?.(product.id)}
+          onClick={handleWishlistClick}
           className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm hover:scale-110"
           aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
         >
@@ -101,7 +120,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           </div>
           
           <button
-            onClick={() => onAddToCart?.(product)}
+            onClick={handleAddToCartClick}
             disabled={addingToCart}
             className={`flex items-center gap-1 px-4 py-2 rounded text-xs font-medium transition-all duration-200 ${
               inCart 
