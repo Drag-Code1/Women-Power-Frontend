@@ -43,7 +43,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
   const handleAddToCartClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToCart?.(product);
+    if (inCart) {
+      // If item is already in cart, navigate to cart page
+      router.push('/cart');
+    } else {
+      // If item is not in cart, add it to cart
+      onAddToCart?.(product);
+    }
   };
 
   return (

@@ -108,8 +108,8 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
  
         {(() => {
           const target = typeof window !== 'undefined' 
-            ? `/profile?returnUrl=${encodeURIComponent(window.location.pathname + window.location.search)}`
-            : '/profile';
+            ? `/login?returnUrl=${encodeURIComponent(window.location.pathname + window.location.search)}`
+            : '/login';
           return (
             <Link
               href={target}

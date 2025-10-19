@@ -37,15 +37,21 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    try {
-      setAddingToCart(true);
-      await addToCart(product.id, 1);
-      alert('Item added to cart successfully!');
-    } catch (error) {
-      console.error('Error adding to cart:', error);
-      alert(error instanceof Error ? error.message : 'Failed to add item to cart');
-    } finally {
-      setAddingToCart(false);
+    if (isInCartState) {
+      // If item is already in cart, navigate to cart page
+      router.push('/cart');
+    } else {
+      // If item is not in cart, add it to cart
+      try {
+        setAddingToCart(true);
+        await addToCart(product.id, 1);
+        alert('Item added to cart successfully!');
+      } catch (error) {
+        console.error('Error adding to cart:', error);
+        alert(error instanceof Error ? error.message : 'Failed to add item to cart');
+      } finally {
+        setAddingToCart(false);
+      }
     }
   };
 

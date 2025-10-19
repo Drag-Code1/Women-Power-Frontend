@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import EventCard from "./EventCard";
 import FeaturedEventsSlider from "./FeaturedEventsSlider";
 import EventFilters from "./EventFilters";
-import { getEventsApi, searchEventsApi, filterEventsApi } from "../../lib/api";
+import { getEventsApi, searchEventsApi } from "../../lib/api";
 
 interface Event {
   id: string;
@@ -30,67 +30,64 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
   const [currentPage, setCurrentPage] = useState(1);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [events, setEvents] = useState<Event[]>(initialEvents);
+  const [allEvents, setAllEvents] = useState<Event[]>(initialEvents);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const eventsPerPage = 12;
 
-  // Fetch events based on current filters and search
-  const fetchEvents = useCallback(async () => {
+  // Fetch all events once on component mount
+  const fetchAllEvents = useCallback(async () => {
     setLoading(true);
     setError(null);
     
     try {
-      let eventsData;
-      
-      // If there's a search term, use search API
-      if (searchTerm.trim()) {
-        const searchResults = await searchEventsApi(searchTerm.trim());
-        setEvents(searchResults);
-        return;
-      }
-      
-      // If there are filters, use filter API
-      if (selectedStatus !== "All") {
-        const filters: any = {};
-        
-        if (selectedStatus !== "All") {
-          filters.status = selectedStatus;
-        }
-        
-        const filterResults = await filterEventsApi(filters);
-        setEvents(filterResults);
-        return;
-      }
-      
-      // Default: fetch all events
-      eventsData = await getEventsApi();
+      const eventsData = await getEventsApi();
+      setAllEvents(eventsData);
       setEvents(eventsData);
-      
     } catch (err) {
       console.error('Error fetching events:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch events');
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, selectedStatus]);
+  }, []);
+
+  // Apply client-side filtering
+  const applyFilters = useCallback(() => {
+    let filteredEvents = [...allEvents];
+    
+    // If there's a search term, filter by search
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filteredEvents = filteredEvents.filter((event: Event) => 
+        event.title.toLowerCase().includes(searchLower) ||
+        event.description.toLowerCase().includes(searchLower) ||
+        event.keywords.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    // Filter by status
+    if (selectedStatus !== "All") {
+      filteredEvents = filteredEvents.filter((event: Event) => 
+        event.status === selectedStatus
+      );
+    }
+    
+    setEvents(filteredEvents);
+  }, [allEvents, searchTerm, selectedStatus]);
 
   useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
+    fetchAllEvents();
+  }, [fetchAllEvents]);
 
-  // Apply client-side filtering for display
-  const filteredEvents = useMemo(() => {
-    return events.filter((event) => {
-      const matchesSearch =
-        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesStatus =
-        selectedStatus === "All" || event.status === selectedStatus;
+  useEffect(() => {
+    applyFilters();
+    setCurrentPage(1);
+  }, [applyFilters]);
 
-      return matchesSearch && matchesStatus;
-    });
-  }, [searchTerm, selectedStatus, events]);
+  // Use the filtered events directly
+  const filteredEvents = events;
 
   const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
 
@@ -202,7 +199,7 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
                 {error}
               </p>
               <button
-                onClick={fetchEvents}
+                onClick={fetchAllEvents}
                 className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
               >
                 Try Again

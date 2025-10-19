@@ -112,7 +112,15 @@ const ProductCardNew: React.FC<ProductCardProps> = ({
           </div>
           
           <button
-            onClick={() => onAddToCart?.(product)}
+            onClick={() => {
+              if (inCart) {
+                // If item is already in cart, navigate to cart page
+                window.location.href = '/cart';
+              } else {
+                // If item is not in cart, add it to cart
+                onAddToCart?.(product);
+              }
+            }}
             disabled={addingToCart}
             className={`flex items-center gap-1 px-4 py-2 rounded text-xs font-medium transition-all duration-200 ${
               inCart 

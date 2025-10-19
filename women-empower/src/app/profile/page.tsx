@@ -1,10 +1,10 @@
-import ProfileSection from "../component/profile/ProfileSection";
+import ProfilePage from "../component/profile/ProfilePage";
 import { AuthProvider } from "../contexts/AuthContext";
 
-export default function ProfilePage() {
+export default function Profile() {
   return (
     <AuthProvider>
-      <ProfileSection />
+      <ProfilePage />
     </AuthProvider>
   );
 }
