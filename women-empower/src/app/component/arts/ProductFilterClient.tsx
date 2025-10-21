@@ -13,6 +13,7 @@ import ProductCard from "./ProductCard";
 import Filters from "./Filters";
 import Pagination from "./Pagination";
 import { searchProducts, filterProducts } from "../../api/products";
+import { useWishlist } from "../../contexts/WishlistContext";
 
 interface Category {
   id: string;
@@ -45,44 +46,14 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
   const [isMobile, setIsMobile] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [cart, setCart] = useState<CartItem>({});
-  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+  
+  // Use WishlistContext instead of local state
+  const { addToWishlist, removeFromWishlist, isInWishlist, isLoading: wishlistLoading } = useWishlist();
 
-  // Initialize wishlist from localStorage and product data
-  useEffect(() => {
-    // Get wishlist from localStorage or initialize from product data
-    const savedWishlist = localStorage.getItem('wishlist');
-    let initialWishlist: Set<string> = new Set();
-    
-    if (savedWishlist) {
-      try {
-        const parsedWishlist = JSON.parse(savedWishlist);
-        initialWishlist = new Set(parsedWishlist);
-      } catch (e) {
-        console.error("Error parsing wishlist from localStorage", e);
-      }
-    } else {
-      // Initialize from product data
-      initialProducts.forEach(product => {
-        if (product.is_in_wishlist) {
-          initialWishlist.add(product.id);
-        }
-      });
-    }
-    
-    setWishlist(initialWishlist);
-  }, [initialProducts]);
-
-  // Save wishlist to localStorage whenever it changes
-  useEffect(() => {
-    if (wishlist.size > 0) {
-      localStorage.setItem('wishlist', JSON.stringify(Array.from(wishlist)));
-    } else {
-      localStorage.removeItem('wishlist');
-    }
-  }, [wishlist]);
+  // Wishlist is now managed by WishlistContext
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
@@ -168,17 +139,18 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
 
   // Remove local cart functions since we're using CartContext now
 
-  const toggleWishlist = useCallback((productId: string) => {
-    setWishlist(prev => {
-      const newWishlist = new Set(prev);
-      if (newWishlist.has(productId)) {
-        newWishlist.delete(productId);
+  const toggleWishlist = useCallback(async (productId: string) => {
+    try {
+      if (isInWishlist(productId)) {
+        await removeFromWishlist(productId);
       } else {
-        newWishlist.add(productId);
+        await addToWishlist(productId);
       }
-      return newWishlist;
-    });
-  }, []);
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+      alert('Failed to update wishlist. Please try again.');
+    }
+  }, [addToWishlist, removeFromWishlist, isInWishlist]);
 
   const totalCartItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
 
@@ -446,8 +418,9 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
                               >
                                 <ProductCard 
                                   product={product}
-                                  wishlist={wishlist}
+                                  isInWishlist={isInWishlist(product.id)}
                                   toggleWishlist={toggleWishlist}
+                                  wishlistLoading={wishlistLoading}
                                 />
                               </div>
                             ))}

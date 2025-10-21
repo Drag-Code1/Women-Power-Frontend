@@ -63,7 +63,7 @@ const ProfilePopUp: React.FC<ProfilePopUpProps> = ({
             />
             <div>
               <h2 className="font-semibold text-gray-800">
-                Hey {userName || 'User'} 👋
+                {userName || 'User'}
               </h2>
             </div>
           </div>

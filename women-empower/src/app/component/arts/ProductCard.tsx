@@ -10,14 +10,16 @@ import { useAuth } from "@/app/contexts/AuthContext";
 
 interface ProductCardProps {
   product: Product;
-  wishlist: Set<string>;
-  toggleWishlist: (id: string) => void;
+  isInWishlist: boolean;
+  toggleWishlist: (id: string) => Promise<void>;
+  wishlistLoading?: boolean;
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
-  wishlist,
-  toggleWishlist
+  isInWishlist,
+  toggleWishlist,
+  wishlistLoading = false
 }) => {
   const router = useRouter();
   const { addToCart, isInCart, getCartItemQuantity } = useCart();
@@ -28,7 +30,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const discountedPrice = priceNum - (priceNum * product.discount / 100);
   const cartQuantity = getCartItemQuantity(product.id);
   const isInCartState = isInCart(product.id);
-  const isInWishlist = wishlist.has(product.id);
 
   const handleProductClick = () => {
     router.push(`/products-details?id=${product.id}`);
@@ -77,11 +78,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
         )}
 
         <button
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
-            toggleWishlist(product.id);
+            if (!wishlistLoading) {
+              await toggleWishlist(product.id);
+            }
           }}
-          className="absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm hover:scale-110"
+          disabled={wishlistLoading}
+          className={`absolute top-2 right-2 transition-colors bg-white rounded-full p-1.5 shadow-sm hover:scale-110 ${
+            wishlistLoading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
         >
           <Heart
             className={`w-4 h-4 transition-colors ${

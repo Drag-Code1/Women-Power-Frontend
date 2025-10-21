@@ -6,6 +6,7 @@ import { Product } from "@/app/types/product";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useWishlist } from "@/app/contexts/WishlistContext";
+import { getCategoryDetailsApi, getArtistDetailsApi } from "@/app/lib/api";
 
 interface ProductDetailsPageProps {
   productId?: string;
@@ -19,6 +20,8 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [addingToCart, setAddingToCart] = useState<boolean>(false);
+  const [categoryName, setCategoryName] = useState<string>('');
+  const [artistName, setArtistName] = useState<string>('');
   
   const { addToCart, isInCart } = useCart();
   const { user } = useAuth();
@@ -46,6 +49,27 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
             isTrending: productData.isTrending ?? false
           };
           setProduct(normalizedProduct);
+
+          // Fetch category and artist names
+          try {
+            if (productData.category_id) {
+              const categoryData = await getCategoryDetailsApi(productData.category_id);
+              setCategoryName(categoryData?.name || 'Unknown Category');
+            }
+          } catch (err) {
+            console.warn('Error fetching category details:', err);
+            setCategoryName('Unknown Category');
+          }
+
+          try {
+            if (productData.artist_id) {
+              const artistData = await getArtistDetailsApi(productData.artist_id);
+              setArtistName(artistData?.artist_Name || 'Unknown Artist');
+            }
+          } catch (err) {
+            console.warn('Error fetching artist details:', err);
+            setArtistName('Unknown Artist');
+          }
         } else {
           setError('Product not found');
         }
@@ -360,18 +384,14 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
           {/* Product Information Section */}
           <div className="border-t border-gray-200 pt-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Product Information</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500 mb-1">Product ID</p>
-                <p className="text-gray-900 font-medium">{product.id || 'PRD-2023-0547'}</p>
+                <p className="text-sm text-gray-500 mb-1">Category</p>
+                <p className="text-gray-900 font-medium">{categoryName || 'Loading...'}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500 mb-1">Category ID</p>
-                <p className="text-gray-900 font-medium">{product.category_id || 'CAT-FLW-001'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 mb-1">Artist ID</p>
-                <p className="text-gray-900 font-medium">{product.artist_id || 'ART-FLW-017'}</p>
+                <p className="text-sm text-gray-500 mb-1">Artist</p>
+                <p className="text-gray-900 font-medium">{artistName || 'Loading...'}</p>
               </div>
             </div>
           </div>
