@@ -35,13 +35,12 @@ export const getCategoryDetailsApi = async (categoryId: string) => {
 export const createCategory = async (payload: { name: string; image?: string }) => {
   // Use auth header for admin-only endpoint and force static image URL
   const { getAuthHeaders } = await import('./authApi');
-  const STATIC_IMAGE_URL = 'https://mybucket.r2.cloudflarestorage.com/images/dance/dance.jpg';
   const res = await fetch('http://localhost:5000/v1/category/', {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({
       name: payload.name,
-      image: STATIC_IMAGE_URL,
+      image: payload.image,
     }),
   });
   const body = await res.json();

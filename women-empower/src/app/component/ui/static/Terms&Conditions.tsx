@@ -98,8 +98,8 @@ const TermsConditionsPage: React.FC = () => {
               support team before making any commitments or purchases.
             </p>
             <div className="mt-4">
-              <button className="px-6 py-2 rounded-lg font-medium bg-[#817363] hover:bg-[#61503c] text-white transition-colors">
-                Contact Support
+              <button  className="px-6 py-2 rounded-lg font-medium bg-[#817363] hover:bg-[#61503c] text-white transition-colors">
+                <a href="/contact">Contact Support</a>
               </button>
             </div>
           </div>

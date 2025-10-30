@@ -1,8 +1,12 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
-import { Category, ModalType, CategoryFormData } from '@/app/types/dashboardcategory';
+import React, { useState, useEffect } from "react";
+import { X } from "lucide-react";
+import {
+  Category,
+  ModalType,
+  CategoryFormData,
+} from "@/app/types/dashboardcategory";
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -19,16 +23,19 @@ export default function CategoryModal({
   onClose,
   onSubmit,
 }: CategoryModalProps) {
-  const [formData, setFormData] = useState<CategoryFormData>({ name: '', image: '' });
-  const [previewImage, setPreviewImage] = useState<string>('');
+  const [formData, setFormData] = useState<CategoryFormData>({
+    name: "",
+    image: "",
+  });
+  const [previewImage, setPreviewImage] = useState<string>("");
 
   useEffect(() => {
     if (category) {
       setFormData({ name: category.name, image: category.image });
       setPreviewImage(category.image);
     } else {
-      setFormData({ name: '', image: '' });
-      setPreviewImage('');
+      setFormData({ name: "", image: "" });
+      setPreviewImage("");
     }
   }, [category, isOpen]);
 
@@ -57,9 +64,9 @@ export default function CategoryModal({
       <div className="bg-white h-full w-full md:w-[500px] shadow-2xl overflow-y-auto animate-slideInRight">
         <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white z-10">
           <h2 className="text-xl font-bold text-gray-800">
-            {modalType === 'create' && 'Add New Category'}
-            {modalType === 'edit' && 'Edit Category'}
-            {modalType === 'view' && 'View Category'}
+            {modalType === "create" && "Add New Category"}
+            {modalType === "edit" && "Edit Category"}
+            {modalType === "view" && "View Category"}
           </h2>
           <button
             onClick={onClose}
@@ -70,7 +77,7 @@ export default function CategoryModal({
         </div>
 
         <div className="p-6">
-          {modalType === 'view' ? (
+          {modalType === "view" ? (
             <div className="space-y-6">
               <div>
                 <img
@@ -81,7 +88,9 @@ export default function CategoryModal({
               </div>
               <div>
                 <p className="text-sm text-gray-600 mb-2">Category Name</p>
-                <p className="text-2xl font-semibold text-gray-800">{category?.name}</p>
+                <p className="text-2xl font-semibold text-gray-800">
+                  {category?.name}
+                </p>
               </div>
             </div>
           ) : (
@@ -93,7 +102,9 @@ export default function CategoryModal({
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter category name"
                 />
@@ -119,17 +130,33 @@ export default function CategoryModal({
                           alt="Preview"
                           className="w-full h-64 object-cover rounded-lg"
                         />
-                        <p className="text-sm text-blue-600 font-medium">Click to change image</p>
+                        <p className="text-sm text-blue-600 font-medium">
+                          Click to change image
+                        </p>
                       </div>
                     ) : (
                       <div className="space-y-3">
                         <div className="text-gray-400">
-                          <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <svg
+                            className="mx-auto h-12 w-12"
+                            stroke="currentColor"
+                            fill="none"
+                            viewBox="0 0 48 48"
+                          >
+                            <path
+                              d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
                           </svg>
                         </div>
-                        <p className="text-sm text-gray-600">Click to upload image</p>
-                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                        <p className="text-sm text-gray-600">
+                          Click to upload image
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          PNG, JPG, GIF up to 10MB
+                        </p>
                       </div>
                     )}
                   </label>
@@ -143,16 +170,16 @@ export default function CategoryModal({
               onClick={onClose}
               className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
             >
-              {modalType === 'view' ? 'Close' : 'Cancel'}
+              {modalType === "view" ? "Close" : "Cancel"}
             </button>
-            {modalType !== 'view' && (
+            {modalType !== "view" && (
               <button
                 onClick={handleSubmit}
                 // backend uses a static image URL; only require name here
                 disabled={!formData.name}
                 className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
-                {modalType === 'create' ? 'Create' : 'Update'}
+                {modalType === "create" ? "Create" : "Update"}
               </button>
             )}
           </div>

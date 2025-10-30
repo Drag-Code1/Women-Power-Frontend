@@ -1,4 +1,3 @@
-
 // types/category.ts
 export interface Category {
   id: string;
@@ -6,9 +5,9 @@ export interface Category {
   image: string;
 }
 
-export type ModalType = 'create' | 'edit' | 'view';
+export type ModalType = "create" | "edit" | "view";
 
 export interface CategoryFormData {
   name: string;
-  image: string;
+  image: string | File;
 }

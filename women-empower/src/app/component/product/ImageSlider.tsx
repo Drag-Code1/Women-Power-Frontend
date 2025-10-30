@@ -9,7 +9,7 @@ interface ImageSliderProps {
 }
 
 const ImageSlider: React.FC<ImageSliderProps> = ({
-  images = ["/images/slider1.PNG", "/images/slider2.PNG", "/images/slider1.PNG"],
+  images =  ["/images/Banner1.jpeg", "/images/Banner2.jpeg", "/images/Banner3.jpeg", "/images/Banner4.jpeg"],
   interval = 4000,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);

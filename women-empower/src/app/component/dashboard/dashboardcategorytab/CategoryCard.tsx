@@ -1,35 +1,73 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
-import { Category, ModalType } from '@/app/types/dashboardcategory';
-import Image from 'next/image';
+import React, { useState, useEffect } from "react";
+import { MoreVertical, Eye, Edit2, Trash2 } from "lucide-react";
+import { Category } from "@/app/types/dashboardcategory";
+import { getFromR2 } from "@/app/lib/utils/r2Client";
 
 interface CategoryCardProps {
   category: Category;
   onView: (category: Category) => void;
   onEdit: (category: Category) => void;
-  onDelete: (id: string) => void;
+  onDelete: (id: string, image: string) => void; // ✅ updated
 }
 
-export default function CategoryCard({ category, onView, onEdit, onDelete }: CategoryCardProps) {
+export default function CategoryCard({
+  category,
+  onView,
+  onEdit,
+  onDelete,
+}: CategoryCardProps) {
   const [openDropdown, setOpenDropdown] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string>("");
+  const [isDeleting, setIsDeleting] = useState(false); // optional UX improvement
 
-  const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this category?')) {
-      onDelete(category.id);
+  useEffect(() => {
+    async function fetchImage() {
+      try {
+        console.log("Fetching image for:", category.image);
+        const url = await getFromR2(category.image);
+        console.log("Fetched access URL:", url);
+        setImageUrl(url);
+      } catch (err) {
+        console.error("❌ Failed to load image from R2:", err);
+      }
     }
-    setOpenDropdown(false);
+
+    if (category.image) {
+      fetchImage();
+    } else {
+      console.warn("⚠️ category.image is empty:", category);
+    }
+  }, [category.image]);
+
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
+
+    setIsDeleting(true);
+    try {
+      onDelete(category.id, category.image); // ✅ now passing both
+    } finally {
+      setIsDeleting(false);
+      setOpenDropdown(false);
+    }
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-visible hover:shadow-lg transition relative">
       <div className="relative h-48">
-        <img
-          src={category.image}
-          alt={category.name}
-          className="w-full h-full object-cover"
-        />
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={category.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">
+            Loading...
+          </div>
+        )}
+
         <div className="absolute top-2 right-2">
           <button
             onClick={() => setOpenDropdown(!openDropdown)}
@@ -62,10 +100,13 @@ export default function CategoryCard({ category, onView, onEdit, onDelete }: Cat
               </button>
               <button
                 onClick={handleDelete}
-                className="w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-gray-50 transition rounded-b-lg"
+                disabled={isDeleting}
+                className="w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-gray-50 transition rounded-b-lg disabled:opacity-50"
               >
                 <Trash2 size={16} className="text-red-600" />
-                <span className="text-sm text-gray-700">Delete</span>
+                <span className="text-sm text-gray-700">
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </span>
               </button>
             </div>
           )}

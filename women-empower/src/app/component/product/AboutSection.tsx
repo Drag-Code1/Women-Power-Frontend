@@ -27,7 +27,7 @@ export default function AboutSection() {
                 <div className="order-2 lg:order-1">
                   <div className="relative w-full h-80 lg:h-96 overflow-hidden rounded-xl shadow-lg bg-white">
                     <Image
-                      src="/images/rangoli1.jpg"
+                      src="/images/rangoli11.jpg"
                       alt="Sonali Thaakkar WEJ"
                       width={700}
                       height={450}

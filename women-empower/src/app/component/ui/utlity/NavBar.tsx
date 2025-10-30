@@ -116,7 +116,7 @@ const NavBar: React.FC = () => {
           <SearchOutlined className="text-white mr-2" />
           <input
             type="text"
-            placeholder="Search for products, artists..."
+            placeholder="Search for products..."
             className="flex-1 bg-transparent outline-none text-white placeholder-gray-300 text-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

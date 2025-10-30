@@ -84,7 +84,7 @@ const FAQ: React.FC<FAQProps> = ({
           <p className="text-gray-600 text-sm">
             Still have questions?
             <a
-              href="/contactus"
+              href="/contact"
               className="text-[#61503c] font-medium ml-1 underline"
             >
               Contact us
