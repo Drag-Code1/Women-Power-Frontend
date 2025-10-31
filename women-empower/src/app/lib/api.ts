@@ -9,7 +9,15 @@ export const fetchArtists = async () => {
 export const getCategoriesApi = async () => {
   const res = await fetch('http://localhost:5000/v1/category/', { cache: 'no-store' });
   const body = await res.json();
-  return body.data;
+  const list = body.data || [];
+  try {
+    const { buildR2PublicUrl } = await import('./utils/dashboardartist-utils');
+    return Array.isArray(list)
+      ? list.map((c: any) => ({ ...c, image: buildR2PublicUrl(c?.image || '') }))
+      : list;
+  } catch {
+    return list;
+  }
 };
 
 // Get category details by ID

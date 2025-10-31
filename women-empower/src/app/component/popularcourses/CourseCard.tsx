@@ -4,6 +4,8 @@ import React from 'react';
 import { Play, BookOpen } from 'lucide-react';
 import { Course } from '@/app/types/course';
 import { useCategoryDetails } from "../../hooks/useCategoryDetails";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface CourseCardProps {
   course: Course;
@@ -18,8 +20,9 @@ export const CourseCard = ({ course }: CourseCardProps) => {
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group h-full flex flex-col">
       {/* Thumbnail */}
       <div className="relative overflow-hidden h-40 flex-shrink-0 bg-gray-200">
-        <img 
+        <R2Image 
           src={course.thumbnail} 
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={course.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
         />
