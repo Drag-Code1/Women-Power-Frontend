@@ -49,6 +49,11 @@ export async function getWishListItems(userId?: string): Promise<WishListItem[]>
       },
     });
 
+    // Treat unauthorized/forbidden as empty wishlist without logging an error
+    if (response.status === 401 || response.status === 403) {
+      return [];
+    }
+
     if (!response.ok) {
       console.error('Failed to fetch wishlist:', response.status, response.statusText);
       return [];
@@ -76,7 +81,8 @@ export async function getWishListItems(userId?: string): Promise<WishListItem[]>
 
     return wishlistItems;
   } catch (error) {
-    console.error('Error fetching wishlist items:', error);
+    // Network or parsing error; keep console noise low
+    console.warn('Wishlist fetch error (network/parsing):', error);
     return [];
   }
 }
@@ -111,6 +117,11 @@ export async function addToWishlist(productId: string, userId?: string): Promise
       }),
     });
 
+    // Gracefully handle unauthorized/forbidden
+    if (response.status === 401 || response.status === 403) {
+      return false;
+    }
+
     if (!response.ok) {
       console.error('Failed to add to wishlist:', response.status, response.statusText);
       return false;
@@ -119,7 +130,7 @@ export async function addToWishlist(productId: string, userId?: string): Promise
     const data = await response.json();
     return data.success || false;
   } catch (error) {
-    console.error('Error adding to wishlist:', error);
+    console.warn('Wishlist add error (network/parsing):', error);
     return false;
   }
 }
@@ -141,6 +152,11 @@ export async function removeFromWishlist(wishlistItemId: string): Promise<boolea
       },
     });
 
+    // Gracefully handle unauthorized/forbidden
+    if (response.status === 401 || response.status === 403) {
+      return false;
+    }
+
     if (!response.ok) {
       console.error('Failed to remove from wishlist:', response.status, response.statusText);
       return false;
@@ -149,7 +165,7 @@ export async function removeFromWishlist(wishlistItemId: string): Promise<boolea
     const data = await response.json();
     return data.success || false;
   } catch (error) {
-    console.error('Error removing from wishlist:', error);
+    console.warn('Wishlist remove error (network/parsing):', error);
     return false;
   }
 }
