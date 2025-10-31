@@ -1,6 +1,8 @@
 // app/courses/CourseCard.tsx
 "use client";
 import React from "react";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface Course {
   id: string;
@@ -26,8 +28,9 @@ const CourseCard = ({ course }: { course: Course }) => {
     <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100 overflow-hidden group h-full flex flex-col">
       {/* Thumbnail - Fixed Height */}
       <div className="relative overflow-hidden h-40 flex-shrink-0 bg-gray-200">
-        <img 
+        <R2Image 
           src={course.thumbnail} 
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={course.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
         />

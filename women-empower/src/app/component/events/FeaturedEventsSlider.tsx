@@ -2,6 +2,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface Event {
   id: string;
@@ -44,8 +46,9 @@ const FeaturedEventsSlider: React.FC<FeaturedEventsSliderProps> = ({
     <div className="mb-12">
       <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="relative h-80 md:h-85">
-          <img 
+          <R2Image 
             src={featuredEvents[currentBanner]?.banner} 
+            fallbackSrc={DEFAULT_THUMBNAIL}
             alt={featuredEvents[currentBanner]?.title}
             className="w-full h-full object-cover"
           />

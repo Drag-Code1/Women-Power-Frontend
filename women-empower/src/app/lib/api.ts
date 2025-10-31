@@ -221,7 +221,18 @@ export const getCoursesApi = async () => {
     (error as any).details = parsed;
     throw error;
   }
-  return parsed.data;
+  const list = parsed.data || [];
+  try {
+    const { buildR2PublicUrl } = await import('./utils/dashboardartist-utils');
+    return Array.isArray(list)
+      ? list.map((c: any) => ({
+          ...c,
+          thumbnail: buildR2PublicUrl(c?.thumbnail || ''),
+        }))
+      : list;
+  } catch {
+    return list;
+  }
 };
 
 // Search courses by title, coordinator, or description

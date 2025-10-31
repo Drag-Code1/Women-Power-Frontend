@@ -2,6 +2,8 @@
 "use client";
 import React from "react";
 import { Calendar, Clock } from "lucide-react";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface Event {
   id: string;
@@ -35,8 +37,9 @@ const EventCard: React.FC<EventCardProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 border border-gray-100 group flex flex-col">
       <div className="relative">
-        <img 
+        <R2Image 
           src={cardImage} 
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={event.title}
           className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300"
         />
