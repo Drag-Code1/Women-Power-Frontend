@@ -95,7 +95,8 @@ export const useCourseManagement = (initialCourses: Course[]) => {
           return;
         }
         const payload = {
-          thumbnail: STATIC_COURSE_THUMBNAIL,
+          // Send the selected preview (data URL) so API helper uploads to R2 and sends only the key
+          thumbnail: thumbnailPreview || formData.thumbnail || '',
           course_coordinator: formData.coordinator,
           category_id: categoryId,
           title: formData.title || formData.courseName,
@@ -135,7 +136,7 @@ export const useCourseManagement = (initialCourses: Course[]) => {
           return;
         }
         const payload = {
-          thumbnail: STATIC_COURSE_THUMBNAIL,
+          thumbnail: thumbnailPreview || formData.thumbnail || '',
           course_coordinator: formData.coordinator,
           category_id: categoryId,
           title: formData.title || formData.courseName,

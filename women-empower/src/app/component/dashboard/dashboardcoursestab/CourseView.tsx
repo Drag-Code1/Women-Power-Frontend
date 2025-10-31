@@ -1,6 +1,8 @@
 // components/CourseView.tsx
 'use client';
 import React from 'react';
+import R2Image from '../dashboardallproductstab/R2Image';
+import { DEFAULT_THUMBNAIL } from '@/app/data/dashboardproductdata';
 import { Course } from '@/app/types/dashboardcoursetab';
 
 interface CourseViewProps {
@@ -10,8 +12,9 @@ interface CourseViewProps {
 const CourseView: React.FC<CourseViewProps> = ({ course }) => {
   return (
     <div className="space-y-6">
-      <img 
+      <R2Image 
         src={course.thumbnail} 
+        fallbackSrc={DEFAULT_THUMBNAIL}
         alt={course.courseName} 
         className="w-full h-64 object-cover rounded-lg" 
       />

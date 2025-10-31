@@ -307,10 +307,20 @@ export const createCourse = async (payload: {
   discount: number;
 }) => {
   const { getAuthHeaders } = await import('./authApi');
+  // If thumbnail is a data URL, upload to R2 and keep only the key
+  let thumbKey = payload.thumbnail || '';
+  const isDataUrl = (v?: string) => !!v && /^data:\\w+\/[\\w.+-]+;base64,/.test(v);
+  // Runtime-safe version (no extra escaping)
+  const _isDataUrl = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
+  if (thumbKey && (isDataUrl(thumbKey) || _isDataUrl(thumbKey))) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploaded = await uploadToR2(thumbKey);
+    thumbKey = uploaded.key;
+  }
   const res = await fetch('http://localhost:5000/v1/course/', {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...payload, thumbnail: thumbKey }),
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -344,10 +354,18 @@ export const updateCourse = async (
   }
 ) => {
   const { getAuthHeaders } = await import('./authApi');
+  let thumbKey = payload.thumbnail || '';
+  const isDataUrl2 = (v?: string) => !!v && /^data:\\w+\/[\\w.+-]+;base64,/.test(v);
+  const _isDataUrl2 = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
+  if (thumbKey && (isDataUrl2(thumbKey) || _isDataUrl2(thumbKey))) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploaded = await uploadToR2(thumbKey);
+    thumbKey = uploaded.key;
+  }
   const res = await fetch(`http://localhost:5000/v1/course/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ ...payload, thumbnail: thumbKey }),
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;

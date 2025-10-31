@@ -4,6 +4,8 @@ import React from "react";
 import { MoreVertical, Eye, Edit2, Trash2, Tag } from "lucide-react";
 import { Course } from "@/app/types/dashboardcoursetab";
 import { calculateDiscountedPrice } from "@/app/lib/utils/dashboardcourse-utils";
+import R2Image from "../dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface CourseCardProps {
   course: Course;
@@ -29,8 +31,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
     >
       {/* Image Section */}
       <div className="relative overflow-hidden">
-        <img
+        <R2Image
           src={course.thumbnail}
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={course.courseName}
           className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
         />
