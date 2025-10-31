@@ -3,6 +3,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Course, ModalMode } from '@/app/types/dashboardcoursetab';
+import R2Image from "../dashboardallproductstab/R2Image";
 
 interface CourseFormProps {
   formData: Course;
@@ -59,7 +60,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
           </div>
           {thumbnailPreview && (
             <div className="relative w-full h-48 rounded-lg overflow-hidden border-2 border-gray-200">
-              <img src={thumbnailPreview} alt="Preview" className="w-full h-full object-cover" />
+              <R2Image src={thumbnailPreview} alt="Preview" className="w-full h-full object-cover" />
               <button
                 onClick={onImageRemove}
                 className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors"

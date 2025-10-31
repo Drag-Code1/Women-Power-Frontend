@@ -5,6 +5,7 @@ import { ImagePlus, X } from "lucide-react";
 import { ProductFormData } from "@/app/types/dashboardproduct";
 import { getArtistsApi, getCategoriesApi } from "@/app/lib/api";
 import { calculateDiscountedPrice, formatCategoryName } from "@/app/lib/utils/dashboardproduct-utils";
+import R2Image from "./R2Image";
 
 interface DrawerFormModeProps {
   formData: ProductFormData;
@@ -76,7 +77,7 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
           
           {thumbnailPreview ? (
             <div className="relative w-full h-48">
-              <img
+              <R2Image
                 src={thumbnailPreview}
                 alt="Thumbnail Preview"
                 className="w-full h-full object-cover rounded-lg"
@@ -133,7 +134,7 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
               
               {imagePreview[index] ? (
                 <div className="relative w-full h-32">
-                  <img
+                  <R2Image
                     src={imagePreview[index]}
                     alt={`Preview ${index + 1}`}
                     className="w-full h-full object-cover rounded-lg"

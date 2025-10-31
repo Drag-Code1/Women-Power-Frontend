@@ -1,6 +1,7 @@
 // components/artist/ArtistFormView.tsx
 import { Upload, User } from 'lucide-react';
 import { ArtistFormData } from '@/app/types/dashboard-artist-tab';
+import R2Image from "../dashboardallproductstab/R2Image";
 
 interface ArtistFormViewProps {
   formData: ArtistFormData;
@@ -26,7 +27,7 @@ export default function ArtistFormView({
         <div className="flex flex-col items-center gap-4">
           <div className="h-32 w-32 rounded-full overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300">
             {imagePreview ? (
-              <img 
+              <R2Image 
                 src={imagePreview} 
                 alt="Preview"
                 className="h-full w-full object-cover"

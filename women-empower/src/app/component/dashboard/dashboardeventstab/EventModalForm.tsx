@@ -3,6 +3,7 @@ import React, { useRef } from 'react';
 import { X, ImageIcon, Upload } from 'lucide-react';
 import { EVENT_CATEGORIES } from '@/app/data/dashboardeventsdata';
 import type { EventFormData, ModalMode } from '@/app/types/dashboardeventtab';
+import R2Image from "../dashboardallproductstab/R2Image";
 
 interface EventModalFormProps {
   formData: EventFormData;
@@ -54,7 +55,7 @@ export const EventModalForm: React.FC<EventModalFormProps> = ({
         >
           {thumbnailPreview ? (
             <div className="relative">
-              <img src={thumbnailPreview} alt="Thumbnail preview" className="w-full h-48 object-cover rounded-lg" />
+              <R2Image src={thumbnailPreview} alt="Thumbnail preview" className="w-full h-48 object-cover rounded-lg" />
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -91,7 +92,7 @@ export const EventModalForm: React.FC<EventModalFormProps> = ({
         >
           {bannerPreview ? (
             <div className="relative">
-              <img src={bannerPreview} alt="Banner preview" className="w-full h-32 object-cover rounded-lg" />
+              <R2Image src={bannerPreview} alt="Banner preview" className="w-full h-32 object-cover rounded-lg" />
               <button
                 onClick={(e) => {
                   e.stopPropagation();

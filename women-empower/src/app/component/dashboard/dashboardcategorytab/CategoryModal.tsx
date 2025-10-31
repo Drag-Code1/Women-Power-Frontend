@@ -7,6 +7,7 @@ import {
   ModalType,
   CategoryFormData,
 } from "@/app/types/dashboardcategory";
+import R2Image from "../dashboardallproductstab/R2Image";
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -80,7 +81,7 @@ export default function CategoryModal({
           {modalType === "view" ? (
             <div className="space-y-6">
               <div>
-                <img
+                <R2Image
                   src={category?.image}
                   alt={category?.name}
                   className="w-full h-80 object-cover rounded-lg"
@@ -125,7 +126,7 @@ export default function CategoryModal({
                   <label htmlFor="image-upload" className="cursor-pointer">
                     {previewImage ? (
                       <div className="space-y-4">
-                        <img
+                        <R2Image
                           src={previewImage}
                           alt="Preview"
                           className="w-full h-64 object-cover rounded-lg"

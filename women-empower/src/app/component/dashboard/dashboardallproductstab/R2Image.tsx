@@ -10,7 +10,8 @@ interface R2ImageProps {
   fallbackSrc?: string;
 }
 
-const isHttp = (val?: string) => !!val && /^https?:\/\//i.test(val);
+// Treat http(s), data URLs and blob URLs as directly renderable
+const isDirectUrl = (val?: string) => !!val && /^(https?:|data:|blob:)/i.test(val);
 
 export default function R2Image({ src, alt = "", className = "", fallbackSrc = "" }: R2ImageProps) {
   const [resolved, setResolved] = useState<string | null>(null);
@@ -18,7 +19,7 @@ export default function R2Image({ src, alt = "", className = "", fallbackSrc = "
 
   const candidate = useMemo(() => {
     if (!src) return "";
-    if (isHttp(src)) return src;
+    if (isDirectUrl(src)) return src;
     return buildR2PublicUrl(src);
   }, [src]);
 
@@ -30,7 +31,7 @@ export default function R2Image({ src, alt = "", className = "", fallbackSrc = "
         setFinalSrc(fallbackSrc || "");
         return;
       }
-      if (isHttp(candidate)) {
+      if (isDirectUrl(candidate)) {
         setResolved(candidate);
         setFinalSrc(candidate);
         return;
@@ -54,7 +55,7 @@ export default function R2Image({ src, alt = "", className = "", fallbackSrc = "
   const handleError = async () => {
     try {
       const base = (typeof process !== 'undefined' && process.env && (process.env.NEXT_PUBLIC_R2_PUBLIC_BASE as string)) || '';
-      const looksLikeKey = !!src && !isHttp(src);
+      const looksLikeKey = !!src && !isDirectUrl(src);
       const isFromBase = !!base && typeof finalSrc === 'string' && finalSrc.startsWith(base);
       let key: string | null = null;
       if (looksLikeKey) key = String(src);
