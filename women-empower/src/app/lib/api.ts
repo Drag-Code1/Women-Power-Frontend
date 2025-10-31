@@ -511,6 +511,8 @@ export const fetchEvents = async () => {
 }
 
 // Events API (v1)
+import { buildR2PublicUrl } from './utils/dashboardartist-utils';
+
 export const getEventsV1 = async () => {
   const res = await fetch('http://localhost:5000/v1/event/', { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
@@ -531,14 +533,14 @@ export const getEventsV1 = async () => {
   // Normalize to dashboard Event type
   return list.map((it: any) => ({
     id: it.id,
-    thumbnail: it.e_image || '',
+    thumbnail: buildR2PublicUrl(it.e_image || ''),
     category: it.category_id || '',
     title: it.title || '',
     description: it.description || '',
     dateTime: it.date_time || '',
     status: (it.status || 'upcoming'),
     keywords: typeof it.keywords === 'string' ? it.keywords.split(',').map((k: string) => k.trim()).filter(Boolean) : Array.isArray(it.keywords) ? it.keywords : [],
-    banner: it.banner || undefined,
+    banner: buildR2PublicUrl(it.banner || undefined),
   }));
 };
 
@@ -668,13 +670,28 @@ export const createEventV1 = async (
   }
 ) => {
   const { getAuthHeaders } = await import('./authApi');
+  // Upload data-URL images to R2 and send keys
+  let imgKey = payload.e_image || '';
+  let bannerKey = payload.banner || '';
+  const isDataUrl = (v?: string) => !!v && /^data:\\w+\/[\\w.+-]+;base64,/.test(v);
+  const _isDataUrl = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
+  if (imgKey && (isDataUrl(imgKey) || _isDataUrl(imgKey))) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploaded = await uploadToR2(imgKey);
+    imgKey = uploaded.key;
+  }
+  if (bannerKey && (isDataUrl(bannerKey) || _isDataUrl(bannerKey))) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploadedB = await uploadToR2(bannerKey);
+    bannerKey = uploadedB.key;
+  }
   const res = await fetch('http://localhost:5000/v1/event/', {
     method: 'POST',
     headers: getAuthHeaders(),
-    // Force a hardcoded image value regardless of input
     body: JSON.stringify({
       ...payload,
-      e_image: 'cloudeflair/r2/ooj/event1.jpg'
+      e_image: imgKey,
+      ...(bannerKey ? { banner: bannerKey } : {}),
     }),
   });
   const contentType = res.headers.get('content-type') || '';
@@ -708,13 +725,27 @@ export const updateEventV1 = async (
   }
 ) => {
   const { getAuthHeaders } = await import('./authApi');
+  let imgKey = payload.e_image || '';
+  let bannerKey = payload.banner || '';
+  const isDataUrl2 = (v?: string) => !!v && /^data:\\w+\/[\\w.+-]+;base64,/.test(v);
+  const _isDataUrl2 = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
+  if (imgKey && (isDataUrl2(imgKey) || _isDataUrl2(imgKey))) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploaded = await uploadToR2(imgKey);
+    imgKey = uploaded.key;
+  }
+  if (bannerKey && (isDataUrl2(bannerKey) || _isDataUrl2(bannerKey))) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploadedB = await uploadToR2(bannerKey);
+    bannerKey = uploadedB.key;
+  }
   const res = await fetch(`http://localhost:5000/v1/event/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
-    // Keep image hardcoded as requested
     body: JSON.stringify({
       ...payload,
-      e_image: 'cloudeflair/r2/ooj/event1.jpg'
+      e_image: imgKey,
+      ...(bannerKey ? { banner: bannerKey } : {}),
     }),
   });
   const contentType = res.headers.get('content-type') || '';

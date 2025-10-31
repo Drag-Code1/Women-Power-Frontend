@@ -6,6 +6,8 @@ import {
   formatEventDateTime,
 } from "@/app/lib/utils/dashboardevent-utils";
 import type { Event, ModalMode } from "@/app/types/dashboardeventtab";
+import R2Image from "../dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface EventCardProps {
   event: Event;
@@ -29,18 +31,12 @@ export const EventCard: React.FC<EventCardProps> = ({
     >
       {/* Image Section */}
       <div className="relative overflow-hidden">
-        {event.thumbnail && (
-          <img
-            src={event.thumbnail}
-            alt={event.title}
-            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        )}
-        {!event.thumbnail && (
-          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-500 text-sm">No image</span>
-          </div>
-        )}
+        <R2Image
+          src={event.thumbnail}
+          fallbackSrc={DEFAULT_THUMBNAIL}
+          alt={event.title}
+          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+        />
 
         {/* Status Badge */}
         <div

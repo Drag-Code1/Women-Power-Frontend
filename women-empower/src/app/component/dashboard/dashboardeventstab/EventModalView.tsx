@@ -1,6 +1,8 @@
 'use client';
 import React from 'react';
 import { getStatusColor, formatEventDateTimeFull } from '@/app/lib/utils/dashboardevent-utils';
+import R2Image from "../dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 import type { Event } from '@/app/types/dashboardeventtab';
 
 interface EventModalViewProps {
@@ -11,9 +13,9 @@ export const EventModalView: React.FC<EventModalViewProps> = ({ event }) => {
   return (
     <div className="space-y-4">
       {event.banner && (
-        <img src={event.banner} alt="Banner" className="w-full h-48 object-cover rounded-lg" />
+        <R2Image src={event.banner} fallbackSrc={DEFAULT_THUMBNAIL} alt="Banner" className="w-full h-48 object-cover rounded-lg" />
       )}
-      <img src={event.thumbnail} alt={event.title} className="w-full h-64 object-cover rounded-lg" />
+      <R2Image src={event.thumbnail} fallbackSrc={DEFAULT_THUMBNAIL} alt={event.title} className="w-full h-64 object-cover rounded-lg" />
       <div>
         <span className={`${getStatusColor(event.status)} text-white text-sm px-3 py-1 rounded-full capitalize inline-block`}>
           {event.status}
