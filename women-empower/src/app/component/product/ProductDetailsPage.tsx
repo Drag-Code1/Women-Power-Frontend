@@ -93,11 +93,15 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
     }
   }, [product, isInWishlist]);
 
-  const productImages: string[] = product?.p_images && product.p_images.length > 0 
-    ? product.p_images 
-    : product?.thumbnail 
-      ? [product.thumbnail]
-      : [];
+  // Build image gallery: include thumbnail + additional images, dedupe empties
+  const productImages: string[] = product
+    ? Array.from(
+        new Set(
+          [product.thumbnail, ...(product.p_images || [])]
+            .filter((s): s is string => !!s && s.trim() !== "")
+        )
+      )
+    : [];
 
   const handleAddToCart = async (): Promise<void> => {
     if (!user) {

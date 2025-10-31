@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getArtistDetailsApi } from "../../lib/api";
+import { getArtistDetailsApi, getCategoryDetailsApi } from "../../lib/api";
 import { Artist } from "../../types/artist";
 import R2Image from "../dashboard/dashboardallproductstab/R2Image";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
@@ -14,6 +14,7 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ artistId }) => {
   const [artist, setArtist] = useState<Artist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [categoryName, setCategoryName] = useState<string>("");
 
   useEffect(() => {
     const fetchArtistDetails = async () => {
@@ -34,6 +35,31 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ artistId }) => {
       fetchArtistDetails();
     }
   }, [artistId]);
+
+  // Resolve category name from artist data
+  useEffect(() => {
+    const resolveCategory = async () => {
+      if (!artist) return;
+      // Prefer category field if present
+      const inline = (artist as any).category as string | undefined;
+      if (inline && inline.trim() !== "") {
+        setCategoryName(inline);
+        return;
+      }
+      // Fallback: fetch category details by ID
+      try {
+        if (artist.category_id) {
+          const cat = await getCategoryDetailsApi(artist.category_id);
+          const name = (cat?.name || (cat?.category_name as string) || "").toString();
+          setCategoryName(name || artist.category_id);
+        }
+      } catch (e) {
+        console.warn("Failed to resolve category name for artist", e);
+        setCategoryName(artist.category_id);
+      }
+    };
+    resolveCategory();
+  }, [artist]);
 
   // Format joining date
   const formatDate = (dateString: string) => {
@@ -94,7 +120,7 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ artistId }) => {
               
               <div className="mt-4 sm:mt-0 sm:ml-6 text-center sm:text-left">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{artist.artist_Name}</h1>
-                <p className="text-gray-600 mt-1">Category ID: {artist.category_id}</p>
+                <p className="text-gray-600 mt-1">Category: {categoryName || artist.category_id}</p>
               </div>
             </div>
             
