@@ -2,6 +2,7 @@
 
 "use client";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
 import { useRouter } from "next/navigation";
 import { Search, Filter, ChevronLeft, ChevronRight, Calendar, Briefcase } from "lucide-react";
 import { Artist } from "@/app/types/artist";
@@ -51,10 +52,10 @@ const ArtistCard: React.FC<{ artist: Artist }> = ({ artist }) => {
     >
       <div className="flex-shrink-0">
         <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden bg-gray-100">
-          <img
+          <R2Image
             src={artist.artist_profile_pic}
             alt={artist.artist_Name}
-            className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>

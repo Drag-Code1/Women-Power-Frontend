@@ -2,7 +2,8 @@
 // Minimal R2 helper for frontend (Next.js or plain TypeScript).
 // Handles image upload, retrieval, and deletion using your backend endpoints.
 
-const API_BASE = "http://localhost:5000/v1/r2";
+const API_ROOT = (typeof process !== 'undefined' && process.env && (process.env.NEXT_PUBLIC_API_URL as string)) || "http://localhost:5000/v1";
+const API_BASE = `${API_ROOT.replace(/\/$/, '')}/r2`;
 /**
  * Upload a file or Blob to Cloudflare R2.
  * Calls backend → gets presigned URL → uploads to R2 → returns { key, accessUrl }.
@@ -79,14 +80,17 @@ export async function uploadToR2(
  */
 export async function getFromR2(key: string): Promise<string> {
   const res = await fetch(
-    `${API_BASE}/generate-access-url?key=${key}`
+    `${API_BASE}/generate-access-url?key=${encodeURIComponent(key)}`
   );
 
   if (!res.ok) throw new Error("Failed to get access URL");
 
-  const { url } = await res.json();
-  console.log("Generated access URL:", url);
-  return url;
+  const data: any = await res.json();
+  const resolved = data?.accessUrl || data?.url || data?.href || data?.signedUrl;
+  if (!resolved || typeof resolved !== 'string') {
+    throw new Error('Access URL not present in response');
+  }
+  return resolved;
 }
 
 /**

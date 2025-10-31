@@ -13,6 +13,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
+import R2Image from "../component/dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 const CartPage: React.FC = () => {
   const { cartItems, updateCartItem, removeFromCart, loading } = useCart();
@@ -136,8 +138,9 @@ const CartPage: React.FC = () => {
                           <div className="flex items-start space-x-4">
                             <div className="relative flex-shrink-0">
                               {item.product?.thumbnail ? (
-                                <img
+                                <R2Image
                                   src={item.product.thumbnail}
+                                  fallbackSrc={DEFAULT_THUMBNAIL}
                                   alt={item.product.p_Name}
                                   className="w-20 h-20 rounded-lg object-cover shadow-inner"
                                 />

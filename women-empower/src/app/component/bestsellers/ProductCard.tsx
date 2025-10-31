@@ -5,6 +5,8 @@ import { Heart, ShoppingCart, Check } from "lucide-react";
 import { Product } from "@/app/types/product";
 import { useWishlist } from "@/app/contexts/WishlistContext";
 import { useRouter } from "next/navigation";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface ProductCardProps {
   product: Product;
@@ -59,8 +61,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       {/* Product Image */}
       <div className="relative">
-        <img
+        <R2Image
           src={product.thumbnail}
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={product.p_Name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />

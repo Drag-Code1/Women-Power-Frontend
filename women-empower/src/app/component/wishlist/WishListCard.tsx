@@ -3,6 +3,8 @@
 import React from "react";
 import { Heart, Check, Sparkles } from "lucide-react";
 import { WishListItem } from "@/app/types/wishlist";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface WishListCardProps {
   item: WishListItem;
@@ -30,8 +32,9 @@ export const WishListCard: React.FC<WishListCardProps> = ({
       style={{ animationDelay: `${index * 50}ms` }}
     >
       <div className="relative overflow-hidden">
-        <img
+        <R2Image
           src={item.thumbnail}
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={item.p_Name}
           className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
         />

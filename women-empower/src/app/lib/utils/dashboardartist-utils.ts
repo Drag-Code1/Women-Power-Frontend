@@ -39,3 +39,14 @@ export function readFileAsDataURL(file: File): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+// If backend stores only R2 object keys, build a usable public URL for rendering
+export function buildR2PublicUrl(possibleKeyOrUrl?: string | null): string {
+  if (!possibleKeyOrUrl) return '';
+  const val = String(possibleKeyOrUrl);
+  if (/^https?:\/\//i.test(val)) return val; // already a URL
+  const base = process.env.NEXT_PUBLIC_R2_PUBLIC_BASE;
+  if (base) return `${base.replace(/\/$/, '')}/${val.replace(/^\//, '')}`;
+  // Fallback: return the key (caller can decide to handle via signed URL if needed)
+  return val;
+}

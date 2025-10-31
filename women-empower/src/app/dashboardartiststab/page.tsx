@@ -1,6 +1,7 @@
 // app/artists/page.tsx
 import ArtistManagementClient from '../component/dashboard/dashboardartiststab/ArtistManagementClient';
 import { getArtistsPaginated, getCategoriesApi } from '@/app/lib/api';
+import { buildR2PublicUrl } from '@/app/lib/utils/dashboardartist-utils';
 
 export default async function ArtistsPage({ searchParams }: { searchParams?: { page?: string } }) {
   const page = Number(searchParams?.page || '1') || 1;
@@ -22,7 +23,7 @@ export default async function ArtistsPage({ searchParams }: { searchParams?: { p
     intro: a.introduction,
     joining_date: a.joining_date,
     experience: Number(a.experience),
-    image: a.artist_profile_pic,
+    image: buildR2PublicUrl(a.artist_profile_pic),
   }));
 
   return (

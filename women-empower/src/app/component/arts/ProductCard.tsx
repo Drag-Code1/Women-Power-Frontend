@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { Product, CartItem } from "@/app/types/product";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface ProductCardProps {
   product: Product;
@@ -59,8 +61,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
   return (
     <div className="group bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden cursor-pointer" onClick={handleProductClick}>
       <div className="relative">
-        <img
+        <R2Image
           src={product.thumbnail}
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={product.p_Name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />

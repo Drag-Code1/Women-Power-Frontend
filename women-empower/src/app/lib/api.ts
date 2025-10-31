@@ -33,15 +33,19 @@ export const getCategoryDetailsApi = async (categoryId: string) => {
 };
 
 export const createCategory = async (payload: { name: string; image?: string }) => {
-  // Use auth header for admin-only endpoint and force static image URL
   const { getAuthHeaders } = await import('./authApi');
+  let imageKey = payload.image || '';
+  // If image is a data URL, upload to R2 first and send the key
+  if (imageKey && /^data:\w+\/[\w.+-]+;base64,/.test(imageKey)) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploaded = await uploadToR2(imageKey);
+    imageKey = uploaded.key;
+  }
+
   const res = await fetch('http://localhost:5000/v1/category/', {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({
-      name: payload.name,
-      image: payload.image,
-    }),
+    body: JSON.stringify({ name: payload.name, image: imageKey }),
   });
   const body = await res.json();
   return body.data;
@@ -49,10 +53,16 @@ export const createCategory = async (payload: { name: string; image?: string }) 
 
 export const updateCategory = async (id: string, payload: { name: string; image: string }) => {
   const { getAuthHeaders } = await import('./authApi');
+  let imageKey = payload.image || '';
+  if (imageKey && /^data:\w+\/[\w.+-]+;base64,/.test(imageKey)) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploaded = await uploadToR2(imageKey);
+    imageKey = uploaded.key;
+  }
   const res = await fetch(`http://localhost:5000/v1/category/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ name: payload.name, image: imageKey }),
   });
   const body = await res.json();
   return body.data;
@@ -356,37 +366,45 @@ export const updateCourse = async (
   return parsed.data;
 };
 
+// Helper: simple data URL detector
+const isDataUrl = (val?: string) => !!val && /^data:\w+\/[\w.+-]+;base64,/.test(val);
+
+// Create Artist with optional R2 image upload. If imageData is a base64 data URL,
+// we upload it to R2 first and send only the R2 key to the API.
 export const createArtist = async (
   payload: {
     artist_Name: string;
-    artist_profile_pic: string;
     category_id: string;
     introduction: string;
     experience: number;
+    imageData?: string; // base64 data URL from file input
   }
 ) => {
   const { getAuthHeaders } = await import('./authApi');
-  const STATIC_IMAGE_URL = 'https://example.com/images/john_doe.jpg';
+  let r2Key: string | undefined;
+  if (isDataUrl(payload.imageData)) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploaded = await uploadToR2(payload.imageData as string);
+    r2Key = uploaded.key; // store only the key in DB
+  }
+
+  const body: any = {
+    artist_Name: payload.artist_Name,
+    category_id: payload.category_id,
+    introduction: payload.introduction,
+    experience: payload.experience,
+  };
+  if (r2Key) body.artist_profile_pic = r2Key;
+
   const res = await fetch('http://localhost:5000/v1/artist/', {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({
-      artist_Name: payload.artist_Name,
-      artist_profile_pic: STATIC_IMAGE_URL,
-      category_id: payload.category_id,
-      introduction: payload.introduction,
-      experience: payload.experience,
-    }),
+    body: JSON.stringify(body),
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
-    if (contentType.includes('application/json')) {
-      parsed = await res.json();
-    } else {
-      const text = await res.text();
-      parsed = { message: text };
-    }
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
   } catch {
     parsed = {};
   }
@@ -400,31 +418,53 @@ export const createArtist = async (
   return parsed.data;
 };
 
+// Update Artist with optional new image upload to R2.
 export const updateArtist = async (
   id: string,
   payload: {
     artist_Name: string;
-    artist_profile_pic: string;
     category_id: string;
     introduction: string;
     experience: number;
+    imageData?: string; // optional base64 data URL if user selected a new image
   }
 ) => {
   const { getAuthHeaders } = await import('./authApi');
-  const STATIC_IMAGE_URL = 'https://example.com/images/john_doe.jpg';
+  let r2Key: string | undefined;
+  if (isDataUrl(payload.imageData)) {
+    const { uploadToR2 } = await import('./utils/r2Client');
+    const uploaded = await uploadToR2(payload.imageData as string);
+    r2Key = uploaded.key;
+  }
+
+  const body: any = {
+    artist_Name: payload.artist_Name,
+    category_id: payload.category_id,
+    introduction: payload.introduction,
+    experience: payload.experience,
+  };
+  if (r2Key) body.artist_profile_pic = r2Key; // only include if changed
+
   const res = await fetch(`http://localhost:5000/v1/artist/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
-    body: JSON.stringify({
-      artist_Name: payload.artist_Name,
-      artist_profile_pic: STATIC_IMAGE_URL,
-      category_id: payload.category_id,
-      introduction: payload.introduction,
-      experience: payload.experience,
-    }),
+    body: JSON.stringify(body),
   });
-  const body = await res.json();
-  return body.data;
+  const contentType = res.headers.get('content-type') || '';
+  let parsed: any = null;
+  try {
+    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
+  } catch {
+    parsed = {};
+  }
+  if (!res.ok) {
+    const msg = parsed?.message || parsed?.error || `Failed to update artist (status ${res.status})`;
+    const error = new Error(msg);
+    // @ts-ignore
+    (error as any).details = parsed;
+    throw error;
+  }
+  return parsed.data;
 };
 
 export const deleteArtist = async (id: string) => {

@@ -2,7 +2,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Artist,ModalType, ArtistFormData  } from '../types/dashboard-artist-tab';
-import { validateFormData, readFileAsDataURL  } from '../lib/utils/dashboardartist-utils';
+import { validateFormData, readFileAsDataURL, buildR2PublicUrl  } from '../lib/utils/dashboardartist-utils';
 import { createArtist, updateArtist, deleteArtist, getCategoriesApi } from '../lib/api';
 
 const initialFormData: ArtistFormData = {
@@ -101,10 +101,10 @@ export function useArtistManager(initialArtists: Artist[]) {
         }
         const created = await createArtist({
           artist_Name: formData.artist_name,
-          artist_profile_pic: '', // ignored by API (hardcoded server-side)
           category_id: categoryId,
           introduction: formData.intro,
-          experience: Number(formData.experience)
+          experience: Number(formData.experience),
+          imageData: formData.image, // base64 string -> uploaded to R2, DB stores key
         });
         const newArtist: Artist = {
           id: created.id,
@@ -114,7 +114,7 @@ export function useArtistManager(initialArtists: Artist[]) {
           intro: created.introduction,
           joining_date: created.joining_date || formData.joining_date || '',
           experience: Number(created.experience),
-          image: created.artist_profile_pic
+          image: buildR2PublicUrl(created.artist_profile_pic) || imagePreview
         };
         setArtists([...artists, newArtist]);
       } catch (e) {
@@ -129,12 +129,12 @@ export function useArtistManager(initialArtists: Artist[]) {
           alert('Please select a valid category.');
           return;
         }
-        const updatedServer = await updateArtist(selectedArtist.id as unknown as string, {
+        const updatedServer = await updateArtist(String(selectedArtist.id), {
           artist_Name: formData.artist_name,
-          artist_profile_pic: '', // ignored by API (hardcoded server-side)
           category_id: categoryId,
           introduction: formData.intro,
-          experience: Number(formData.experience)
+          experience: Number(formData.experience),
+          imageData: formData.image, // if user picked new image (data URL) it will upload
         });
         const updatedLocal: Artist = {
           id: updatedServer.id,
@@ -144,7 +144,7 @@ export function useArtistManager(initialArtists: Artist[]) {
           intro: updatedServer.introduction,
           joining_date: updatedServer.joining_date || selectedArtist.joining_date,
           experience: Number(updatedServer.experience),
-          image: updatedServer.artist_profile_pic
+          image: buildR2PublicUrl(updatedServer.artist_profile_pic) || selectedArtist.image
         };
         setArtists(artists.map(artist => 
           artist.id === selectedArtist.id 

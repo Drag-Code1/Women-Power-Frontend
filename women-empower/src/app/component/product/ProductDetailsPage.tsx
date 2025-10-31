@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { Heart, Star, Plus, Minus, ShoppingCart } from "lucide-react";
 import { productService } from "@/app/lib/productapi";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 import { Product } from "@/app/types/product";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -232,10 +234,11 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
                               : "border-gray-200 hover:border-[#695946]"
                           }`}
                         >
-                          <img
+                          <R2Image
                             src={image}
                             alt={`View ${index + 1}`}
                             className="w-full h-full object-cover"
+                            fallbackSrc={DEFAULT_THUMBNAIL}
                           />
                         </button>
                       ))}
@@ -249,8 +252,9 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
                       <div className="absolute top-4 left-4 z-10 bg-red-500 text-white text-xs px-2 py-1 rounded-md font-medium">
                         Trending
                       </div>
-                      <img
+                      <R2Image
                         src={productImages[selectedImage]}
+                        fallbackSrc={DEFAULT_THUMBNAIL}
                         alt={product.p_Name}
                         className="w-full h-full object-cover"
                       />

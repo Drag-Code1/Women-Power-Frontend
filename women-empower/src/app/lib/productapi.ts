@@ -1,4 +1,5 @@
 import { Product, ProductFormData } from "@/app/types/dashboardproduct";
+import { buildR2PublicUrl } from "@/app/lib/utils/dashboardartist-utils";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1";
@@ -8,11 +9,13 @@ const normalizeProduct = (raw: any): Product => {
   const resolvedId = raw.id || raw.product_id || raw._id || "";
   const resolvedCategoryId = raw.category_id || raw.categoryId || raw.category?.id || "";
   const resolvedArtistId = raw.artist_id || raw.artistId || raw.artist?.id || "";
+  const resolveOne = (v: any) => buildR2PublicUrl(v ? String(v) : "");
+  const resolveMany = (arr: any) => Array.isArray(arr) ? arr.map((v) => resolveOne(v)) : [];
   return {
     id: resolvedId,
     p_Name: raw.p_Name || "",
-    thumbnail: raw.thumbnail || "",
-    p_images: Array.isArray(raw.p_images) ? raw.p_images : [],
+    thumbnail: resolveOne(raw.thumbnail || ""),
+    p_images: resolveMany(raw.p_images),
     category_id: resolvedCategoryId,
     artist_id: resolvedArtistId,
     price: Number(raw.price) || 0,
@@ -224,11 +227,29 @@ export const productService = {
     productData: Partial<Product>
   ): Promise<Product | null> => {
     try {
+      // Upload data-URL images to R2 and keep only keys
+      // In dev patching, escapes may duplicate; use proper runtime regex in _isDataUrl
+      const _isDataUrl = (val?: string) => !!val && /^data:\w+\/[\w.+-]+;base64,/.test(val);
+      const toKeyOrPass = async (val?: string): Promise<string> => {
+        if (!val) return "";
+        if (_isDataUrl(val)) {
+          const { uploadToR2 } = await import('./utils/r2Client');
+          const uploaded = await uploadToR2(val);
+          return uploaded.key;
+        }
+        return val; // allow existing key or http(s) url
+      };
+
+      const thumbKey = await toKeyOrPass(productData.thumbnail || "");
+      const imageKeys = Array.isArray(productData.p_images)
+        ? await Promise.all(productData.p_images.map((img) => toKeyOrPass(img)))
+        : [];
+
       // Clean the data before sending
       const cleanData = {
         p_Name: productData.p_Name,
-        thumbnail: productData.thumbnail || "",
-        p_images: productData.p_images || [],
+        thumbnail: thumbKey,
+        p_images: imageKeys,
         category_id: productData.category_id,
         artist_id: productData.artist_id,
         price: Number(productData.price),
@@ -270,15 +291,31 @@ export const productService = {
     productData: Partial<Product>
   ): Promise<Product | null> => {
     try {
-      // Clean the data before sending
+      // Process any new data-URL images to R2 keys
+      const _isDataUrl2 = (val?: string) => !!val && /^data:\w+\/[\w.+-]+;base64,/.test(val);
+      const toKeyOrPass = async (val?: string): Promise<string> => {
+        if (!val) return "";
+        if (_isDataUrl2(val)) {
+          const { uploadToR2 } = await import('./utils/r2Client');
+          const uploaded = await uploadToR2(val);
+          return uploaded.key;
+        }
+        return val;
+      };
+
+      // Clean the data before sending (include only provided fields)
       const cleanData: any = {};
 
       if (productData.p_Name !== undefined)
         cleanData.p_Name = productData.p_Name;
-      if (productData.thumbnail !== undefined)
-        cleanData.thumbnail = productData.thumbnail;
-      if (productData.p_images !== undefined)
-        cleanData.p_images = productData.p_images;
+      if (productData.thumbnail !== undefined) {
+        cleanData.thumbnail = await toKeyOrPass(productData.thumbnail);
+      }
+      if (productData.p_images !== undefined) {
+        cleanData.p_images = Array.isArray(productData.p_images)
+          ? await Promise.all(productData.p_images.map((img) => toKeyOrPass(img)))
+          : [];
+      }
       if (productData.category_id !== undefined)
         cleanData.category_id = productData.category_id;
       if (productData.artist_id !== undefined)

@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { getArtistDetailsApi } from "../../lib/api";
 import { Artist } from "../../types/artist";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface ArtistProfileProps {
   artistId: string;
@@ -83,8 +85,9 @@ const ArtistProfile: React.FC<ArtistProfileProps> = ({ artistId }) => {
           
           <div className="relative px-6 pb-6">
             <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-16 mb-6">
-              <img
+              <R2Image
                 src={artist.artist_profile_pic}
+                fallbackSrc={DEFAULT_THUMBNAIL}
                 alt={artist.artist_Name}
                 className="rounded-full w-32 h-32 sm:w-40 sm:h-40 object-cover border-4 border-white shadow-lg"
               />

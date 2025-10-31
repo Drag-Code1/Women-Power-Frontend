@@ -12,6 +12,8 @@ import { useCart } from "@/app/contexts/CartContext";
 import { useWishlist } from "@/app/contexts/WishlistContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface ArtworkItem {
   p_Name: string;
@@ -206,8 +208,9 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId }) => {
                 >
                   {/* Image Container */}
                   <div className="relative overflow-hidden">
-                    <img
+                    <R2Image
                       src={artwork.thumbnail}
+                      fallbackSrc={DEFAULT_THUMBNAIL}
                       alt={artwork.p_Name}
                       className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                     />

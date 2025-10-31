@@ -2,7 +2,8 @@
 'use client';
 import { MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
 import { Artist,ModalType } from '@/app/types/dashboard-artist-tab';
-import { formatDate, getInitials } from '@/app/lib/utils/dashboardartist-utils';
+import { formatDate } from '@/app/lib/utils/dashboardartist-utils';
+import ArtistAvatar from './ArtistAvatar';
 
 interface ArtistTableProps {
   artists: Artist[];
@@ -49,20 +50,8 @@ export default function ArtistTable({
               <tr key={artist.id} className="hover:bg-gray-50 transition">
                 <td className="px-6 py-4">
                   <div className="flex items-center">
-                    <div className="h-10 w-10 flex-shrink-0 rounded-full overflow-hidden bg-blue-100">
-                      {artist.image ? (
-                        <img 
-                          src={artist.image} 
-                          alt={artist.artist_name}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center">
-                          <span className="text-blue-600 font-semibold text-sm">
-                            {getInitials(artist.artist_name)}
-                          </span>
-                        </div>
-                      )}
+                    <div className="h-10 w-10 flex-shrink-0">
+                      <ArtistAvatar image={artist.image} name={artist.artist_name} size="sm" />
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">

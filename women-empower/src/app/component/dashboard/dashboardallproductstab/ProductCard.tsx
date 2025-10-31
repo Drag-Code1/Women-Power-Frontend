@@ -5,6 +5,7 @@ import { Star, TrendingUp, MoreVertical, Eye, Edit, Trash2, Tag } from "lucide-r
 import { Product, DrawerMode } from "@/app/types/dashboardproduct";
 import { calculateDiscountedPrice } from "@/app/lib/utils/dashboardproduct-utils";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import R2Image from "./R2Image";
 
 interface ProductCardProps {
   product: Product;
@@ -36,8 +37,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     >
       {/* Image Section */}
       <div className="relative overflow-hidden">
-        <img
-          src={product.thumbnail || DEFAULT_THUMBNAIL}
+        <R2Image
+          src={product.thumbnail}
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={product.p_Name}
           className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
         />

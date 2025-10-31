@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Star, TrendingUp } from "lucide-react";
 import { Product } from "@/app/types/dashboardproduct";
 import { calculateDiscountedPrice, getAllImages } from "@/app/lib/utils/dashboardproduct-utils";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import R2Image from "./R2Image";
 
 interface DrawerViewModeProps {
   selectedProduct: Product | null;
@@ -35,8 +36,9 @@ export const DrawerViewMode: React.FC<DrawerViewModeProps> = ({
   return (
     <div className="space-y-6">
       <div className="relative">
-        <img
-          src={currentImage || DEFAULT_THUMBNAIL}
+        <R2Image
+          src={currentImage}
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={selectedProduct.p_Name}
           className="w-full h-64 object-cover rounded-lg"
         />
@@ -77,7 +79,7 @@ export const DrawerViewMode: React.FC<DrawerViewModeProps> = ({
               currentImageIndex === index ? "border-blue-500" : "border-gray-200"
             }`}
           >
-            <img src={img} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
+            <R2Image src={img} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
           </button>
         ))}
       </div>

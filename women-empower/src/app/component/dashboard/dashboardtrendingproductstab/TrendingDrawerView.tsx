@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Star, TrendingUp } from "lucide-react";
 import { TrendingProduct } from "@/app/types/dashboardtrendingtab";
 import { calculateDiscountedPrice, getAllImages } from "@/app/lib/utils/dashboardtrending-utils";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import R2Image from "../dashboardallproductstab/R2Image";
 interface TrendingDrawerViewProps {
   selectedProduct: TrendingProduct | null;
   currentImageIndex: number;
@@ -28,8 +29,9 @@ export const TrendingDrawerView: React.FC<TrendingDrawerViewProps> = ({
   return (
     <div className="space-y-6">
       <div className="relative">
-        <img
-          src={currentImage || DEFAULT_THUMBNAIL}
+        <R2Image
+          src={currentImage}
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={selectedProduct.p_Name}
           className="w-full h-64 object-cover rounded-lg"
         />
@@ -70,7 +72,7 @@ export const TrendingDrawerView: React.FC<TrendingDrawerViewProps> = ({
               currentImageIndex === index ? "border-orange-500" : "border-gray-200"
             }`}
           >
-            <img src={img} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
+            <R2Image src={img} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
           </button>
         ))}
       </div>

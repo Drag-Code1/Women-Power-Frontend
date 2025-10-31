@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Briefcase, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Artist } from "@/app/types/artist";
+import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface ArtistCardProps {
   artist: Artist;
@@ -37,10 +39,11 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist }) => {
       {/* Artist Photo */}
       <div className="flex-shrink-0">
         <div className="w-32 h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-amber-100 to-amber-50 ring-4 ring-amber-100">
-          <img
+          <R2Image
             src={artist.artist_profile_pic}
+            fallbackSrc={DEFAULT_THUMBNAIL}
             alt={artist.artist_Name}
-            className="w-full h-full object-cover transform transition-transform duration-500 hover:scale-110"
+            className="w-full h-full object-cover"
           />
         </div>
       </div>

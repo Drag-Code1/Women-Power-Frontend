@@ -5,6 +5,7 @@ import { Star, TrendingUp, MoreVertical, Eye, X, Tag } from "lucide-react";
 import { TrendingProduct, TrendingDrawerMode } from "@/app/types/dashboardtrendingtab";
 import { calculateDiscountedPrice } from "@/app/lib/utils/dashboardtrending-utils";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import R2Image from "../dashboardallproductstab/R2Image";
 
 interface TrendingProductCardProps {
   product: TrendingProduct;
@@ -30,8 +31,9 @@ export const TrendingProductCard: React.FC<TrendingProductCardProps> = ({
     >
       {/* Image Section */}
       <div className="relative overflow-hidden">
-        <img
-          src={product.p_thumbnail || DEFAULT_THUMBNAIL}
+        <R2Image
+          src={product.p_thumbnail}
+          fallbackSrc={DEFAULT_THUMBNAIL}
           alt={product.p_Name}
           className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
         />
