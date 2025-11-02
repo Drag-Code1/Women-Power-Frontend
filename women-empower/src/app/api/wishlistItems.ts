@@ -1,6 +1,11 @@
 import { WishListItem } from "../types/wishlist";
 import { getToken, getUser } from "../lib/auth";
 
+// Prefer configurable API base; fallback to local backend
+const API_BASE_URL =
+  (typeof process !== "undefined" && process.env && (process.env.NEXT_PUBLIC_API_URL as string)) ||
+  "http://localhost:5000/v1";
+
 // API Response interfaces
 interface WishlistApiResponse {
   success: boolean;
@@ -41,7 +46,8 @@ export async function getWishListItems(userId?: string): Promise<WishListItem[]>
       return [];
     }
 
-    const response = await fetch(`http://localhost:5000/v1/wishlist/${targetUserId}`, {
+    // Primary: call real backend if available/configured
+    const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/wishlist/${targetUserId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -54,36 +60,72 @@ export async function getWishListItems(userId?: string): Promise<WishListItem[]>
       return [];
     }
 
-    if (!response.ok) {
+    if (response.ok) {
+      const data: WishlistApiResponse = await response.json();
+
+      if (!data.success) {
+        console.error('API returned error:', data.message);
+        return [];
+      }
+
+      // Transform API response to our WishListItem format
+      const wishlistItems: WishListItem[] = data.data.map((item) => ({
+        id: item.product.id, // Product ID
+        wishlistItemId: item.id, // Wishlist item ID for deletion
+        p_Name: item.product.p_Name,
+        thumbnail: item.product.thumbnail,
+        category_id: item.product.category_id,
+        price: item.product.price,
+        discount: item.product.discount,
+        isTrending: item.product.isTrending,
+        is_in_wishlist: item.product.is_in_wishlist,
+      }));
+
+      return wishlistItems;
+    }
+
+    // If backend is unreachable or returns not found, try local mock API
+    // Avoid noisy error logs for expected 404 when backend isn't available
+    if (response.status !== 404) {
       console.error('Failed to fetch wishlist:', response.status, response.statusText);
-      return [];
     }
-
-    const data: WishlistApiResponse = await response.json();
-    
-    if (!data.success) {
-      console.error('API returned error:', data.message);
-      return [];
-    }
-
-    // Transform API response to our WishListItem format
-    const wishlistItems: WishListItem[] = data.data.map((item) => ({
-      id: item.product.id, // Product ID
-      wishlistItemId: item.id, // Wishlist item ID for deletion
-      p_Name: item.product.p_Name,
-      thumbnail: item.product.thumbnail,
-      category_id: item.product.category_id,
-      price: item.product.price,
-      discount: item.product.discount,
-      isTrending: item.product.isTrending,
-      is_in_wishlist: item.product.is_in_wishlist,
-    }));
-
-    return wishlistItems;
+    const mockRes = await fetch('/api/wishlist', { method: 'GET' });
+    if (!mockRes.ok) return [];
+    const mockData: any[] = await mockRes.json();
+    // Map mock items to WishListItem shape; use product id as wishlistItemId for deletion
+    return mockData.map((item) => ({
+      id: String(item.id),
+      wishlistItemId: String(item.id),
+      p_Name: item.p_Name,
+      thumbnail: item.thumbnail,
+      category_id: item.category_id,
+      price: item.price,
+      discount: item.discount,
+      isTrending: !!item.isTrending,
+      is_in_wishlist: true,
+    })) as WishListItem[];
   } catch (error) {
     // Network or parsing error; keep console noise low
     console.warn('Wishlist fetch error (network/parsing):', error);
-    return [];
+    try {
+      // Final fallback to local mock API
+      const mockRes = await fetch('/api/wishlist', { method: 'GET' });
+      if (!mockRes.ok) return [];
+      const mockData: any[] = await mockRes.json();
+      return mockData.map((item) => ({
+        id: String(item.id),
+        wishlistItemId: String(item.id),
+        p_Name: item.p_Name,
+        thumbnail: item.thumbnail,
+        category_id: item.category_id,
+        price: item.price,
+        discount: item.discount,
+        isTrending: !!item.isTrending,
+        is_in_wishlist: true,
+      })) as WishListItem[];
+    } catch {
+      return [];
+    }
   }
 }
 
@@ -105,7 +147,8 @@ export async function addToWishlist(productId: string, userId?: string): Promise
       return false;
     }
 
-    const response = await fetch('http://localhost:5000/v1/wishlist', {
+    // Primary: backend API
+    const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/wishlist`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -122,16 +165,31 @@ export async function addToWishlist(productId: string, userId?: string): Promise
       return false;
     }
 
-    if (!response.ok) {
-      console.error('Failed to add to wishlist:', response.status, response.statusText);
-      return false;
+    if (response.ok) {
+      const data = await response.json();
+      return data.success || false;
     }
 
-    const data = await response.json();
-    return data.success || false;
+    // Fallback: local mock API
+    console.error('Failed to add to wishlist:', response.status, response.statusText);
+    const mockRes = await fetch('/api/wishlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: productId }),
+    });
+    return mockRes.ok;
   } catch (error) {
     console.warn('Wishlist add error (network/parsing):', error);
-    return false;
+    try {
+      const mockRes = await fetch('/api/wishlist', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: productId }),
+      });
+      return mockRes.ok;
+    } catch {
+      return false;
+    }
   }
 }
 
@@ -144,7 +202,8 @@ export async function removeFromWishlist(wishlistItemId: string): Promise<boolea
       return false;
     }
 
-    const response = await fetch(`http://localhost:5000/v1/wishlist/${wishlistItemId}`, {
+    // Primary: backend API
+    const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/wishlist/${wishlistItemId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -157,15 +216,26 @@ export async function removeFromWishlist(wishlistItemId: string): Promise<boolea
       return false;
     }
 
-    if (!response.ok) {
-      console.error('Failed to remove from wishlist:', response.status, response.statusText);
-      return false;
+    if (response.ok) {
+      const data = await response.json();
+      return data.success || false;
     }
 
-    const data = await response.json();
-    return data.success || false;
+    // Fallback: local mock API (uses product id as id)
+    console.error('Failed to remove from wishlist:', response.status, response.statusText);
+    const mockRes = await fetch(`/api/wishlist?id=${encodeURIComponent(wishlistItemId)}`, {
+      method: 'DELETE',
+    });
+    return mockRes.ok;
   } catch (error) {
     console.warn('Wishlist remove error (network/parsing):', error);
-    return false;
+    try {
+      const mockRes = await fetch(`/api/wishlist?id=${encodeURIComponent(wishlistItemId)}`, {
+        method: 'DELETE',
+      });
+      return mockRes.ok;
+    } catch {
+      return false;
+    }
   }
 }
