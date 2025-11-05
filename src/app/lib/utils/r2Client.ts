@@ -2,6 +2,8 @@
 // Minimal R2 helper for frontend (Next.js or plain TypeScript).
 // Handles image upload, retrieval, and deletion using your backend endpoints.
 import { API_BASE_URL } from '../config';
+interface UploadUrlResponse { uploadUrl: string; key: string }
+interface AccessUrlResponse { accessUrl?: string; url?: string; href?: string; signedUrl?: string }
 const API_BASE = `${API_BASE_URL.replace(/\/$/, '')}/r2`;
 /**
  * Upload a file or Blob to Cloudflare R2.
@@ -44,7 +46,7 @@ export async function uploadToR2(
     throw new Error(`Failed to get presigned upload URL: ${uploadUrlRes.status}`);
   }
 
-  const { uploadUrl, key } = await uploadUrlRes.json();
+  const { uploadUrl, key } = (await uploadUrlRes.json()) as UploadUrlResponse;
 
   // 2️⃣ Upload file directly to R2
   const putRes = await fetch(uploadUrl, {
@@ -67,7 +69,7 @@ export async function uploadToR2(
     throw new Error(`Failed to get access URL: ${accessRes.status}`);
   }
 
-  const { accessUrl } = await accessRes.json();
+  const { accessUrl } = (await accessRes.json()) as AccessUrlResponse;
 
   // 4️⃣ Return key and access URL
   return { key, accessUrl };
@@ -84,7 +86,7 @@ export async function getFromR2(key: string): Promise<string> {
 
   if (!res.ok) throw new Error("Failed to get access URL");
 
-  const data: any = await res.json();
+  const data = (await res.json()) as AccessUrlResponse;
   const resolved = data?.accessUrl || data?.url || data?.href || data?.signedUrl;
   if (!resolved || typeof resolved !== 'string') {
     throw new Error('Access URL not present in response');

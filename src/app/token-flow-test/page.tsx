@@ -136,7 +136,7 @@ export default function TokenFlowTestPage() {
           <h3 className="text-lg font-semibold text-blue-800 mb-2">Instructions:</h3>
           <ol className="list-decimal list-inside space-y-1 text-blue-700">
             <li>Make sure you are logged in to the application</li>
-            <li>Click "Test Token Flow" to run comprehensive token tests</li>
+            <li>Click &quot;Test Token Flow&quot; to run comprehensive token tests</li>
             <li>Check the results to see if all API calls work with the stored token</li>
             <li>If any test fails, check the browser console for detailed error messages</li>
           </ol>
@@ -145,3 +145,4 @@ export default function TokenFlowTestPage() {
     </div>
   );
 }
+

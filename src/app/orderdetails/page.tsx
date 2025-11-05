@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Image from 'next/image';
 
 // Types
 interface Product {
@@ -191,9 +192,11 @@ const OrderDetailsPage: React.FC = () => {
                 {order.items.map((item, index) => (
                   <div key={index} className="flex flex-col sm:flex-row gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100 hover:shadow-sm transition-shadow">
                     <div className="flex-shrink-0">
-                      <img 
-                        src={item.product.image} 
+                      <Image
+                        src={item.product.image}
                         alt={item.product.title}
+                        width={96}
+                        height={96}
                         className="w-full sm:w-24 h-24 object-cover rounded-lg shadow-sm"
                       />
                     </div>

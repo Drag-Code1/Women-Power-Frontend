@@ -16,8 +16,8 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function createCategory(formData: FormData) {
-  const name = formData.get('name') as string;
-  const image = formData.get('image') as string;
+  const _name = formData.get('name') as string;
+  const _image = formData.get('image') as string;
   
   // Database me category create karein
   // await db.category.create({ data: { name, image } });
@@ -25,9 +25,9 @@ export async function createCategory(formData: FormData) {
   return { success: true, message: 'Category created successfully' };
 }
 
-export async function updateCategory(id: number, formData: FormData) {
-  const name = formData.get('name') as string;
-  const image = formData.get('image') as string;
+export async function updateCategory(_id: number, formData: FormData) {
+  const _name = formData.get('name') as string;
+  const _image = formData.get('image') as string;
   
   // Database me category update karein
   // await db.category.update({ where: { id }, data: { name, image } });
@@ -35,7 +35,7 @@ export async function updateCategory(id: number, formData: FormData) {
   return { success: true, message: 'Category updated successfully' };
 }
 
-export async function deleteCategory(id: number) {
+export async function deleteCategory(_id: number) {
   // Database se category delete karein
   // await db.category.delete({ where: { id } });
   

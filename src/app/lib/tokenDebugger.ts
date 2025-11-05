@@ -1,6 +1,6 @@
 // Token Debugger - Run this in browser console to check token status
 
-export const checkTokenInBrowser = () => {
+export const checkTokenInBrowser = (): { token: string | null; user: string | null } => {
   console.log('🔍 === BROWSER TOKEN CHECK ===');
   
   // Check localStorage directly
@@ -45,7 +45,13 @@ export const checkTokenInBrowser = () => {
 };
 
 // Make it available globally for console access
+declare global {
+  interface Window {
+    checkTokenInBrowser: () => { token: string | null; user: string | null };
+  }
+}
+
 if (typeof window !== 'undefined') {
-  (window as any).checkTokenInBrowser = checkTokenInBrowser;
+  (window as Window).checkTokenInBrowser = checkTokenInBrowser;
   console.log('💡 Run checkTokenInBrowser() in console to debug token');
 }
