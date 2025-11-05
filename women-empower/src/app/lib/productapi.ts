@@ -1,8 +1,6 @@
 import { Product, ProductFormData } from "@/app/types/dashboardproduct";
 import { buildR2PublicUrl } from "@/app/lib/utils/dashboardartist-utils";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/v1";
+import { API_BASE_URL } from './config';
 
 // ✅ Utility: normalize raw API product into Product
 const normalizeProduct = (raw: any): Product => {
@@ -129,7 +127,7 @@ export const productService = {
         payload = await parseJsonSafely(primary);
       } else {
         console.warn(`Primary products endpoint failed (${primary.status}). Trying legacy /api/products...`);
-        const legacy = await fetch(`http://localhost:5000/api/products`, {
+        const legacy = await fetch(`/api/products`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
           cache: "no-store",

@@ -1,6 +1,7 @@
 ﻿// Cart API functions
 import { getAuthenticatedHeaders, getCurrentToken } from './authenticatedApi';
 import { getToken } from './authApi';
+import { API_BASE_URL } from './config';
 
 export interface CartItem {
   id: string;
@@ -46,7 +47,7 @@ export const addToCartApi = async (cartData: AddToCartRequest, token?: string) =
   }
   
   try {
-    const res = await fetch('http://localhost:5000/v1/cart/', {
+    const res = await fetch(`${API_BASE_URL}/cart/`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -100,7 +101,7 @@ export const getCartItemsApi = async (userId: string, token?: string) => {
   
   console.log('ðŸ”‘ Getting cart items with token:', authToken ? authToken.substring(0, 20) + '...' : 'null');
   
-  const res = await fetch(`http://localhost:5000/v1/cart/${userId}`, {
+  const res = await fetch(`${API_BASE_URL}/cart/${userId}`, {
     method: 'GET',
     headers: { 
       'Content-Type': 'application/json',
@@ -159,7 +160,7 @@ export const updateCartItemApi = async (cartItemId: string, quantity: number, to
     throw new Error('Authorization token missing');
   }
   
-  const res = await fetch(`http://localhost:5000/v1/cart/${cartItemId}`, {
+  const res = await fetch(`${API_BASE_URL}/cart/${cartItemId}`, {
     method: 'PUT',
     headers: { 
       'Content-Type': 'application/json',
@@ -196,7 +197,7 @@ export const removeFromCartApi = async (cartItemId: string, token?: string) => {
     throw new Error('Authorization token missing');
   }
   
-  const res = await fetch(`http://localhost:5000/v1/cart/${cartItemId}`, {
+  const res = await fetch(`${API_BASE_URL}/cart/${cartItemId}`, {
     method: 'DELETE',
     headers: { 
       'Content-Type': 'application/json',

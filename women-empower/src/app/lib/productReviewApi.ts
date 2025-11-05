@@ -1,5 +1,6 @@
 // Product Reviews API functions
 import { getAuthenticatedHeaders, getCurrentToken } from './authenticatedApi';
+import { API_BASE_URL } from './config';
 
 export interface ProductReview {
   id: string;
@@ -39,7 +40,7 @@ export const getProductReviewsApi = async (productId: string, token?: string) =>
     headers['Authorization'] = `Bearer ${authToken}`;
   }
   
-  const res = await fetch(`http://localhost:5000/v1/product-review/${productId}`, { 
+  const res = await fetch(`${API_BASE_URL}/product-review/${productId}`, { 
     cache: 'no-store',
     headers
   });
@@ -80,7 +81,7 @@ export const createProductReviewApi = async (reviewData: CreateProductReviewRequ
   console.log('🔑 Token being used for API call:', authToken);
   console.log('📝 Review data:', reviewData);
   
-  const res = await fetch('http://localhost:5000/v1/product-review', {
+  const res = await fetch(`${API_BASE_URL}/product-review`, {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',

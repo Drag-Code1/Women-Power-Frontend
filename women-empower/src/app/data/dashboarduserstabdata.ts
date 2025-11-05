@@ -1,6 +1,7 @@
 // ==================== app/lib/userapi.ts ====================
 import { User } from "../types/dashboarduserstab";
 import { getAuthHeaders } from "../lib/authApi";
+import { API_BASE_URL } from "../lib/config";
 
 // Fetch all users
 export async function getUsers(token?: string): Promise<User[]> {
@@ -10,7 +11,7 @@ export async function getUsers(token?: string): Promise<User[]> {
     ...(token && { Authorization: `Bearer ${token}` }),
   };
 
-  const res = await fetch("http://localhost:5000/v1/user/", {
+  const res = await fetch(`${API_BASE_URL}/user/`, {
     cache: "no-store", // avoid Next.js caching
     headers,
   });

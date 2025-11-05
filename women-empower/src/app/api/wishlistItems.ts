@@ -1,10 +1,6 @@
 import { WishListItem } from "../types/wishlist";
 import { getToken, getUser } from "../lib/auth";
-
-// Prefer configurable API base; fallback to local backend
-const API_BASE_URL =
-  (typeof process !== "undefined" && process.env && (process.env.NEXT_PUBLIC_API_URL as string)) ||
-  "http://localhost:5000/v1";
+import { API_BASE_URL } from "../lib/config";
 
 // API Response interfaces
 interface WishlistApiResponse {

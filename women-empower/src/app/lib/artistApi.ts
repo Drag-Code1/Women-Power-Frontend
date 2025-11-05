@@ -1,4 +1,5 @@
 import { getToken } from './auth';
+import { API_BASE_URL } from './config';
 
 // Artist Product API Response interfaces
 interface ArtistProductApiResponse {
@@ -48,7 +49,7 @@ export async function getArtistProducts(artistId: string): Promise<ArtistProduct
       return [];
     }
 
-    const response = await fetch(`http://localhost:5000/v1/product/artist/${artistId}`, {
+    const response = await fetch(`${API_BASE_URL}/product/artist/${artistId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

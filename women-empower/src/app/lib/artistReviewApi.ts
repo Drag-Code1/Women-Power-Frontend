@@ -1,5 +1,6 @@
 // Artist Reviews API functions
 import { getAuthenticatedHeaders, getCurrentToken } from './authenticatedApi';
+import { API_BASE_URL } from './config';
 
 export const getArtistReviewsApi = async (artistId: string, token?: string) => {
   // Get token from localStorage if not provided
@@ -14,7 +15,7 @@ export const getArtistReviewsApi = async (artistId: string, token?: string) => {
     headers['Authorization'] = `Bearer ${authToken}`;
   }
   
-  const res = await fetch(`http://localhost:5000/v1/artist-review/${artistId}`, { 
+  const res = await fetch(`${API_BASE_URL}/artist-review/${artistId}`, { 
     cache: 'no-store',
     headers
   });
@@ -59,7 +60,7 @@ export const createArtistReviewApi = async (reviewData: {
   console.log('🔑 Token being used for API call:', authToken);
   console.log('📝 Review data:', reviewData);
   
-  const res = await fetch('http://localhost:5000/v1/artist-review', {
+  const res = await fetch(`${API_BASE_URL}/artist-review`, {
     method: 'POST',
     headers: { 
       'Content-Type': 'application/json',

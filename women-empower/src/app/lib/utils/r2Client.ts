@@ -1,9 +1,8 @@
 
 // Minimal R2 helper for frontend (Next.js or plain TypeScript).
 // Handles image upload, retrieval, and deletion using your backend endpoints.
-
-const API_ROOT = (typeof process !== 'undefined' && process.env && (process.env.NEXT_PUBLIC_API_URL as string)) || "http://localhost:5000/v1";
-const API_BASE = `${API_ROOT.replace(/\/$/, '')}/r2`;
+import { API_BASE_URL } from '../config';
+const API_BASE = `${API_BASE_URL.replace(/\/$/, '')}/r2`;
 /**
  * Upload a file or Blob to Cloudflare R2.
  * Calls backend → gets presigned URL → uploads to R2 → returns { key, accessUrl }.

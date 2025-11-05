@@ -1,7 +1,6 @@
 // lib/api/bannerApi.ts
 import { Banner, CreateBannerDTO, UpdateBannerDTO } from "../types/dashboard-banner-tab";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+import { API_BASE_URL } from './config';
 
 // ============================================
 // SERVER-SIDE API CALLS (for SSR)
@@ -10,7 +9,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 export async function fetchBannersServer(): Promise<Banner[]> {
   try {
     // Try the backend API first
-    const res = await fetch('http://localhost:5000/v1/banner/', {
+    const res = await fetch(`${API_BASE_URL}/banner/`, {
       cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
@@ -36,7 +35,7 @@ export async function fetchBannersServer(): Promise<Banner[]> {
 
 export async function fetchBannersClient(): Promise<Banner[]> {
   try {
-    const res = await fetch('http://localhost:5000/v1/banner/', {
+    const res = await fetch(`${API_BASE_URL}/banner/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +57,7 @@ export async function fetchBannersClient(): Promise<Banner[]> {
 
 export async function fetchBannersByType(type: string): Promise<Banner[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/banners?type=${type}`, {
+    const res = await fetch(`${API_BASE_URL}/banner/?type=${type}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -79,7 +78,7 @@ export async function fetchBannersByType(type: string): Promise<Banner[]> {
 
 export async function createBannerApi(payload: CreateBannerDTO): Promise<Banner> {
   try {
-    const res = await fetch(`${API_BASE_URL}/banners`, {
+    const res = await fetch(`${API_BASE_URL}/banner/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -102,7 +101,7 @@ export async function createBannerApi(payload: CreateBannerDTO): Promise<Banner>
 
 export async function updateBannerApi(id: string, payload: UpdateBannerDTO): Promise<Banner> {
   try {
-    const res = await fetch(`${API_BASE_URL}/banners/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/banner/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -125,7 +124,7 @@ export async function updateBannerApi(id: string, payload: UpdateBannerDTO): Pro
 
 export async function deleteBannerApi(id: string): Promise<void> {
   try {
-    const res = await fetch(`${API_BASE_URL}/banners/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/banner/${id}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

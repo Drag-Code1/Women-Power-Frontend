@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import CategoryList from '@/app/component/dashboard/dashboardcategorytab/CategoryList';
+import { API_BASE_URL } from '@/app/lib/config';
 
 export const metadata = {
   title: 'Category Management',
@@ -7,7 +8,7 @@ export const metadata = {
 };
 
 async function fetchCategories() {
-  const res = await fetch('http://localhost:5000/v1/category/', { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/category/`, { cache: 'no-store' });
   const body = await res.json();
   return body.data;
 }

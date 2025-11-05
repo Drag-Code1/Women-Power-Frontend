@@ -1,5 +1,6 @@
 // app/events/page.tsx (Server Component)
 import EventsSectionClient from "../component/events/EventsSectionClient";
+import { API_BASE_URL } from "../lib/config";
 
 interface Event {
   id: string;
@@ -26,7 +27,7 @@ async function getEvents(): Promise<{
 }> {
   try {
     // Fetch events from API
-    const res = await fetch('http://localhost:5000/v1/event/', {
+    const res = await fetch(`${API_BASE_URL}/event/`, {
       cache: 'no-store'
     });
     

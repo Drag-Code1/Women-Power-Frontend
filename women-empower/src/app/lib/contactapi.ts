@@ -1,6 +1,7 @@
 // ==================== app/lib/contactapi.ts ====================
 import { Contact } from "../types/dashboardcontacttab";
 import { getAuthHeaders } from "../lib/authApi";
+import { API_BASE_URL } from './config';
 
 // Fetch all contacts
 export async function getContacts(token?: string): Promise<Contact[]> {
@@ -10,7 +11,7 @@ export async function getContacts(token?: string): Promise<Contact[]> {
     ...(token && { Authorization: `Bearer ${token}` }),
   };
 
-  const res = await fetch("http://localhost:5000/v1/contact-details/", {
+  const res = await fetch(`${API_BASE_URL}/contact-details/`, {
     cache: "no-store", // no caching in Next.js
     headers,
   });
@@ -29,7 +30,7 @@ export async function deleteContact(id: string, token?: string): Promise<void> {
     ...(token && { Authorization: `Bearer ${token}` }),
   };
 
-  const res = await fetch(`http://localhost:5000/v1/contact-details/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/contact-details/${id}`, {
     method: "DELETE",
     headers,
   });

@@ -1,13 +1,13 @@
-
+import { API_BASE_URL } from './config';
 export const fetchArtists = async () => {
-  const res = await fetch('http://localhost:5000/api/artist', { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/artist/`, { cache: 'no-store' });
   const data = await res.json();
   return data;
 }
 
 // Category APIs (v1)
 export const getCategoriesApi = async () => {
-  const res = await fetch('http://localhost:5000/v1/category/', { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/category/`, { cache: 'no-store' });
   const body = await res.json();
   const list = body.data || [];
   try {
@@ -22,7 +22,7 @@ export const getCategoriesApi = async () => {
 
 // Get category details by ID
 export const getCategoryDetailsApi = async (categoryId: string) => {
-  const res = await fetch(`http://localhost:5000/v1/category/${categoryId}`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/category/${categoryId}`, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -50,7 +50,7 @@ export const createCategory = async (payload: { name: string; image?: string }) 
     imageKey = uploaded.key;
   }
 
-  const res = await fetch('http://localhost:5000/v1/category/', {
+  const res = await fetch(`${API_BASE_URL}/category/`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({ name: payload.name, image: imageKey }),
@@ -67,7 +67,7 @@ export const updateCategory = async (id: string, payload: { name: string; image:
     const uploaded = await uploadToR2(imageKey);
     imageKey = uploaded.key;
   }
-  const res = await fetch(`http://localhost:5000/v1/category/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/category/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify({ name: payload.name, image: imageKey }),
@@ -78,7 +78,7 @@ export const updateCategory = async (id: string, payload: { name: string; image:
 
 export const deleteCategory = async (id: string) => {
   const { getAuthHeaders } = await import('./authApi');
-  const res = await fetch(`http://localhost:5000/v1/category/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/category/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -90,7 +90,7 @@ export const deleteCategory = async (id: string) => {
 };
 
 export const getArtistsApi = async (page: number = 1) => {
-  const url = `http://localhost:5000/v1/artist/?page=${encodeURIComponent(page)}`;
+  const url = `${API_BASE_URL}/artist/?page=${encodeURIComponent(page)}`;
   const res = await fetch(url, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -112,7 +112,7 @@ export const getArtistsApi = async (page: number = 1) => {
 
 // Search artists by name
 export const searchArtistsApi = async (query: string) => {
-  const url = `http://localhost:5000/v1/artist/${encodeURIComponent(query)}`;
+  const url = `${API_BASE_URL}/artist/${encodeURIComponent(query)}`;
   const res = await fetch(url, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -139,7 +139,7 @@ export const filterArtistsApi = async (filters: {
     maxExp: number;
   };
 }) => {
-  const url = 'http://localhost:5000/v1/artist/filter';
+  const url = `${API_BASE_URL}/artist/filter`;
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -165,7 +165,7 @@ export const filterArtistsApi = async (filters: {
 
 // Get artist details by ID
 export const getArtistDetailsApi = async (id: string) => {
-  const url = `http://localhost:5000/v1/artist/details/${encodeURIComponent(id)}`;
+  const url = `${API_BASE_URL}/artist/details/${encodeURIComponent(id)}`;
   const res = await fetch(url, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -188,7 +188,7 @@ export const getArtistDetailsApi = async (id: string) => {
 export const getArtistsPaginated = async (
   page: number = 1
 ): Promise<{ totalArtists: number; totalPages: number; currentPage: number; data: any[] }> => {
-  const url = `http://localhost:5000/v1/artist/?page=${encodeURIComponent(page)}`;
+  const url = `${API_BASE_URL}/artist/?page=${encodeURIComponent(page)}`;
   const res = await fetch(url, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -214,7 +214,7 @@ export const getArtistsPaginated = async (
 };
 
 export const getCoursesApi = async () => {
-  const res = await fetch('http://localhost:5000/v1/course/', { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/course/`, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -245,7 +245,7 @@ export const getCoursesApi = async () => {
 
 // Search courses by title, coordinator, or description
 export const searchCoursesApi = async (query: string) => {
-  const res = await fetch(`http://localhost:5000/v1/course/search?q=${encodeURIComponent(query)}`, { 
+  const res = await fetch(`${API_BASE_URL}/course/search?q=${encodeURIComponent(query)}`, { 
     cache: 'no-store' 
   });
   const contentType = res.headers.get('content-type') || '';
@@ -274,7 +274,7 @@ export const filterCoursesApi = async (filters: {
     max: number;
   };
 }) => {
-  const res = await fetch('http://localhost:5000/v1/course/filter', {
+  const res = await fetch(`${API_BASE_URL}/course/filter`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(filters),
@@ -299,7 +299,7 @@ export const filterCoursesApi = async (filters: {
 
 export const deleteCourse = async (id: string) => {
   const { getAuthHeaders } = await import('./authApi');
-  const res = await fetch(`http://localhost:5000/v1/course/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/course/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -336,7 +336,7 @@ export const createCourse = async (payload: {
     const uploaded = await uploadToR2(thumbKey);
     thumbKey = uploaded.key;
   }
-  const res = await fetch('http://localhost:5000/v1/course/', {
+  const res = await fetch(`${API_BASE_URL}/course/`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({ ...payload, thumbnail: thumbKey }),
@@ -381,7 +381,7 @@ export const updateCourse = async (
     const uploaded = await uploadToR2(thumbKey);
     thumbKey = uploaded.key;
   }
-  const res = await fetch(`http://localhost:5000/v1/course/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/course/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify({ ...payload, thumbnail: thumbKey }),
@@ -433,7 +433,7 @@ export const createArtist = async (
   };
   if (r2Key) body.artist_profile_pic = r2Key;
 
-  const res = await fetch('http://localhost:5000/v1/artist/', {
+  const res = await fetch(`${API_BASE_URL}/artist/`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
@@ -482,7 +482,7 @@ export const updateArtist = async (
   };
   if (r2Key) body.artist_profile_pic = r2Key; // only include if changed
 
-  const res = await fetch(`http://localhost:5000/v1/artist/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/artist/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
@@ -506,7 +506,7 @@ export const updateArtist = async (
 
 export const deleteArtist = async (id: string) => {
   const { getAuthHeaders } = await import('./authApi');
-  const res = await fetch(`http://localhost:5000/v1/artist/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/artist/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -517,14 +517,14 @@ export const deleteArtist = async (id: string) => {
 };
 
 export const fetchFeaturedEvents = async () => {
-  const res = await fetch('http://localhost:5000/api/featured-events', { cache: 'force-cache' });
+  const res = await fetch('/api/featured-events', { cache: 'force-cache' });
   const data = await res.json();
   return data;
 }
 
 export const fetchEvents = async () => {
   console.log("Fetching events...");
-  const res = await fetch('http://localhost:5000/api/events', { cache: 'force-cache' });
+  const res = await fetch('/api/events', { cache: 'force-cache' });
   const data = await res.json();
   return data;
 }
@@ -533,7 +533,7 @@ export const fetchEvents = async () => {
 import { buildR2PublicUrl } from './utils/dashboardartist-utils';
 
 export const getEventsV1 = async () => {
-  const res = await fetch('http://localhost:5000/v1/event/', { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/event/`, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -565,7 +565,7 @@ export const getEventsV1 = async () => {
 
 // Get all events for events page
 export const getEventsApi = async () => {
-  const res = await fetch('http://localhost:5000/v1/event/', { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/event/`, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -585,7 +585,7 @@ export const getEventsApi = async () => {
 
 // Search events by title, description, or keywords
 export const searchEventsApi = async (query: string) => {
-  const res = await fetch(`http://localhost:5000/v1/event/search?q=${encodeURIComponent(query)}`, { 
+  const res = await fetch(`${API_BASE_URL}/event/search?q=${encodeURIComponent(query)}`, { 
     cache: 'no-store' 
   });
   const contentType = res.headers.get('content-type') || '';
@@ -610,7 +610,7 @@ export const filterEventsApi = async (filters: {
   status?: string;
   category_id?: string;
 }) => {
-  const res = await fetch('http://localhost:5000/v1/event/filter', {
+  const res = await fetch(`${API_BASE_URL}/event/filter`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(filters),
@@ -636,7 +636,7 @@ export const filterEventsApi = async (filters: {
 // Get latest events for dashboard (limited to 4)
 export const getLatestEvents = async () => {
   try {
-    const res = await fetch('http://localhost:5000/v1/event/', { cache: 'no-store' });
+    const res = await fetch(`${API_BASE_URL}/event/`, { cache: 'no-store' });
     const contentType = res.headers.get('content-type') || '';
     let parsed: any = null;
     try {
@@ -704,7 +704,7 @@ export const createEventV1 = async (
     const uploadedB = await uploadToR2(bannerKey);
     bannerKey = uploadedB.key;
   }
-  const res = await fetch('http://localhost:5000/v1/event/', {
+  const res = await fetch(`${API_BASE_URL}/event/`, {
     method: 'POST',
     headers: getAuthHeaders(),
     body: JSON.stringify({
@@ -758,7 +758,7 @@ export const updateEventV1 = async (
     const uploadedB = await uploadToR2(bannerKey);
     bannerKey = uploadedB.key;
   }
-  const res = await fetch(`http://localhost:5000/v1/event/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/event/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
     body: JSON.stringify({
@@ -792,7 +792,7 @@ export const updateEventV1 = async (
 
 export const deleteEventV1 = async (id: string) => {
   const { getAuthHeaders } = await import('./authApi');
-  const res = await fetch(`http://localhost:5000/v1/event/${id}`, {
+  const res = await fetch(`${API_BASE_URL}/event/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   });
@@ -811,7 +811,7 @@ export const deleteEventV1 = async (id: string) => {
 export const fetchCartItems = async () => {
   
   try {
-    const response = await fetch('http://localhost:5000/api/cart');
+    const response = await fetch('/api/cart');
     if (!response.ok) {
       throw new Error('Network response was not ok');
     } 
@@ -827,7 +827,7 @@ export const fetchCartItems = async () => {
 export const fetchWishListItems = async () => {
   
   try {
-    const response = await fetch('http://localhost:5000/api/wishlist');
+    const response = await fetch('/api/wishlist');
     if (!response.ok) {
       throw new Error('Network response was not ok');
     } 
@@ -848,7 +848,7 @@ export const getDashboardCounts = async (): Promise<{
   eventCount: number;
 }> => {
   const { getAuthHeaders } = await import('./authApi');
-  const res = await fetch('http://localhost:5000/v1/dashboard/', { 
+  const res = await fetch(`${API_BASE_URL}/dashboard/`, { 
     cache: 'no-store',
     headers: getAuthHeaders(),
   });
@@ -878,7 +878,7 @@ export const getDashboardCounts = async (): Promise<{
 export const clearWishlist = async () => {
   
   try {
-    const response = await fetch('http://localhost:5000/api/wishlist');
+    const response = await fetch('/api/wishlist');
     if (!response.ok) {
       throw new Error('Network response was not ok');
     } 
@@ -899,7 +899,7 @@ export const signupUser = async (userData: {
   email: string;
   mobileNo: string;
 }) => {
-  const res = await fetch('http://localhost:5000/v1/user/', {
+  const res = await fetch(`${API_BASE_URL}/user/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(userData),
@@ -925,7 +925,7 @@ export const signupUser = async (userData: {
 };
 
 export const sendOTP = async (email: string) => {
-  const res = await fetch('http://localhost:5000/v1/login/', {
+  const res = await fetch(`${API_BASE_URL}/login/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email }),
@@ -951,7 +951,7 @@ export const sendOTP = async (email: string) => {
 };
 
 export const verifyOTP = async (email: string, otp: number) => {
-  const res = await fetch('http://localhost:5000/v1/login/otp', {
+  const res = await fetch(`${API_BASE_URL}/login/otp`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, otp }),
@@ -978,7 +978,7 @@ export const verifyOTP = async (email: string, otp: number) => {
 
 // Best Seller Products API
 export const getBestSellerProducts = async () => {
-  const res = await fetch('http://localhost:5000/v1/product/best-seller', { 
+  const res = await fetch(`${API_BASE_URL}/product/best-seller`, { 
     cache: 'no-store' 
   });
   
@@ -1003,7 +1003,7 @@ export const getBestSellerProducts = async () => {
 
 // Trending Products API
 export const getTrendingProducts = async () => {
-  const res = await fetch('http://localhost:5000/v1/product/trending', { 
+  const res = await fetch(`${API_BASE_URL}/product/trending`, { 
     cache: 'no-store' 
   });
   
@@ -1028,7 +1028,7 @@ export const getTrendingProducts = async () => {
 
 // Products API - Get all products with pagination
 export const getProductsApi = async (page: number = 1) => {
-  const url = `http://localhost:5000/v1/product/?page=${encodeURIComponent(page)}`;
+  const url = `${API_BASE_URL}/product/?page=${encodeURIComponent(page)}`;
   const res = await fetch(url, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -1050,7 +1050,7 @@ export const getProductsApi = async (page: number = 1) => {
 
 // Search products by name
 export const searchProductsApi = async (query: string) => {
-  const url = `http://localhost:5000/v1/product/search/${encodeURIComponent(query)}`;
+  const url = `${API_BASE_URL}/product/search/${encodeURIComponent(query)}`;
   const res = await fetch(url, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -1077,7 +1077,7 @@ export const filterProductsApi = async (filters: {
     maxPrice: number;
   };
 }) => {
-  const res = await fetch('http://localhost:5000/v1/product/filter', {
+  const res = await fetch(`${API_BASE_URL}/product/filter`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(filters),
@@ -1111,7 +1111,7 @@ export async function postcontactForm(formData: {
   try {
     const { getAuthHeaders } = await import('./authApi');
     
-    const response = await fetch("http://localhost:5000/v1/contact-details/", {
+    const response = await fetch(`${API_BASE_URL}/contact-details/`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(formData),

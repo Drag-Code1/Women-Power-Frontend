@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { WishListItem } from '../types/wishlist';
 import { getWishListItems, addToWishlist, removeFromWishlist } from '../api/wishlistItems';
 import { useAuth } from './AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface WishlistContextType {
   wishlistItems: WishListItem[];
@@ -33,6 +34,7 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
   const [wishlistItems, setWishlistItems] = useState<WishListItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user, isAuthenticated } = useAuth();
+  const router = useRouter();
 
   const wishlistCount = wishlistItems.length;
 
@@ -55,7 +57,8 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
   const handleAddToWishlist = async (productId: string): Promise<boolean> => {
     if (!isAuthenticated || !user?.id) {
-      console.error('User not authenticated');
+      const returnUrl = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/';
+      router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
       return false;
     }
 
@@ -74,7 +77,8 @@ export const WishlistProvider: React.FC<WishlistProviderProps> = ({ children }) 
 
   const handleRemoveFromWishlist = async (productId: string): Promise<boolean> => {
     if (!isAuthenticated || !user?.id) {
-      console.error('User not authenticated');
+      const returnUrl = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/';
+      router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
       return false;
     }
 
