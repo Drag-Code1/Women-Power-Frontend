@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { MoreVertical, Eye, Edit2, Trash2 } from "lucide-react";
 import { Category } from "@/app/types/dashboardcategory";
+import Image from 'next/image';
 import { getFromR2 } from "@/app/lib/utils/r2Client";
 
 interface CategoryCardProps {
@@ -57,10 +58,12 @@ export default function CategoryCard({
     <div className="bg-white rounded-lg shadow-md overflow-visible hover:shadow-lg transition relative">
       <div className="relative h-48">
         {imageUrl ? (
-          <img
+          <Image
             src={imageUrl}
             alt={category.name}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-500">

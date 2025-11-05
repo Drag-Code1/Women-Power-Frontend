@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: 'images.pexels.com' },
       { protocol: 'https', hostname: '*.cloudflarestorage.com' },
+      { protocol: 'https', hostname: '6030e27f467a2a8ec5f96bd95f16262b.r2.cloudflarestorage.com' },
     ],
   },
   eslint: {

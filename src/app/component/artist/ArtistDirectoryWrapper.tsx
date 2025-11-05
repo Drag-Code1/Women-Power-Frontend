@@ -21,13 +21,17 @@ async function ArtistDirectoryWrapper() {
 
     // Fetch categories
     const categoriesData = await getCategoriesApi();
-    categories = categoriesData?.map((cat: any) => cat.name) || [];
+    categories = Array.isArray(categoriesData)
+      ? categoriesData.map((cat: { id: string; name: string }) => cat.name)
+      : [];
     
     // Create a category mapping object
-    const categoryMap: { [key: string]: string } = {};
-    categoriesData?.forEach((cat: any) => {
-      categoryMap[cat.id] = cat.name;
-    });
+    const categoryMap: Record<string, string> = {};
+    if (Array.isArray(categoriesData)) {
+      categoriesData.forEach((cat: { id: string; name: string }) => {
+        categoryMap[cat.id] = cat.name;
+      });
+    }
     
     // Map category names to artists
     artists = artists.map(artist => ({

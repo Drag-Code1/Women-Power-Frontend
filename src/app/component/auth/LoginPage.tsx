@@ -62,9 +62,9 @@ const LoginPage: React.FC = () => {
         console.log('OTP sent successfully, showing verification screen');
         setShowOtpVerification(true);
         setSuccess('OTP sent successfully to your email!');
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error sending OTP:', error);
-        setError(error.message || 'Failed to send OTP. Please try again.');
+        setError(error instanceof Error ? error.message : 'Failed to send OTP. Please try again.');
       }
     } else {
       setError('Please enter a valid email address');
@@ -106,9 +106,9 @@ const LoginPage: React.FC = () => {
             router.push(target);
           }, 100);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('OTP verification error:', error);
-        setError(error.message || 'Invalid OTP. Please try again.');
+        setError(error instanceof Error ? error.message : 'Invalid OTP. Please try again.');
       }
     } else {
       setError('Please enter complete OTP');
@@ -161,8 +161,8 @@ const LoginPage: React.FC = () => {
         email: '',
         mobileNo: ''
       });
-    } catch (error: any) {
-      setError(error.message || 'Registration failed. Please try again.');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Registration failed. Please try again.');
     }
   };
 

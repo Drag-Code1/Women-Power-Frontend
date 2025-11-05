@@ -1,5 +1,6 @@
 'use client'
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Eye, X, Package, Calendar, CreditCard, User, Phone, MapPin, ShoppingBag, Hash } from 'lucide-react';
 import '@/app/globals.css';
 
@@ -511,9 +512,11 @@ const OrderDashboard = () => {
                   {selectedOrder.products.map((product, idx) => (
                     <div key={idx} className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
                       <div className="flex items-center space-x-4">
-                        <img
+                        <Image
                           src={product.productImg}
                           alt={product.productName}
+                          width={80}
+                          height={80}
                           className="w-20 h-20 object-cover rounded-lg shadow"
                         />
                         <div className="flex-1 min-w-0">

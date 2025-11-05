@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { User, LogOut, ChevronDown } from "lucide-react";
 import { useAuth } from "@/app/contexts/AuthContext";
+import Image from 'next/image';
 import { useRouter } from "next/navigation";
 
 interface UserInfo {
@@ -32,10 +33,12 @@ const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
         className="flex items-center space-x-3 text-gray-700 hover:text-gray-900 p-2 rounded-lg hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-50"
       >
         {userInfo.avatar ? (
-          <img
+          <Image
             className="h-9 w-9 rounded-full object-cover border-2 border-gray-200 shadow-sm"
             src={userInfo.avatar}
             alt={userInfo.name}
+            width={36}
+            height={36}
           />
         ) : (
           <div className="h-9 w-9 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center border-2 border-gray-200 shadow-sm">
@@ -68,10 +71,12 @@ const ProfileMenu = ({ userInfo }: { userInfo: UserInfo }) => {
             <div className="px-6 py-6 bg-gray-50 border-b border-gray-200">
               <div className="flex items-center space-x-4">
                 {userInfo.avatar ? (
-                  <img
+                  <Image
                     className="h-14 w-14 rounded-full object-cover border-2 border-gray-200 shadow-sm"
                     src={userInfo.avatar}
                     alt={userInfo.name}
+                    width={56}
+                    height={56}
                   />
                 ) : (
                   <div className="h-14 w-14 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center border-2 border-gray-200 shadow-sm">

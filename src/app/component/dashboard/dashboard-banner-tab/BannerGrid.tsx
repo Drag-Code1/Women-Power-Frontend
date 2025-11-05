@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
 import { Banner } from  "@/app/types/dashboard-banner-tab";
 
@@ -33,13 +34,12 @@ export default function BannerGrid({ banners, onEdit, onDelete, onPreview, isLoa
           className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative"
         >
           <div className="aspect-video bg-gray-100 relative">
-            <img 
-              src={banner.img_url} 
+            <Image 
+              src={banner.img_url}
               alt="Banner"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
-              }}
+              fill
+              sizes="(max-width: 768px) 100vw, 33vw"
+              className="object-cover"
             />
             
             {/* Three Dot Menu */}

@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { X, Upload } from 'lucide-react';
 import { Banner, BannerTypeConfig } from "@/app/types/dashboard-banner-tab";
 
@@ -128,14 +129,15 @@ export default function BannerModal({
           {mode === 'preview' ? (
             // Preview Mode
             <div className="p-6">
-              <img 
-                src={banner?.img_url} 
-                alt="Banner Preview"
-                className="w-full rounded-lg"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/1200x400?text=Image+Not+Found';
-                }}
-              />
+              {banner?.img_url && (
+                <Image 
+                  src={banner.img_url}
+                  alt="Banner Preview"
+                  width={1200}
+                  height={400}
+                  className="w-full h-auto rounded-lg"
+                />
+              )}
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-600">Type</p>
@@ -172,10 +174,13 @@ export default function BannerModal({
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
                   {imagePreview ? (
                     <div className="space-y-4">
-                      <img 
-                        src={imagePreview} 
+                      <Image 
+                        src={imagePreview}
                         alt="Preview"
+                        width={1200}
+                        height={400}
                         className="w-full h-48 object-cover rounded-lg"
+                        unoptimized
                       />
                       <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors">
                         <Upload className="w-5 h-5" />

@@ -231,12 +231,14 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
     const fetchCategories = async () => {
       try {
         const categoriesData = await getCategoriesApi();
-        const idToNameMap: { [key: string]: string } = {};
-        const nameToIdMap: { [key: string]: string } = {};
-        categoriesData?.forEach((cat: any) => {
-          idToNameMap[cat.id] = cat.name;
-          nameToIdMap[cat.name] = cat.id;
-        });
+        const idToNameMap: Record<string, string> = {};
+        const nameToIdMap: Record<string, string> = {};
+        if (Array.isArray(categoriesData)) {
+          categoriesData.forEach((cat: { id: string; name: string }) => {
+            idToNameMap[cat.id] = cat.name;
+            nameToIdMap[cat.name] = cat.id;
+          });
+        }
         setCategoryMap(idToNameMap);
         setCategoryIdMap(nameToIdMap);
       } catch (error) {
@@ -273,7 +275,7 @@ const ArtistDirectoryContent: React.FC<ArtistDirectoryContentProps> = ({
       
       // If there are filters, use filter API
       if (selectedCategories.length > 0 || selectedExperience.length > 0) {
-        const filters: any = {};
+        const filters: { categories?: string[]; experience?: { minExp: number; maxExp: number } } = {};
         
         if (selectedCategories.length > 0) {
           // Convert category names to category IDs for the API

@@ -109,8 +109,8 @@ const SignupPage: React.FC = () => {
         router.push('/login');
       }, 2000);
       
-    } catch (error: any) {
-      setError(error.message || 'Registration failed. Please try again.');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Registration failed. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

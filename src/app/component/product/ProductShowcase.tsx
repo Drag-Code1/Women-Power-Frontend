@@ -1,20 +1,21 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const productImages = [
   {
     id: 1,
-    src: "./images/showcase.webp",
+    src: "/images/showcase.webp",
     alt: "Abstract Folded Pot Design 1"
   },
   {
     id: 2,
-    src: "./images/showcase.webp",
+    src: "/images/showcase.webp",
     alt: "Abstract Folded Pot Design 2"
   },
   {
     id: 3,
-    src: "./images/showcase.webp",
+    src: "/images/showcase.webp",
     alt: "Abstract Folded Pot Design 3"
   }
 ];
@@ -45,10 +46,12 @@ const ProductShowcase: React.FC = () => {
               <div className="relative max-w-md mx-auto">
                 <div className="relative overflow-hidden rounded-lg bg-white shadow-sm">
                   <div className="aspect-[4/3] relative">
-                    <img
+                    <Image
                       src={productImages[currentImageIndex].src}
                       alt={productImages[currentImageIndex].alt}
-                      className="w-full h-full object-cover transition-transform duration-[4000ms] ease-in-out animate-zoom"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-[4000ms] ease-in-out animate-zoom"
                     />
                   </div>
                 </div>

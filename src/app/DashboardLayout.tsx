@@ -9,7 +9,7 @@ interface DashboardLayoutProps {
 }
 
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  const [isMobile, setIsMobile] = useState(false);
+  const [_isMobile, setIsMobile] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { user, isAuthenticated, isLoading } = useAuth();
 

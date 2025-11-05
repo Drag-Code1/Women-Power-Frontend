@@ -81,7 +81,7 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
         } else {
           // If we have filters, use filter API
           if (selectedCategories.length > 0 || selectedPriceRanges.length > 0) {
-            const filters: any = {};
+            const filters: { categories?: string[]; price?: { minPrice: number; maxPrice: number } } = {};
             
             if (selectedCategories.length > 0) {
               filters.categories = selectedCategories;
