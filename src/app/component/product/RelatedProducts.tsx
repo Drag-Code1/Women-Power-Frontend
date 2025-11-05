@@ -277,7 +277,17 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ categoryId }) => {
       try {
         setLoading(true);
         setError(null);
-        const relatedProducts = await productService.getRelatedProducts(categoryId);
+        const relatedRaw = await productService.getRelatedProducts(categoryId);
+        const relatedProducts: Product[] = (Array.isArray(relatedRaw) ? relatedRaw : []).map((p: any) => ({
+          id: String(p.id ?? p.product_id ?? p._id ?? ''),
+          p_Name: String(p.p_Name ?? p.name ?? ''),
+          thumbnail: String(p.thumbnail ?? ''),
+          category_id: String(p.category_id ?? ''),
+          price: String(typeof p.price === 'number' ? p.price.toFixed(2) : p.price ?? '0'),
+          discount: Number(p.discount) || 0,
+          isTrending: !!p.isTrending,
+          is_in_wishlist: !!p.is_in_wishlist,
+        }));
         setProducts(relatedProducts);
       } catch (err) {
         console.error('Error fetching related products:', err);
