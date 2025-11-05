@@ -1,13 +1,14 @@
 import { getBestSellers } from "@/app/api/bestsellersproduct";
 import { BestSellersClient } from "../bestsellers/BestSellersClient";
+import type { Product } from "@/app/types/product";
 
 export const BestSellers = async () => {
   // Fetch data on the server
-  let products = [];
-  let error = null;
+  let products: Product[] = [];
+  let error: string | null = null;
 
   try {
-    products = await getBestSellers();
+    products = (await getBestSellers()) as Product[];
   } catch (err) {
     console.error('Error fetching best sellers:', err);
     error = err instanceof Error ? err.message : 'Failed to fetch best sellers';
