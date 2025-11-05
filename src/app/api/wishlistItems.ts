@@ -87,9 +87,9 @@ export async function getWishListItems(userId?: string): Promise<WishListItem[]>
     }
     const mockRes = await fetch('/api/wishlist', { method: 'GET' });
     if (!mockRes.ok) return [];
-    const mockData: any[] = await mockRes.json();
+    const mockData: WishListItem[] = await mockRes.json();
     // Map mock items to WishListItem shape; use product id as wishlistItemId for deletion
-    return mockData.map((item) => ({
+    return mockData.map((item: WishListItem) => ({
       id: String(item.id),
       wishlistItemId: String(item.id),
       p_Name: item.p_Name,
@@ -107,8 +107,8 @@ export async function getWishListItems(userId?: string): Promise<WishListItem[]>
       // Final fallback to local mock API
       const mockRes = await fetch('/api/wishlist', { method: 'GET' });
       if (!mockRes.ok) return [];
-      const mockData: any[] = await mockRes.json();
-      return mockData.map((item) => ({
+      const mockData: WishListItem[] = await mockRes.json();
+      return mockData.map((item: WishListItem) => ({
         id: String(item.id),
         wishlistItemId: String(item.id),
         p_Name: item.p_Name,

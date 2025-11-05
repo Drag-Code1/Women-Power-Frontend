@@ -269,7 +269,7 @@ const LoginSignup: React.FC<LoginSignupProps> = ({
               </div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">Verify OTP</h1>
               <p className="text-gray-600">
-                We've sent a 6-digit code to {emailAddress}
+                We&apos;ve sent a 6-digit code to {emailAddress}
               </p>
             </div>
 
