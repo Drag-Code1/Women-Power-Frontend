@@ -1,5 +1,7 @@
 import React from 'react';
-import { Edit, Save, Cancel } from '@mui/icons-material';
+import Edit from '@mui/icons-material/Edit';
+import Save from '@mui/icons-material/Save';
+import Cancel from '@mui/icons-material/Cancel';
 import { User } from '../../types/auth';
 
 interface ProfileTabProps {

@@ -2,31 +2,29 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { 
-  Person, 
-  Phone, 
-  Email, 
-  LocationOn, 
-  ShoppingBag, 
-  Settings, 
-  Logout, 
-  Edit, 
-  Save, 
-  Cancel, 
-  ArrowBack, 
-  LocalShipping, 
-  Receipt, 
-  Star, 
-  Shield, 
-  Help, 
-  Support, 
-  Add, 
-  Delete, 
-  Home, 
-  Work, 
-  Business, 
-  AccountCircle 
-} from '@mui/icons-material';
+import Person from '@mui/icons-material/Person';
+import Phone from '@mui/icons-material/Phone';
+import Email from '@mui/icons-material/Email';
+import LocationOn from '@mui/icons-material/LocationOn';
+import ShoppingBag from '@mui/icons-material/ShoppingBag';
+import Settings from '@mui/icons-material/Settings';
+import Logout from '@mui/icons-material/Logout';
+import Edit from '@mui/icons-material/Edit';
+import Save from '@mui/icons-material/Save';
+import Cancel from '@mui/icons-material/Cancel';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import LocalShipping from '@mui/icons-material/LocalShipping';
+import Receipt from '@mui/icons-material/Receipt';
+import Star from '@mui/icons-material/Star';
+import Shield from '@mui/icons-material/Shield';
+import Help from '@mui/icons-material/Help';
+import Support from '@mui/icons-material/Support';
+import Add from '@mui/icons-material/Add';
+import Delete from '@mui/icons-material/Delete';
+import Home from '@mui/icons-material/Home';
+import Work from '@mui/icons-material/Work';
+import Business from '@mui/icons-material/Business';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 
 // Import sub-components
 import LoginSignup from '@/app/LoginSignup/page';

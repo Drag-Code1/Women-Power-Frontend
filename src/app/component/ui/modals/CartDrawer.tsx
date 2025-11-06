@@ -1,14 +1,12 @@
 "use client";
 
 import React from "react";
-import {
-  Close,
-  ShoppingCartOutlined,
-  Add,
-  Remove,
-  Delete,
-  ArrowForward,
-} from "@mui/icons-material";
+import Close from "@mui/icons-material/Close";
+import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
+import Add from "@mui/icons-material/Add";
+import Remove from "@mui/icons-material/Remove";
+import Delete from "@mui/icons-material/Delete";
+import ArrowForward from "@mui/icons-material/ArrowForward";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";

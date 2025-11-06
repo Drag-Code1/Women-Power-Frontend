@@ -3,11 +3,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { debugTokenStatus, getToken, getUser, isTokenValid } from '../lib/auth';
+import type { User } from '../types/auth';
 
 export default function TokenTestPage() {
   const { user, token, isAuthenticated, isLoading } = useAuth();
   const [localToken, setLocalToken] = useState<string | null>(null);
-  const [localUser, setLocalUser] = useState<any>(null);
+  const [localUser, setLocalUser] = useState<User | null>(null);
 
   useEffect(() => {
     // Get token and user directly from localStorage
@@ -121,7 +122,7 @@ export default function TokenTestPage() {
           <h3 className="text-lg font-semibold text-yellow-800 mb-2">Instructions:</h3>
           <ol className="list-decimal list-inside space-y-1 text-yellow-700">
             <li>Make sure you are logged in to the application</li>
-            <li>Click "Debug Token (Console)" to see detailed token information in the browser console</li>
+            <li>Click &quot;Debug Token (Console)&quot; to see detailed token information in the browser console</li>
             <li>Open browser console (F12) to see the debug output</li>
             <li>Check if the token is valid and not expired</li>
             <li>If token is missing, try logging in again</li>

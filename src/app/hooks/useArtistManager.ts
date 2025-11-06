@@ -21,7 +21,7 @@ export function useArtistManager(initialArtists: Artist[]) {
   const [selectedArtist, setSelectedArtist] = useState<Artist | null>(null);
   const [formData, setFormData] = useState<ArtistFormData>(initialFormData);
   const [imagePreview, setImagePreview] = useState<string>('');
-  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([]);
 
   useEffect(() => {
@@ -174,11 +174,12 @@ export function useArtistManager(initialArtists: Artist[]) {
         console.error('Failed to delete artist', e);
       }
     }
-    setOpenDropdownId(null as unknown as number | null);
+    setOpenDropdownId(null);
   };
 
   const toggleDropdown = (id: string | number) => {
-    const next = String(openDropdownId) === String(id) ? null : (id as unknown as number);
+    const idStr = String(id);
+    const next = String(openDropdownId) === idStr ? null : idStr;
     setOpenDropdownId(next);
   };
 

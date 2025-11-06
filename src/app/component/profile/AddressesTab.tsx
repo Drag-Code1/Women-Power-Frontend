@@ -1,5 +1,11 @@
 import React from 'react';
-import { LocationOn, Home, Work, Add, Edit, Delete, Cancel } from '@mui/icons-material';
+import LocationOn from '@mui/icons-material/LocationOn';
+import Home from '@mui/icons-material/Home';
+import Work from '@mui/icons-material/Work';
+import Add from '@mui/icons-material/Add';
+import Edit from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
+import Cancel from '@mui/icons-material/Cancel';
 import { Address } from './ProfileSection';
 import { User } from '../../types/auth';
 
@@ -10,7 +16,7 @@ interface AddressesTabProps {
   editingAddress: Address | null;
   setEditingAddress: (address: Address | null) => void;
   newAddress: Omit<Address, 'id'>;
-  setNewAddress: (address: Omit<Address, 'id'>) => void;
+  setNewAddress: React.Dispatch<React.SetStateAction<Omit<Address, 'id'>>>;
   handleAddAddress: () => void;
   handleEditAddress: (address: Address) => void;
   handleUpdateAddress: () => void;

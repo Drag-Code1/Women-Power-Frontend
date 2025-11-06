@@ -1,4 +1,5 @@
 // app/events/page.tsx (Server Component)
+export const dynamic = 'force-dynamic';
 import EventsSectionClient from "../component/events/EventsSectionClient";
 import { API_BASE_URL } from "../lib/config";
 

@@ -2,7 +2,8 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
-import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
+import ArrowBackIos from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIos from "@mui/icons-material/ArrowForwardIos";
 import { Category } from "@/app/types/category";
 import { CategoryCard } from "./CategoryCard";
 

@@ -13,4 +13,4 @@ export interface Event {
 
 export type ModalMode = 'add' | 'edit' | 'view';
 
-export interface EventFormData extends Partial<Event> {}
+export type EventFormData = Partial<Event>;

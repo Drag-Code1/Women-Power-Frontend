@@ -1,6 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Star, StarBorder, Sort, FilterList, CheckCircle, Palette, Person } from '@mui/icons-material';
+import Star from '@mui/icons-material/Star';
+import StarBorder from '@mui/icons-material/StarBorder';
+import Sort from '@mui/icons-material/Sort';
+import FilterList from '@mui/icons-material/FilterList';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import Palette from '@mui/icons-material/Palette';
+import Person from '@mui/icons-material/Person';
 import { getArtistReviewsApi, createArtistReviewApi } from '../../lib/artistReviewApi';
 import { ArtistReview } from '../../types/artistReview';
 import { useAuth } from '../../contexts/AuthContext';

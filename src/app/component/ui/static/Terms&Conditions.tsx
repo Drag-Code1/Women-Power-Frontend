@@ -1,12 +1,10 @@
 "use client";
 
 import React from "react";
-import {
-  WarningAmber,
-  VideoLibrary,
-  CheckCircle,
-  CreditCard,
-} from "@mui/icons-material";
+import WarningAmber from "@mui/icons-material/WarningAmber";
+import VideoLibrary from "@mui/icons-material/VideoLibrary";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import CreditCard from "@mui/icons-material/CreditCard";
 
 const TermsConditionsPage: React.FC = () => {
   const terms = [

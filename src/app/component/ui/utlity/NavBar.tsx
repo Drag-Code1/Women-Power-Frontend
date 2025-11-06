@@ -1,15 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import {
-  Person,
-  FavoriteBorder,
-  Search,
-  Menu,
-  Close,
-  SearchOutlined,
-  ShoppingCartOutlined,
-} from "@mui/icons-material";
+import Person from "@mui/icons-material/Person";
+import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
+import Search from "@mui/icons-material/Search";
+import Menu from "@mui/icons-material/Menu";
+import Close from "@mui/icons-material/Close";
+import SearchOutlined from "@mui/icons-material/SearchOutlined";
+import ShoppingCartOutlined from "@mui/icons-material/ShoppingCartOutlined";
 import CartDrawer from "../modals/CartDrawer";
 import { usePathname, useRouter } from "next/navigation";
 import ProfilePopUp from "../modals/ProfilePopUp";

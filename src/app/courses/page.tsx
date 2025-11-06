@@ -1,4 +1,5 @@
 // app/courses/page.tsx (Server Component)
+export const dynamic = 'force-dynamic';
 import CoursesDirectoryClient from "../component/courses/CoursesDirectoryClient ";
 import { getCoursesApi, getCategoriesApi } from "../lib/api";
 import { Course } from "../types/course";

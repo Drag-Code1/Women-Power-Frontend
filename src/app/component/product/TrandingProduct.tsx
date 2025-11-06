@@ -1,10 +1,11 @@
 import { getTrendingProducts } from "@/app/api/trandingproducts";
+import type { Product } from "@/app/types/product";
 import { TrendingProductsClient } from "../trandingproducts/TrendingProductsClient";
 
 export const TrendingProducts = async () => {
   // Fetch data on the server
-  let products = [];
-  let error = null;
+  let products: Product[] = [];
+  let error: string | null = null;
 
   try {
     products = await getTrendingProducts();
@@ -29,12 +30,12 @@ export const TrendingProducts = async () => {
             <p className="text-gray-600 mb-4">
               {error}
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
+            <a
+              href="/"
+              className="inline-block bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
             >
               Try Again
-            </button>
+            </a>
           </div>
         ) : products.length > 0 ? (
           <TrendingProductsClient products={products} />

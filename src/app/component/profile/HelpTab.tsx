@@ -1,5 +1,7 @@
 import React from 'react';
-import { Support, Receipt, Help } from '@mui/icons-material';
+import Support from '@mui/icons-material/Support';
+import Receipt from '@mui/icons-material/Receipt';
+import Help from '@mui/icons-material/Help';
 import Link from 'next/link';
 
 const HelpTab: React.FC = () => {

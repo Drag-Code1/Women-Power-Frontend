@@ -4,6 +4,8 @@ import ProductFilterClient from "../component/arts/ProductFilterClient";
 import { Product } from "../types/product";
 
 // Main page component (Server Component)
+export const dynamic = 'force-dynamic';
+
 export default async function ArtsPage() {
   // Fetch data from API
   let products: Product[] = [];

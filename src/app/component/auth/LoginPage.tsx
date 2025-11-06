@@ -2,13 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { 
-  Shield, 
-  Email,
-  Lock,
-  CheckCircle,
-  Error as ErrorIcon
-} from '@mui/icons-material';
+import Shield from '@mui/icons-material/Shield';
+import Email from '@mui/icons-material/Email';
+import Lock from '@mui/icons-material/Lock';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
 
 // Import sub-components
 import LoginSignup from '@/app/LoginSignup/page';

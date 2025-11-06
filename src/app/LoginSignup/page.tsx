@@ -1,7 +1,11 @@
 "use client";
 
 import React from 'react';
-import { Email, AccountCircle, Shield, ArrowBack, Phone } from '@mui/icons-material';
+import Email from '@mui/icons-material/Email';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Shield from '@mui/icons-material/Shield';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import Phone from '@mui/icons-material/Phone';
 
 interface LoginSignupProps {
   authMode: 'login' | 'signup';

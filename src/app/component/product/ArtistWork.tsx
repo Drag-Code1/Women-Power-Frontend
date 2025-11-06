@@ -1,10 +1,8 @@
 "use client";
 import React, { useRef, useState, useEffect } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Visibility,
-} from "@mui/icons-material";
+import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import ChevronRight from "@mui/icons-material/ChevronRight";
+import Visibility from "@mui/icons-material/Visibility";
 import { Heart, ShoppingCart } from "lucide-react";
 import "@/app/globals.css";
 import { getArtistProducts, ArtistProduct } from "@/app/lib/artistApi";

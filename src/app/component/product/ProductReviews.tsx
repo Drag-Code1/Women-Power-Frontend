@@ -1,6 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Star, StarBorder, Sort, FilterList, CheckCircle } from '@mui/icons-material';
+import Star from '@mui/icons-material/Star';
+import StarBorder from '@mui/icons-material/StarBorder';
+import Sort from '@mui/icons-material/Sort';
+import FilterList from '@mui/icons-material/FilterList';
+import CheckCircle from '@mui/icons-material/CheckCircle';
 import { useAuth } from '@/app/contexts/AuthContext';
 import { getProductReviewsApi, createProductReviewApi, ProductReview } from '@/app/lib/productReviewApi';
 import { getCurrentToken, getCurrentUser } from '@/app/lib/authenticatedApi';

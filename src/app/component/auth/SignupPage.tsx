@@ -2,15 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Shield, 
-  Person,
-  Email,
-  Phone,
-  CheckCircle,
-  Error as ErrorIcon,
-  ArrowBack
-} from '@mui/icons-material';
+import Shield from '@mui/icons-material/Shield';
+import Person from '@mui/icons-material/Person';
+import Email from '@mui/icons-material/Email';
+import Phone from '@mui/icons-material/Phone';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import ErrorIcon from '@mui/icons-material/Error';
+import ArrowBack from '@mui/icons-material/ArrowBack';
 
 // Import sub-components
 import LoginSignup from '@/app/LoginSignup/page';

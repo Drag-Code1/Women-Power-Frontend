@@ -1,14 +1,12 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  EmailOutlined,
-  PhoneOutlined,
-  Facebook,
-  Twitter,
-  Instagram,
-  LinkedIn,
-} from "@mui/icons-material";
+import EmailOutlined from "@mui/icons-material/EmailOutlined";
+import PhoneOutlined from "@mui/icons-material/PhoneOutlined";
+import Facebook from "@mui/icons-material/Facebook";
+import Twitter from "@mui/icons-material/Twitter";
+import Instagram from "@mui/icons-material/Instagram";
+import LinkedIn from "@mui/icons-material/LinkedIn";
 
 interface FooterProps {
   logoSrc?: string;

@@ -14,9 +14,9 @@ export interface Product {
   p_Name: string;
   thumbnail: string;
   category_id: string;
-  price: string;
+  price: number | string;
   discount: number;
-  isTrending: boolean;
+  isTrending?: boolean;
   is_in_wishlist?: boolean;
 }
 
@@ -37,7 +37,7 @@ const ProductCardNew: React.FC<ProductCardProps> = ({
   addingToCart = false
 }) => {
   // Calculate prices
-  const originalPrice = parseFloat(product.price);
+  const originalPrice = typeof product.price === 'number' ? product.price : parseFloat(product.price);
   const discountAmount = originalPrice * (product.discount / 100);
   const finalPrice = originalPrice - discountAmount;
   

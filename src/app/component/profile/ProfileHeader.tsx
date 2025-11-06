@@ -1,5 +1,5 @@
 import React from 'react';
-import { Logout } from '@mui/icons-material';
+import Logout from '@mui/icons-material/Logout';
 import { User } from '../../types/auth';
 
 interface ProfileHeaderProps {

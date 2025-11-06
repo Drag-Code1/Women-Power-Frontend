@@ -10,7 +10,7 @@ interface ArtistTableProps {
   onView: (artist: Artist) => void;
   onEdit: (artist: Artist) => void;
   onDelete: (id: string | number) => void;
-  openDropdownId: number | null;
+  openDropdownId: string | null;
   onToggleDropdown: (id: string | number) => void;
 }
 

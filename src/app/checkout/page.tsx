@@ -1,25 +1,23 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import {
-  Home,
-  Work,
-  Business,
-  Add,
-  Edit,
-  Delete,
-  CreditCard,
-  AccountBalance,
-  Payment,
-  AccountBalanceWallet,
-  QrCode,
-  Visibility,
-  VisibilityOff,
-  ArrowBack,
-  Check,
-  LocationOn,
-  Phone,
-  Person
-} from '@mui/icons-material';
+import Home from '@mui/icons-material/Home';
+import Work from '@mui/icons-material/Work';
+import Business from '@mui/icons-material/Business';
+import Add from '@mui/icons-material/Add';
+import Edit from '@mui/icons-material/Edit';
+import Delete from '@mui/icons-material/Delete';
+import CreditCard from '@mui/icons-material/CreditCard';
+import AccountBalance from '@mui/icons-material/AccountBalance';
+import Payment from '@mui/icons-material/Payment';
+import AccountBalanceWallet from '@mui/icons-material/AccountBalanceWallet';
+import QrCode from '@mui/icons-material/QrCode';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import ArrowBack from '@mui/icons-material/ArrowBack';
+import Check from '@mui/icons-material/Check';
+import LocationOn from '@mui/icons-material/LocationOn';
+import Phone from '@mui/icons-material/Phone';
+import Person from '@mui/icons-material/Person';
 
 interface CartItem {
   id: string;

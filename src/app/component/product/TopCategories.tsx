@@ -1,10 +1,11 @@
 import { getTopCategories } from "@/app/api/category";
+import type { Category } from "@/app/types/category";
 import { TopCategoriesClient } from '../categories/TopCategoriesClient';
 
 export const TopCategories = async () => {
   // Fetch data on the server
-  let categories = [];
-  let error = null;
+  let categories: Category[] = [];
+  let error: string | null = null;
 
   try {
     categories = await getTopCategories();
@@ -25,12 +26,12 @@ export const TopCategories = async () => {
             <p className="text-gray-600 mb-4">
               {error}
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
+            <a
+              href="/"
+              className="inline-block bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
             >
               Try Again
-            </button>
+            </a>
           </div>
         ) : categories.length > 0 ? (
           <TopCategoriesClient categories={categories} />
