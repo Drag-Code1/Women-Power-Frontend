@@ -24,7 +24,7 @@ export const ARTISTS = [
   "Arjun Singh",
 ] as const;
 
-export const DEFAULT_THUMBNAIL = "https://cdn.pixabay.com/photo/2024/07/14/14/42/woman-8894656_1280.jpg";
+export const DEFAULT_THUMBNAIL = "";
 
 export const INITIAL_FORM_DATA = {
   p_Name: "",

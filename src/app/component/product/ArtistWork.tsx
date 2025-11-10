@@ -98,10 +98,7 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId }) => {
     }
   };
 
-  // Handle view details
-  const handleViewDetails = (productId: string) => {
-    router.push(`/products-details?id=${productId}`);
-  };
+
 
   const checkScrollButtons = () => {
     if (scrollContainerRef.current) {
@@ -227,17 +224,8 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId }) => {
                     </button>
 
                     {/* Overlay Actions */}
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 
+                    <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-30 
                                  transition-all duration-300 flex items-center justify-center">
-                      <button
-                        onClick={() => handleViewDetails(artwork.id)}
-                        className="opacity-0 group-hover:opacity-100 bg-white text-gray-800 
-                                 px-4 py-2 rounded-full font-semibold flex items-center gap-2
-                                 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300"
-                      >
-                        <Visibility fontSize="small" />
-                        View Details
-                      </button>
                     </div>
 
                     {/* Trending Badge */}

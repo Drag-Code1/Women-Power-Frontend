@@ -5,45 +5,122 @@ import WarningAmber from "@mui/icons-material/WarningAmber";
 import VideoLibrary from "@mui/icons-material/VideoLibrary";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 import CreditCard from "@mui/icons-material/CreditCard";
+import Business from "@mui/icons-material/Business";
+import LocationOn from "@mui/icons-material/LocationOn";
+import Language from "@mui/icons-material/Language";
+import Security from "@mui/icons-material/Security";
+import Gavel from "@mui/icons-material/Gavel";
+import PrivacyTip from "@mui/icons-material/PrivacyTip";
+import Update from "@mui/icons-material/Update";
+import ContactMail from "@mui/icons-material/ContactMail";
 
 const TermsConditionsPage: React.FC = () => {
+  const vendorInfo = {
+    name: "Woman Empowering Journey",
+    address: "Opp Hanuman Mandir, Main Mondha Golai Market, Parli Vaijnath 431515, Dist. Beed, Maharashtra, 413716",
+    website: "www.womanej.com",
+    email: "team@womanej.com"
+  };
+
   const terms = [
     {
       id: 1,
-      icon: <WarningAmber fontSize="large" className="text-yellow-500" />,
-      title: "Workshop and Competition Fees",
-      description:
-        "All workshop and competition fees are non-refundable. Please register mindfully and ensure you can attend before making payment.",
-      details:
-        "Once payment is processed, no refunds will be issued under any circumstances. This policy helps us maintain quality programming and fair pricing for all participants.",
+      icon: <Business fontSize="large" className="text-blue-500" />,
+      title: "Vendor Information",
+      description: "Woman Empowering Journey",
+      details: "We are a registered enterprise operating from Maharashtra, India. All services and products are provided under this business entity."
     },
     {
       id: 2,
-      icon: <VideoLibrary fontSize="large" className="text-blue-500" />,
-      title: "Recordings Access",
-      description:
-        "Recordings (if provided) will have limited-time access and are strictly for personal use only.",
-      details:
-        "Recording access typically expires 30 days after the event. Sharing, distributing, or commercial use of recordings is strictly prohibited and may result in legal action.",
+      icon: <LocationOn fontSize="large" className="text-red-500" />,
+      title: "Business Address",
+      description: "Opp Hanuman Mandir, Main Mondha Golai Market, Parli Vaijnath 431515, Dist. Beed, Maharashtra, 413716",
+      details: "Our registered office is located at the above address. All official correspondence should be directed to this location."
     },
     {
       id: 3,
-      icon: <CheckCircle fontSize="large" className="text-green-500" />,
-      title: "Handcrafted Art Products",
-      description:
-        "All art products are handcrafted with care, so little variations in color and design are natural and expected.",
-      details:
-        "Each piece is unique due to the handmade nature. Minor variations in color, texture, or design elements are not considered defects but rather characteristics that make each item special.",
+      icon: <Language fontSize="large" className="text-green-500" />,
+      title: "Website Usage",
+      description: "Our website and its content are intended for your personal, non-commercial use.",
+      details: "Unauthorized use, modification, or distribution of the content on our website is prohibited. By accessing our website at www.vaibhavdhus.com, you agree to comply with these terms."
     },
     {
       id: 4,
-      icon: <CreditCard fontSize="large" className="text-purple-500" />,
-      title: "Order Processing",
-      description:
-        "Orders are processed only after full payment confirmation is received.",
-      details:
-        "Processing begins within 1-2 business days after payment verification. You will receive an email confirmation once your order enters the production queue.",
+      icon: <Security fontSize="large" className="text-purple-500" />,
+      title: "Intellectual Property",
+      description: "All content on this website is the property of Woman Empowering Journey.",
+      details: "All content, including text, graphics, logos, and images, is protected by applicable copyright laws. Any reproduction or redistribution without permission is strictly prohibited."
     },
+    {
+      id: 5,
+      icon: <Gavel fontSize="large" className="text-orange-500" />,
+      title: "User Conduct",
+      description: "You agree not to post or transmit any harmful, threatening, or inappropriate content.",
+      details: "Any misuse of the website that violates these terms may result in termination of your access to the website. We reserve the right to take appropriate legal action against violators."
+    },
+    {
+      id: 6,
+      icon: <PrivacyTip fontSize="large" className="teal-500" />,
+      title: "Privacy Policy",
+      description: "Your privacy is important to us.",
+      details: "Please refer to our Privacy Policy for information on how we collect, use, and protect your personal information. We are committed to safeguarding your data."
+    },
+    {
+      id: 7,
+      icon: <WarningAmber fontSize="large" className="text-yellow-500" />,
+      title: "Product Information",
+      description: "We make every effort to display accurate information on our website.",
+      details: "However, we do not warrant that product descriptions or other content on this site are error-free, complete, or current. All products are provided 'as is'."
+    },
+    {
+      id: 8,
+      icon: <CheckCircle fontSize="large" className="text-green-500" />,
+      title: "Handcrafted Art Products",
+      description: "All art products are handcrafted with care, so variations in color and design are natural.",
+      details: "Each piece is unique due to the handmade nature. Minor variations in color, texture, or design elements are not considered defects but rather characteristics that make each item special."
+    },
+    {
+      id: 9,
+      icon: <CreditCard fontSize="large" className="text-purple-500" />,
+      title: "Order Processing & Fees",
+      description: "Orders are processed only after full payment confirmation is received.",
+      details: "All workshop and competition fees are non-refundable. Once payment is processed, no refunds will be issued under any circumstances. Processing begins within 1-2 business days after payment verification."
+    },
+    {
+      id: 10,
+      icon: <VideoLibrary fontSize="large" className="text-blue-500" />,
+      title: "Recordings Access",
+      description: "Recordings (if provided) will have limited-time access and are for personal use only.",
+      details: "Recording access typically expires 30 days after the event. Sharing, distributing, or commercial use of recordings is strictly prohibited and may result in legal action."
+    },
+    {
+      id: 11,
+      icon: <Gavel fontSize="large" className="text-indigo-500" />,
+      title: "Limitation of Liability",
+      description: "We will not be liable for any direct, indirect, incidental, or consequential damages.",
+      details: "Your use of our website is at your own risk. We shall not be responsible for any loss or damage of any kind arising from your use of our services or website."
+    },
+    {
+      id: 12,
+      icon: <Security fontSize="large" className="text-blue-600" />,
+      title: "Governing Law",
+      description: "These Terms and Conditions are governed by the laws of India.",
+      details: "Any disputes arising out of or in connection with these terms shall be subject to the exclusive jurisdiction of the courts of Maharashtra."
+    },
+    {
+      id: 13,
+      icon: <Update fontSize="large" className="text-gray-500" />,
+      title: "Changes to Terms",
+      description: "We reserve the right to update or modify these Terms and Conditions at any time.",
+      details: "Changes may be made without prior notice. Your continued use of the website following any changes signifies your acceptance of the updated terms."
+    },
+    {
+      id: 14,
+      icon: <ContactMail fontSize="large" className="text-red-500" />,
+      title: "Contact Us",
+      description: "If you have any questions regarding these Terms and Conditions, please contact us.",
+      details: "Email: vaibhavdhus@gmail.com. We value your feedback and are here to assist with any concerns you may have regarding our terms and services."
+    }
   ];
 
   return (
@@ -63,7 +140,37 @@ const TermsConditionsPage: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Vendor Information Section */}
+        <section className="mb-12 p-6 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200">
+          <h2 className="text-xl font-bold mb-4 text-center text-blue-800">Vendor Information</h2>
+          <div className="grid md:grid-cols-3 gap-4 text-center">
+            <div className="flex flex-col items-center">
+              <Business className="text-blue-600 mb-2" fontSize="large" />
+              <h3 className="font-semibold mb-1">Vendor</h3>
+              <p className="text-gray-700">{vendorInfo.name}</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <LocationOn className="text-red-600 mb-2" fontSize="large" />
+              <h3 className="font-semibold mb-1">Address</h3>
+              <p className="text-gray-700">{vendorInfo.address}</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <Language className="text-green-600 mb-2" fontSize="large" />
+              <h3 className="font-semibold mb-1">Website</h3>
+              <p className="text-gray-700">{vendorInfo.website}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* Introduction */}
+        <section className="mb-12 p-6 rounded-xl bg-gray-50 border border-gray-200">
+          <h2 className="text-xl font-bold mb-4">Introduction</h2>
+          <p className="text-gray-700 leading-relaxed">
+            Welcome to our website. By accessing or using our services, you agree to comply with and be bound by the following Terms and Conditions. Please read them carefully before using our website.
+          </p>
+        </section>
+
         {/* Terms Grid */}
         <section className="grid gap-6 md:grid-cols-2">
           {terms.map((term) => (
@@ -96,7 +203,7 @@ const TermsConditionsPage: React.FC = () => {
               support team before making any commitments or purchases.
             </p>
             <div className="mt-4">
-              <button  className="px-6 py-2 rounded-lg font-medium bg-[#817363] hover:bg-[#61503c] text-white transition-colors">
+              <button className="px-6 py-2 rounded-lg font-medium bg-[#817363] hover:bg-[#61503c] text-white transition-colors">
                 <a href="/contact">Contact Support</a>
               </button>
             </div>

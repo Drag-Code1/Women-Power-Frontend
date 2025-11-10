@@ -82,12 +82,6 @@ const ProductShowcase: React.FC = () => {
                   to encourage the Indian traditional art in the form of Decorative Kundan Items, 
                   which create the exceptional aura….
                 </p>
-                
-                <div className="pt-3 flex justify-center lg:justify-start">
-                  <button className="bg-[#867259eb] hover:bg-[#61503c] text-white px-6 py-2.5 rounded-md font-medium transition-all duration-300 hover:scale-105">
-                    View More
-                  </button>
-                </div>
               </div>
             </div>
           </div>

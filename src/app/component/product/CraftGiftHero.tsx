@@ -64,14 +64,6 @@ const CraftGiftHero = () => {
         >
           Create memories that last forever
         </p>
-
-        <button
-          className={`mt-6 px-5 py-2 sm:px-6 sm:py-2.5 bg-[#61503c] text-white font-medium text-sm sm:text-base rounded-md shadow-md hover:bg-[#4e3f31] hover:shadow-lg hover:scale-105 transition-all duration-300 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-          }`}
-        >
-          Purchase Now
-        </button>
       </div>
 
       {/* floating particles */}

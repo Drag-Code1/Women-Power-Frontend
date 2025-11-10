@@ -152,9 +152,11 @@ const Contact = () => {
   return (
     <section className="py-12 px-4 md:px-10 bg-[#f7f7f7] text-[#5C452B]">
       <div className="grid grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto rounded-xl shadow-md overflow-hidden bg-white border border-gray-200 items-stretch">
-        
         {/* Left: Contact Info */}
-        <div className="p-8 bg-[#f7f7f7] space-y-6 flex flex-col justify-center">
+        <div className="p-8 bg-[#f7f7f7] space-y-8 flex flex-col justify-center">
+
+          <div className='font-semibold text-3xl '>Woman Empowering Journey</div>
+
           <h2 className="text-2xl font-bold mb-4">Contact Info</h2>
 
           <div>
@@ -166,6 +168,7 @@ const Contact = () => {
               Opp Hanuman Mandir, Main Mondha Golai Market <br />
               Parli Vaijnath 431515, Dist. Beed, Maharashtra
             </p>
+            <p className="text-sm leading-relaxed"> Udyam Number  - UDYAM-MH-05-0083924</p>
           </div>
 
           <div>
