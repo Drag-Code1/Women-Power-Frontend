@@ -340,10 +340,10 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
                 </button>
                 
                 <div className="flex gap-3">
-                  <button className="flex-1 border border-gray-200 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                  <a href={`/checkout?productId=${product.id}&quantity=${quantity}`} className="flex-1 border border-gray-200 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
                     <ShoppingCart size={18} />
                     Buy Now
-                  </button>
+                  </a>
                   
                   <button
                     onClick={handleToggleWishlist}

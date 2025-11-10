@@ -1,37 +1,52 @@
 "use client";
 import React from "react";
 
-interface PolicyItem {
-  text: string;
+interface PolicySection {
+  title: string;
+  content: string;
+}
+
+interface ContactInfo {
+  email: string;
+  phone: string;
 }
 
 interface ReturnExchangePolicyProps {
   title?: string;
   subtitle?: string;
-  policyItems?: PolicyItem[];
-  noteTitle?: string;
-  noteContent?: string;
-  companyName?: string;
+  policySections?: PolicySection[];
+  contactInfo?: ContactInfo;
 }
 
 const ReturnExchangePolicy: React.FC<ReturnExchangePolicyProps> = ({
-  title = "Return & Exchange Policy",
-  subtitle = "We want you to love your purchase. Still, if you receive a damaged product, we are happy to exchange it.",
-  policyItems = [
+  title = "Cancellation, Return & Refund Policy",
+  subtitle = "",
+  policySections = [
     {
-      text: "Please share clear photos and videos of the damage within 48 hours of delivery.",
-    },
-    { text: "Return the product to the address provided by our team." },
-    {
-      text: "Once we receive and verify it, we'll send you a replacement of the same design/product.",
+      title: "Cancellation Policy",
+      content: "We understand that there may be times when you need to cancel your order. Cancellations are permitted if the request is made within 24 hours of placing the order and before the order has been dispatched. Once an order is shipped, it cannot be canceled.\n\nTo request a cancellation, please contact us at Sonalithakkar1112@gmail.com or call 9309100122."
     },
     {
-      text: "Customized products and items damaged due to mishandling are not eligible for exchange.",
+      title: "Return Policy",
+      content: "Our policy allows returns within 7 days of receiving the product, provided the item is unused, in its original packaging, and in a resellable condition. Please note that certain items may not be eligible for return, including items that have been customized or used.\n\nTo initiate a return, please contact our support team to receive return instructions. The return shipping cost will be borne by the customer unless the product was damaged or defective upon delivery."
     },
+    {
+      title: "Refund Policy",
+      content: "Refunds will be processed upon successful receipt and inspection of the returned item. Once the return is approved, the refund will be issued to the original payment method within 7-10 business days.\n\nPlease note that original shipping fees are non-refundable, and certain items may not be eligible for a refund. If the item was marked as a final sale, it cannot be returned or refunded."
+    },
+    {
+      title: "Non-Refundable Items",
+      content: "Services, digital products, and any items marked as \"Final Sale\" are not eligible for return or refund. Please read the product descriptions carefully before making a purchase."
+    },
+    {
+      title: "Contact Us",
+      content: "If you have any questions about our Cancellation, Return & Refund Policy, please contact us at Sonalithakkar1112@gmail.com or call 9309100122. We are here to help and address any concerns you may have."
+    }
   ],
-  noteTitle = "Note",
-  noteContent = "By shopping with Woman.EJ, you agree to these policies. We may update them as needed to serve you better.",
-  companyName = "Woman.EJ",
+  contactInfo = {
+    email: "Sonalithakkar1112@gmail.com",
+    phone: "9309100122"
+  }
 }) => {
   return (
     <main className="min-h-screen py-12">
@@ -42,44 +57,30 @@ const ReturnExchangePolicy: React.FC<ReturnExchangePolicyProps> = ({
             {title}
           </h1>
           <div className="w-16 h-1 bg-[#61503c] mx-auto rounded-full mb-4"></div>
-          <p className="text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
-            {subtitle}
-          </p>
+          {subtitle && (
+            <p className="text-lg text-gray-700 leading-relaxed max-w-2xl mx-auto">
+              {subtitle}
+            </p>
+          )}
         </header>
 
         {/* Card */}
         <article className="bg-white rounded-xl shadow-md overflow-hidden">
-          {/* Policy Steps */}
+          {/* Policy Sections */}
           <section className="p-8">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-              Exchange Process
-            </h2>
-            <div className="space-y-5">
-              {policyItems.map((item, index) => (
-                <div key={index} className="flex items-start space-x-3">
-                  <div className="w-8 h-8 bg-[#f3f3f3] flex-shrink-0 text-[#61503c] rounded-full flex items-center justify-center text-sm font-semibold">
-                    {index + 1}
-                  </div>
-                  <p className="text-gray-700 leading-relaxed">{item.text}</p>
+            {policySections.map((section: PolicySection, index: number) => (
+              <div key={index} className="mb-8 last:mb-0">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+                  {section.title}
+                </h2>
+                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                  {section.content}
                 </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Divider */}
-          <div className="border-t border-gray-200"></div>
-
-          {/* Note */}
-          <section className="p-8 bg-gray-50">
-            <div className="bg-white rounded-lg p-6 border-l-4 border-[#61503c] shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-                <span className="w-6 h-6 bg-[#f3f3f3] flex-shrink-0 text-[#61503c] rounded-full flex items-center justify-center text-sm font-bold mr-2">
-                  !
-                </span>
-                {noteTitle}
-              </h3>
-              <p className="text-gray-700">{noteContent}</p>
-            </div>
+                {index < policySections.length - 1 && (
+                  <div className="mt-6 border-t border-gray-200"></div>
+                )}
+              </div>
+            ))}
           </section>
         </article>
 
@@ -90,20 +91,20 @@ const ReturnExchangePolicy: React.FC<ReturnExchangePolicyProps> = ({
               Need Help?
             </h4>
             <p className="text-gray-600 mb-4">
-              Have questions about our return and exchange policy?
+              Have questions about our policies?
             </p>
             <div className="flex flex-col sm:flex-row sm:justify-center gap-3">
               <a
-                href="/contact"
-                className="bg-[#817363] hover:bg-[#61503c] text-white transition-colors font-medium px-6 py-3 rounded-lg  shadow-sm"
+                href={`mailto:${contactInfo.email}`}
+                className="bg-[#817363] hover:bg-[#61503c] text-white transition-colors font-medium px-6 py-3 rounded-lg shadow-sm"
               >
-                Contact Support
+                Email Us
               </a>
               <a
-                href="/faq"
+                href={`tel:${contactInfo.phone}`}
                 className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-3 rounded-lg transition-colors shadow-sm"
               >
-                View FAQs
+                Call Us
               </a>
             </div>
           </div>
