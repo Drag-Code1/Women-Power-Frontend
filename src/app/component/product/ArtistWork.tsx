@@ -85,7 +85,8 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId }) => {
   // Handle add to cart
   const handleAddToCart = async (product: ArtistProduct) => {
     if (!isAuthenticated) {
-      router.push('/login');
+      const returnUrl = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/';
+      router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
       return;
     }
 
@@ -103,7 +104,8 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId }) => {
   // Handle wishlist toggle
   const handleToggleWishlist = async (product: ArtistProduct) => {
     if (!isAuthenticated) {
-      router.push('/login');
+      const returnUrl = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/';
+      router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
       return;
     }
 

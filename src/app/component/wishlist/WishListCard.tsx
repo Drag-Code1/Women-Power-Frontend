@@ -5,6 +5,7 @@ import { Heart, Check, Sparkles } from "lucide-react";
 import { WishListItem } from "@/app/types/wishlist";
 import R2Image from "../dashboard/dashboardallproductstab/R2Image";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import { useCart } from "@/app/contexts/CartContext";
 
 interface WishListCardProps {
   item: WishListItem;
@@ -19,6 +20,7 @@ export const WishListCard: React.FC<WishListCardProps> = ({
   onRemove, 
   onMoveToCart 
 }) => {
+  const { isInCart } = useCart();
   const netPrice = parseFloat(item.price);
   const discountPercentage = item.discount || 0;
   const offerPrice =
@@ -94,7 +96,7 @@ export const WishListCard: React.FC<WishListCardProps> = ({
               </div>
             )}
           </div>
-          {item.inCart ? (
+          {isInCart(item.id) ? (
             <button className="bg-green-500 text-white px-3 py-2 rounded-md text-xs font-light flex items-center gap-1 cursor-default">
               <Check className="w-3 h-3" />
               In Cart

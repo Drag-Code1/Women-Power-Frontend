@@ -1,12 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { WishListItem } from "@/app/types/wishlist";
 import { WishListHeader } from "./WishListHeader";
 import { WishListCard } from "./WishListCard";
 import { WishListEmpty } from "./WishListEmpty";
 import { WishListSkeleton } from "./WishListSkeleton";
 import { useWishlist } from "@/app/contexts/WishlistContext";
+import { useCart } from "@/app/contexts/CartContext";
+import { useAuth } from "@/app/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface WishListClientProps {
   initialItems: WishListItem[];
@@ -18,6 +21,10 @@ export const WishListClient: React.FC<WishListClientProps> = ({
   loading = false
 }) => {
   const { wishlistItems, removeFromWishlist } = useWishlist();
+  const { addToCart } = useCart();
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  const [addingId, setAddingId] = useState<string | null>(null);
 
   const handleRemoveFromWishList = async (productId: string) => {
     await removeFromWishlist(productId);
@@ -29,16 +36,29 @@ export const WishListClient: React.FC<WishListClientProps> = ({
     await Promise.all(removePromises);
   };
 
-  const addToCart = (item: WishListItem) => {
-    console.log("Adding to cart:", item);
-    // TODO: Implement add to cart functionality
+  const handleAddToCart = async (item: WishListItem) => {
+    if (!isAuthenticated) {
+      const returnUrl = typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '/';
+      router.push(`/login?returnUrl=${encodeURIComponent(returnUrl)}`);
+      return;
+    }
+
+    try {
+      setAddingId(item.id);
+      await addToCart(item.id, 1);
+    } catch (err) {
+      console.error('Error adding wishlist item to cart:', err);
+    } finally {
+      setAddingId(null);
+    }
   };
 
   const moveToCart = async (item: WishListItem) => {
-    addToCart(item);
+    await handleAddToCart(item);
+    // Best-effort remove from wishlist after adding to cart
     setTimeout(async () => {
       await handleRemoveFromWishList(item.id);
-    }, 500);
+    }, 300);
   };
 
   return (
