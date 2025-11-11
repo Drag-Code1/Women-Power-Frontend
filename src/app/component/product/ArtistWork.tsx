@@ -288,7 +288,7 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId }) => {
                       {/* Wishlist Button */}
                       <button
                         onClick={() => handleToggleWishlist(artwork)}
-                        className="absolute top-3 right-3 bg-white rounded-full p-1.5 shadow-sm hover:scale-110 transition-all"
+                        className="absolute top-3 right-3 bg-white rounded-full p-1.5 shadow-sm hover:scale-110 transition-all z-10"
                         aria-label={isInWishlist(artwork.id) ? "Remove from wishlist" : "Add to wishlist"}
                       >
                         <Heart
@@ -298,8 +298,8 @@ const ArtistWork: React.FC<ArtistWorkProps> = ({ artistId }) => {
                         />
                       </button>
 
-                      {/* Overlay Actions */}
-                      <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-30 
+                      {/* Overlay Actions (ignore pointer events to not block buttons) */}
+                      <div className="absolute inset-0 bg-opacity-0 group-hover:bg-opacity-30 pointer-events-none 
                                    transition-all duration-300 flex items-center justify-center">
                       </div>
 
