@@ -10,6 +10,7 @@ import { useWishlist } from "@/app/contexts/WishlistContext";
 import { useCart } from "@/app/contexts/CartContext";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { getCategoryDetailsApi } from "@/app/lib/api";
 
 interface WishListClientProps {
   initialItems: WishListItem[];
@@ -25,6 +26,31 @@ export const WishListClient: React.FC<WishListClientProps> = ({
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const [addingId, setAddingId] = useState<string | null>(null);
+  const [categoryNames, setCategoryNames] = useState<Record<string, string>>({});
+
+  // Resolve category names for wishlist items
+  React.useEffect(() => {
+    const fetchCategoryNames = async () => {
+      try {
+        const uniqueIds = Array.from(new Set(wishlistItems.map(i => i.category_id).filter(Boolean)));
+        const toFetch = uniqueIds.filter(id => !(id in categoryNames));
+        if (toFetch.length === 0) return;
+        const results = await Promise.all(toFetch.map(async (id) => {
+          try {
+            const details = await getCategoryDetailsApi(id);
+            const name = details?.name || id;
+            return [id, name] as [string, string];
+          } catch {
+            return [id, id] as [string, string];
+          }
+        }));
+        setCategoryNames(prev => ({ ...prev, ...Object.fromEntries(results) }));
+      } catch {
+        // ignore
+      }
+    };
+    fetchCategoryNames();
+  }, [wishlistItems, categoryNames]);
 
   const handleRemoveFromWishList = async (productId: string) => {
     await removeFromWishlist(productId);
@@ -92,6 +118,7 @@ export const WishListClient: React.FC<WishListClientProps> = ({
                 index={index}
                 onRemove={handleRemoveFromWishList}
                 onMoveToCart={moveToCart}
+                categoryName={categoryNames[item.category_id]}
               />
             ))}
           </div>

@@ -12,13 +12,15 @@ interface WishListCardProps {
   index: number;
   onRemove: (id: string) => void;
   onMoveToCart: (item: WishListItem) => void;
+  categoryName?: string;
 }
 
 export const WishListCard: React.FC<WishListCardProps> = ({ 
   item, 
   index,
   onRemove, 
-  onMoveToCart 
+  onMoveToCart,
+  categoryName,
 }) => {
   const { isInCart } = useCart();
   const netPrice = parseFloat(item.price);
@@ -69,7 +71,7 @@ export const WishListCard: React.FC<WishListCardProps> = ({
         {/* Category */}
         <div className="mb-2">
           <span className="text-xs text-gray-500 uppercase tracking-wide">
-            {item.category_id}
+            {categoryName || item.category_id}
           </span>
         </div>
 
