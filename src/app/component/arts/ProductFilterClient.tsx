@@ -14,6 +14,7 @@ import Filters from "./Filters";
 import Pagination from "./Pagination";
 import { searchProducts, filterProducts } from "../../api/products";
 import { useWishlist } from "../../contexts/WishlistContext";
+import { useSearchParams } from "next/navigation";
 
 interface Category {
   id: string;
@@ -65,6 +66,17 @@ const ProductFilterClient: React.FC<ProductFilterClientProps> = ({
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedCategories, selectedPriceRanges, sortBy]);
+
+  // Initialize selected category from query param (e.g., /arts?category=catId)
+  const searchParams = useSearchParams();
+  useEffect(() => {
+    const categoryFromUrl = searchParams?.get('category');
+    if (categoryFromUrl) {
+      setSelectedCategories([categoryFromUrl]);
+    }
+    // We only want to run this once on mount with initial URL params
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // API integration for search and filtering
   useEffect(() => {

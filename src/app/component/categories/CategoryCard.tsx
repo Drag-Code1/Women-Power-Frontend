@@ -4,14 +4,34 @@ import React from "react";
 import { Category } from "@/app/types/category";
 import R2Image from "../dashboard/dashboardallproductstab/R2Image";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+import { useRouter } from "next/navigation";
 
 interface CategoryCardProps {
   category: Category;
 }
 
 export const CategoryCard: React.FC<CategoryCardProps> = ({ category }) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    // Navigate to arts listing, carrying selected category for filtering
+    router.push(`/arts?category=${encodeURIComponent(category.id)}`);
+  };
+
   return (
-    <div className="flex-shrink-0 w-28 sm:w-32 md:w-36 bg-white rounded-xl overflow-hidden cursor-pointer">
+    <div
+      className="flex-shrink-0 w-28 sm:w-32 md:w-36 bg-white rounded-xl overflow-hidden cursor-pointer"
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+      aria-label={`View ${category.name} in arts`}
+    >
       <div className="w-full h-20 sm:h-24 md:h-28 flex items-center justify-center">
         <R2Image
           src={category.image}
