@@ -131,7 +131,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <button
             onClick={handleAddToCartClick}
             disabled={addingToCart}
-            className={`flex items-center gap-1 px-4 py-2 rounded text-xs font-medium transition-all duration-200 ${
+            className={`flex items-center gap-1 px-2 py-2 rounded text-xs font-medium transition-all duration-200 ${
               inCart 
                 ? "bg-green-600 text-white hover:bg-green-700" 
                 : "bg-[#695946] text-white hover:bg-[#61503c] active:scale-95"
@@ -144,12 +144,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               </>
             ) : inCart ? (
               <>
-                <Check className="w-3 h-3" />
+               
                 In Cart
               </>
             ) : (
               <>
-                <ShoppingCart className="w-3 h-3" />
+             
                 Add to Cart
               </>
             )}

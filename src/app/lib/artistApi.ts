@@ -42,12 +42,14 @@ export interface ArtistProduct {
 
 export async function getArtistProducts(artistId: string): Promise<ArtistProduct[]> {
   try {
-    const token = getToken();
+   
     
-    if (!token) {
-      console.error('No auth token available for fetching artist products');
-      return [];
-    }
+   const token = getToken();
+if (!token) {
+  console.error('No auth token available for fetching artist products');
+  return [];
+}
+
 
     const response = await fetch(`${API_BASE_URL}/product/artist/${artistId}`, {
       method: 'GET',

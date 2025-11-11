@@ -125,7 +125,7 @@ const ProductCardNew: React.FC<ProductCardProps> = ({
               }
             }}
             disabled={addingToCart}
-            className={`flex items-center gap-1 px-4 py-2 rounded text-xs font-medium transition-all duration-200 ${
+            className={`flex items-center gap-1 px-2 py-2 rounded text-xs font-medium transition-all duration-200 ${
               inCart 
                 ? "bg-green-600 text-white hover:bg-green-700" 
                 : "bg-[#695946] text-white hover:bg-[#61503c] active:scale-95"
@@ -138,12 +138,12 @@ const ProductCardNew: React.FC<ProductCardProps> = ({
               </>
             ) : inCart ? (
               <>
-                <Check className="w-3 h-3" />
+              
                 In Cart
               </>
             ) : (
               <>
-                <ShoppingCart className="w-3 h-3" />
+               
                 Add to Cart
               </>
             )}
@@ -169,6 +169,9 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ categoryId }) => {
   const [addingToCart, setAddingToCart] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Fixed visible cards count: 2 for mobile, 3 for larger screens
+  const [visibleCards, setVisibleCards] = useState(2);
   
   const { addToCart, isInCart } = useCart();
   const { user } = useAuth();
@@ -201,10 +204,29 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ categoryId }) => {
     fetchRelatedProducts();
   }, [categoryId]);
 
+  // Update visible cards based on screen width
+  useEffect(() => {
+    const updateVisibleCards = () => {
+      if (window.innerWidth < 640) {
+        setVisibleCards(2);
+      } else if (window.innerWidth < 1024) {
+        setVisibleCards(3);
+      } else {
+        setVisibleCards(4);
+      }
+    };
+
+    updateVisibleCards();
+    window.addEventListener('resize', updateVisibleCards);
+    
+    return () => window.removeEventListener('resize', updateVisibleCards);
+  }, []);
+
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.children[0]?.clientWidth || 0;
-      const gap = 16; // gap-4 (4 * 4px)
+      const containerWidth = scrollContainerRef.current.offsetWidth;
+      const cardWidth = containerWidth / visibleCards;
+      const gap = 16; // gap-4
       const scrollAmount = cardWidth + gap;
 
       scrollContainerRef.current.scrollBy({
@@ -218,7 +240,8 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ categoryId }) => {
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.children[0]?.clientWidth || 0;
+      const containerWidth = scrollContainerRef.current.offsetWidth;
+      const cardWidth = containerWidth / visibleCards;
       const gap = 16;
       const scrollAmount = cardWidth + gap;
 
@@ -227,7 +250,7 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ categoryId }) => {
         behavior: "smooth",
       });
 
-      setCurrentIndex((prev) => Math.min(products.length - 1, prev + 1));
+      setCurrentIndex((prev) => Math.min(products.length - visibleCards, prev + 1));
     }
   };
 
@@ -268,108 +291,182 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ categoryId }) => {
     }
   };
 
-  // Remove local isInCart function since we're using CartContext
+  // Touch handling for mobile swipe
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(0);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      scrollRight();
+    } else if (isRightSwipe) {
+      scrollLeft();
+    }
+  };
 
   return (
-    <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-white rounded-sm">
-        <div className="mb-4 sm:mb-5 text-left">
-          <h2 className="text-black text-2xl sm:text-3xl font-bold">Releted Products</h2>
+    <div className="bg-[#f1f2f4] py-2 sm:py-3 px-2 sm:px-4">
+      <section className="w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 py-4 sm:py-5 bg-white rounded-sm overflow-hidden">
+        <div className="mb-3 sm:mb-4 text-left px-2 sm:px-0">
+          <h2 className="text-black text-xl sm:text-2xl md:text-3xl font-bold">Related Products</h2>
         </div>
 
         <div className="relative">
-          {/* Left Navigation Button */}
-          <button
-            onClick={scrollLeft}
-            disabled={currentIndex === 0}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
-              currentIndex === 0
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
-            }`}
-            aria-label="Scroll left"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="15,18 9,12 15,6"></polyline>
-            </svg>
-          </button>
-
-          {/* Right Navigation Button */}
-          <button
-            onClick={scrollRight}
-            disabled={currentIndex >= products.length - 1}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
-              currentIndex >= products.length - 1
-                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
-            }`}
-            aria-label="Scroll right"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="9,18 15,12 9,6"></polyline>
-            </svg>
-          </button>
-
-          {/* Products Container */}
-          <div className="bg-white rounded-lg px-0">
-            {loading ? (
-              <div className="flex justify-center items-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#695946]"></div>
-                <span className="ml-2 text-gray-600">Loading related products...</span>
-              </div>
-            ) : error ? (
-              <div className="flex justify-center items-center py-8">
-                <span className="text-red-500">{error}</span>
-              </div>
-            ) : products.length === 0 ? (
-              <div className="flex justify-center items-center py-8">
-                <span className="text-gray-500">No related products found</span>
-              </div>
-            ) : (
-            <div
-              ref={scrollContainerRef}
-              className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
-              style={{ 
-                scrollbarWidth: "none", 
-                msOverflowStyle: "none",
-                WebkitOverflowScrolling: "touch"
-              }}
-            >
-                {products.map((product: Product) => (
-                <div 
-                  key={product.id} 
-                  className="flex-shrink-0 w-64 sm:w-72"
-                >
-                  <ProductCardNew 
-                    product={product} 
-                    onAddToCart={handleAddToCart}
-                    onToggleWishlist={handleToggleWishlist}
-                    isInCart={isInCart}
-                    addingToCart={addingToCart === product.id}
-                  />
-                </div>
-              ))}
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#695946]"></div>
+              <span className="ml-2 text-gray-600">Loading related products...</span>
             </div>
-            )}
-          </div>
+          ) : error ? (
+            <div className="flex justify-center items-center py-8">
+              <span className="text-red-500">{error}</span>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="flex justify-center items-center py-8">
+              <span className="text-gray-500">No related products found</span>
+            </div>
+          ) : (
+            <>
+              {/* Products Container with Touch Support */}
+              <div className="bg-white rounded-lg overflow-hidden">
+                <div
+                  ref={scrollContainerRef}
+                  className="flex gap-4 overflow-x-hidden scroll-smooth"
+                  style={{ 
+                    scrollbarWidth: "none", 
+                    msOverflowStyle: "none",
+                    WebkitOverflowScrolling: "touch",
+                  }}
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                >
+                  {products.map((product: Product, index: number) => (
+                    <div 
+                      key={product.id} 
+                      className="flex-shrink-0"
+                      style={{ 
+                        width: `calc(${100 / visibleCards}% - ${(visibleCards - 1) * 16 / visibleCards}px)` 
+                      }}
+                    >
+                      <ProductCardNew 
+                        product={product} 
+                        onAddToCart={handleAddToCart}
+                        onToggleWishlist={handleToggleWishlist}
+                        isInCart={isInCart}
+                        addingToCart={addingToCart === product.id}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Navigation Buttons - Show on all devices but style differently for mobile */}
+              {products.length > visibleCards && (
+                <>
+                  {/* Left Navigation Button */}
+                  <button
+                    onClick={scrollLeft}
+                    disabled={currentIndex === 0}
+                    className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
+                      currentIndex === 0
+                        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                        : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
+                    }`}
+                    aria-label="Scroll left"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      className="sm:w-5 sm:h-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="15,18 9,12 15,6"></polyline>
+                    </svg>
+                  </button>
+
+                  {/* Right Navigation Button */}
+                  <button
+                    onClick={scrollRight}
+                    disabled={currentIndex >= products.length - visibleCards}
+                    className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
+                      currentIndex >= products.length - visibleCards
+                        ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                        : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
+                    }`}
+                    aria-label="Scroll right"
+                  >
+                    <svg
+                      width="16"
+                      height="16"
+                      className="sm:w-5 sm:h-5"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="9,18 15,12 9,6"></polyline>
+                    </svg>
+                  </button>
+                </>
+              )}
+
+              {/* Dots Indicator for Mobile */}
+              {products.length > 1 && (
+                <div className="flex justify-center mt-4 space-x-2">
+                  {Array.from({ length: Math.ceil(products.length / visibleCards) }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        if (scrollContainerRef.current) {
+                          const containerWidth = scrollContainerRef.current.offsetWidth;
+                          const cardWidth = containerWidth / visibleCards;
+                          const gap = 16;
+                          const scrollPosition = index * visibleCards * (cardWidth + gap);
+                          
+                          scrollContainerRef.current.scrollTo({
+                            left: scrollPosition,
+                            behavior: "smooth",
+                          });
+                          
+                          setCurrentIndex(index * visibleCards);
+                        }
+                      }}
+                      className={`w-2 h-2 rounded-full transition-all ${
+                        Math.floor(currentIndex / visibleCards) === index
+                          ? "bg-[#61503c] w-6"
+                          : "bg-gray-300"
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </section>
     </div>

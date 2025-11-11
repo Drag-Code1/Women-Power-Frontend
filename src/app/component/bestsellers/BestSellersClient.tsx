@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Product } from "@/app/types/product";
 import { ProductCard } from "./ProductCard";
 import { useCart } from "@/app/contexts/CartContext";
@@ -24,10 +24,31 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
   // Use all products from API (best sellers)
   const bestSellerProducts = productList;
 
+  // Fixed visible cards count: 2 for mobile, 3 for larger screens
+  const [visibleCards, setVisibleCards] = useState(2);
+  
+  useEffect(() => {
+    const updateVisibleCards = () => {
+      if (window.innerWidth < 640) {
+        setVisibleCards(2);
+      } else if (window.innerWidth < 1024) {
+        setVisibleCards(3);
+      } else {
+        setVisibleCards(4);
+      }
+    };
+
+    updateVisibleCards();
+    window.addEventListener('resize', updateVisibleCards);
+    
+    return () => window.removeEventListener('resize', updateVisibleCards);
+  }, []);
+
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.children[0]?.clientWidth || 0;
-      const gap = 16; // gap-4 (4 * 4px)
+      const containerWidth = scrollContainerRef.current.offsetWidth;
+      const cardWidth = containerWidth / visibleCards;
+      const gap = 16; // gap-4
       const scrollAmount = cardWidth + gap;
 
       scrollContainerRef.current.scrollBy({
@@ -41,7 +62,8 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
 
   const scrollRight = () => {
     if (scrollContainerRef.current) {
-      const cardWidth = scrollContainerRef.current.children[0]?.clientWidth || 0;
+      const containerWidth = scrollContainerRef.current.offsetWidth;
+      const cardWidth = containerWidth / visibleCards;
       const gap = 16;
       const scrollAmount = cardWidth + gap;
 
@@ -50,7 +72,7 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
         behavior: "smooth",
       });
 
-      setCurrentIndex((prev) => Math.min(bestSellerProducts.length - 1, prev + 1));
+      setCurrentIndex((prev) => Math.min(bestSellerProducts.length - visibleCards, prev + 1));
     }
   };
 
@@ -102,75 +124,58 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
     }
   };
 
-  // Remove local isInCart function since we're using CartContext
+  // Touch handling for mobile swipe
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(0);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      scrollRight();
+    } else if (isRightSwipe) {
+      scrollLeft();
+    }
+  };
 
   return (
     <div className="relative">
-      {/* Left Navigation Button */}
-      <button
-        onClick={scrollLeft}
-        disabled={currentIndex === 0}
-        className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
-          currentIndex === 0
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
-        }`}
-        aria-label="Scroll left"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="15,18 9,12 15,6"></polyline>
-        </svg>
-      </button>
-
-      {/* Right Navigation Button */}
-      <button
-        onClick={scrollRight}
-        disabled={currentIndex >= bestSellerProducts.length - 1}
-        className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
-          currentIndex >= bestSellerProducts.length - 1
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
-        }`}
-        aria-label="Scroll right"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="9,18 15,12 9,6"></polyline>
-        </svg>
-      </button>
-
-      {/* Products Container */}
-      <div className="bg-white rounded-lg px-0">
+      {/* Products Container with Touch Support */}
+      <div className="bg-white rounded-lg overflow-hidden">
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+          className="flex gap-4 overflow-x-hidden scroll-smooth"
           style={{ 
             scrollbarWidth: "none", 
             msOverflowStyle: "none",
-            WebkitOverflowScrolling: "touch"
+            WebkitOverflowScrolling: "touch",
           }}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
         >
-          {bestSellerProducts.map((product: Product) => (
+          {bestSellerProducts.map((product: Product, index: number) => (
             <div 
               key={product.id} 
-              className="flex-shrink-0 w-64 sm:w-72"
+              className="flex-shrink-0"
+              style={{ 
+                width: `calc(${100 / visibleCards}% - ${(visibleCards - 1) * 16 / visibleCards}px)` 
+              }}
             >
               <ProductCard 
                 product={product} 
@@ -183,6 +188,95 @@ export const BestSellersClient = ({ products }: BestSellersClientProps) => {
           ))}
         </div>
       </div>
+
+      {/* Navigation Buttons - Show on all devices but style differently for mobile */}
+      {bestSellerProducts.length > visibleCards && (
+        <>
+          {/* Left Navigation Button */}
+          <button
+            onClick={scrollLeft}
+            disabled={currentIndex === 0}
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
+              currentIndex === 0
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
+            }`}
+            aria-label="Scroll left"
+          >
+            <svg
+              width="16"
+              height="16"
+              className="sm:w-5 sm:h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="15,18 9,12 15,6"></polyline>
+            </svg>
+          </button>
+
+          {/* Right Navigation Button */}
+          <button
+            onClick={scrollRight}
+            disabled={currentIndex >= bestSellerProducts.length - visibleCards}
+            className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-lg transition-all duration-200 ${
+              currentIndex >= bestSellerProducts.length - visibleCards
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-700 hover:bg-gray-50 hover:text-black"
+            }`}
+            aria-label="Scroll right"
+          >
+            <svg
+              width="16"
+              height="16"
+              className="sm:w-5 sm:h-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+          </button>
+        </>
+      )}
+
+      {/* Dots Indicator for Mobile */}
+      {bestSellerProducts.length > 1 && (
+        <div className="flex justify-center mt-4 space-x-2">
+          {Array.from({ length: Math.ceil(bestSellerProducts.length / visibleCards) }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                if (scrollContainerRef.current) {
+                  const containerWidth = scrollContainerRef.current.offsetWidth;
+                  const cardWidth = containerWidth / visibleCards;
+                  const gap = 16;
+                  const scrollPosition = index * visibleCards * (cardWidth + gap);
+                  
+                  scrollContainerRef.current.scrollTo({
+                    left: scrollPosition,
+                    behavior: "smooth",
+                  });
+                  
+                  setCurrentIndex(index * visibleCards);
+                }
+              }}
+              className={`w-2 h-2 rounded-full transition-all ${
+                Math.floor(currentIndex / visibleCards) === index
+                  ? "bg-[#61503c] w-6"
+                  : "bg-gray-300"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
