@@ -118,7 +118,6 @@ const NavBar: React.FC = () => {
             className="flex-1 bg-transparent outline-none text-white placeholder-gray-300 text-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            autoFocus
           />
         </div>
 
