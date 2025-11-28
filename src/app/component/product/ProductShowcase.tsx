@@ -14,7 +14,7 @@ const productImages = [
   },
   {
     id: 3,
-    src: "./images/showcase3.jpg",
+    src: "./images/showcase3.JPG",
     alt: "Abstract Folded Pot Design 3"
   }
 ];
