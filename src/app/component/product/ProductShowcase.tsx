@@ -4,17 +4,17 @@ import React, { useState, useEffect } from 'react';
 const productImages = [
   {
     id: 1,
-    src: "./images/showcase.webp",
+    src: "./images/showcase.jpeg",
     alt: "Abstract Folded Pot Design 1"
   },
   {
     id: 2,
-    src: "./images/showcase.webp",
+    src: "./images/showcase2.jpg",
     alt: "Abstract Folded Pot Design 2"
   },
   {
     id: 3,
-    src: "./images/showcase.webp",
+    src: "./images/showcase3.jpg",
     alt: "Abstract Folded Pot Design 3"
   }
 ];
@@ -43,12 +43,12 @@ const ProductShowcase: React.FC = () => {
             {/* Image Section */}
             <div className="lg:w-1/2 relative bg-white">
               <div className="relative max-w-md mx-auto">
-                <div className="relative overflow-hidden rounded-lg bg-white shadow-sm">
-                  <div className="aspect-[4/3] relative">
+                <div className="relative rounded-lg bg-white shadow-sm overflow-hidden">
+                  <div className="aspect-[4/3] relative overflow-hidden">
                     <img
                       src={productImages[currentImageIndex].src}
                       alt={productImages[currentImageIndex].alt}
-                      className="w-full h-full object-cover transition-transform duration-[4000ms] ease-in-out animate-zoom"
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-[4000ms] ease-in-out animate-zoom"
                     />
                   </div>
                 </div>
@@ -95,7 +95,7 @@ const ProductShowcase: React.FC = () => {
             transform: scale(1);
           }
           50% {
-            transform: scale(1.1);
+            transform: scale(1.05);
           }
           100% {
             transform: scale(1);

@@ -38,7 +38,7 @@ const CraftGiftHero = () => {
       <div
         className="absolute inset-0 bg-cover bg-center transform scale-105 animate-zoom"
         style={{
-          backgroundImage: "url('/images/green-diwali.jpg')",
+          backgroundImage: "url('/images/green-diwali.jpeg')",
         }}
       ></div>
 

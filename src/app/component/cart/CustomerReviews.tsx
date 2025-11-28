@@ -5,8 +5,46 @@ import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 
-// ✅ Import reviews data from external file
-import reviewsData from "@/app/data/reviewsData";
+// Reviews data directly included in the file with shortened reviews
+const reviewsData = [
+  {
+    id: 1,
+    name: "Pooja Mohota",
+    review: "I enjoyed learning this new art form with simplicity and great information. The tutor was polite and solved all doubts nicely. This is my 2nd time with you, and I've always enjoyed your sessions. Looking forward to more!",
+    rating: 5,
+    date: "November 17, 2025"
+  },
+  {
+    id: 2,
+    name: "Radhika Bhat",
+    review: "Namaste Namrta ji, I feel blessed to learn this beautiful art from such an amazing teacher. Your passion and kindness truly inspire me.",
+    rating: 5,
+    date: "November 17, 2025"
+  },
+  {
+    id: 3,
+    name: "Neelima",
+    review: "I've taken multiple courses with Ayushi ma'am including lippon art, mirror mosaic, and rangoli. She explains everything clearly. Thank you for offering reasonable courses with excellent teachers. I'm excited to complete my project soon!",
+    rating: 5,
+    date: "November 17, 2025"
+  },
+  {
+    id: 4,
+    name: "Sheetal",
+    review: "Very excited for my 4th workshop! I've learned something new in every workshop and can't wait to discover more in this one. 🎉🎉",
+    rating: 5,
+    date: "November 17, 2025"
+  }
+];
+
+// Define type for review
+interface Review {
+  id: number;
+  name: string;
+  review: string;
+  rating: number;
+  date: string;
+}
 
 const CustomerReviews: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -25,7 +63,7 @@ const CustomerReviews: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // ✅ Auto-slide control
+  // Auto-slide control
   useEffect(() => {
     startAutoSlide();
     return () => stopAutoSlide();
@@ -35,7 +73,7 @@ const CustomerReviews: React.FC = () => {
     stopAutoSlide();
     intervalRef.current = setInterval(() => {
       setCurrentPage((prev) => (prev + 1) % totalPages);
-    }, 2000);
+    }, 5000);
   };
 
   const stopAutoSlide = () => {
@@ -73,49 +111,46 @@ const CustomerReviews: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-[#f6f0e3] rounded-sm ">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 bg-[#f6f0e3] rounded-sm">
       {/* Header */}
       <div className="mb-4 sm:mb-5 text-left">
         <h3 className="text-b text-2xl sm:text-2xl">Our Customer Reviews</h3>
       </div>
 
-      {/* Reviews */}
-      <div
-        className={`grid gap-6 mb-8 transition-transform duration-700 ease-in-out`}
-        style={{
-          gridTemplateColumns: isMobile
-            ? "1fr"
-            : "repeat(auto-fit, minmax(280px, 1fr))",
-        }}
-      >
-        {getCurrentReviews().map((review) => (
-          <div
-            key={`${review.id}-${currentPage}`}
-            className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-500 p-5 border border-gray-100 animate-slide-in"
-            onMouseEnter={stopAutoSlide}   // ✅ Hover par stop
-            onMouseLeave={startAutoSlide} // ✅ Hover hatne par resume
-          >
-            <FormatQuoteIcon className="text-[#61503c] mb-2 w-6 h-6" />
-            <p className="text-gray-700 leading-relaxed mb-4">
-              "{review.review}"
-            </p>
-            <div className="mb-3">{renderStars(review.rating)}</div>
-
-            <div className="flex items-center gap-3 pt-3 border-t border-gray-100">
-              <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#61503c] text-white font-bold text-sm">
-                {getInitials(review.name)}
-              </div>
-              <div>
-                <h4 className="font-semibold text-gray-900 text-sm">
-                  {review.name}
-                </h4>
-                <p className="text-xs text-gray-500">
-                  Verified Customer • {review.date}
+      {/* Reviews Container */}
+      <div className="mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {getCurrentReviews().map((review) => (
+            <div
+              key={`${review.id}-${currentPage}`}
+              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-500 p-5 border border-gray-100 h-full flex flex-col"
+              onMouseEnter={stopAutoSlide}
+              onMouseLeave={startAutoSlide}
+            >
+              <div className="flex-grow flex flex-col">
+                <FormatQuoteIcon className="text-[#61503c] mb-2 w-6 h-6" />
+                <p className="text-gray-700 leading-relaxed mb-4 flex-grow overflow-hidden">
+                  "{review.review}"
                 </p>
+                <div className="mb-3">{renderStars(review.rating)}</div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-3 border-t border-gray-100 mt-auto">
+                <div className="w-10 h-10 flex items-center justify-center rounded-full bg-[#61503c] text-white font-bold text-sm flex-shrink-0">
+                  {getInitials(review.name)}
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 text-sm">
+                    {review.name}
+                  </h4>
+                  <p className="text-xs text-gray-500">
+                    Verified Customer • {review.date}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Pagination Dots */}
@@ -138,11 +173,11 @@ const CustomerReviews: React.FC = () => {
         @keyframes slide-in {
           from {
             opacity: 0;
-            transform: translateX(30px);
+            transform: translateY(20px);
           }
           to {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateY(0);
           }
         }
         .animate-slide-in {

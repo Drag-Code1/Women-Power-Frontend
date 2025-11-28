@@ -4,7 +4,7 @@ import Image from "next/image";
 export default function AboutSection() {
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
-      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-white rounded-sm ">
+      <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-5 bg-white rounded-sm">
         <div className="max-w-7xl mx-auto space-y-12">
           {/* Namrta Gupta Section */}
           <section className="py-6 px-6 md:px-6 bg-gradient-to-br from-[#7A5C3D]/5 to-[#5C452B]/10 text-[#5C452B] font-sans rounded-xl">
@@ -22,38 +22,36 @@ export default function AboutSection() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                {/* Image */}
-                <div className="order-2 lg:order-1">
-                  <div className="relative w-full h-80 lg:h-96 overflow-hidden rounded-xl shadow-lg bg-white">
-                    <Image
-                      src="/images/rangoli11.jpg"
-                      alt="Sonali Thaakkar WEJ"
-                      width={700}
-                      height={450}
-                      className="object-contain w-full h-full"
-                    />
-                  </div>
+              <div className="flex flex-col items-center gap-8">
+                {/* Circular Image */}
+                <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-[#7A5C3D]/30">
+                  <Image
+                    src="/images/namarata.jpeg"
+                    alt="Namrta Gupta"
+                    width={400}
+                    height={400}
+                    className="object-cover w-full h-full"
+                  />
                 </div>
 
                 {/* Content */}
-                <div className="order-1 lg:order-2 space-y-6">
-                  <div>
+                <div className="w-full space-y-6">
+                  <div className="text-center">
                     <h3 className="text-xl font-bold mb-3 text-[#7A5C3D]">
                       Traditional Artistry
                     </h3>
-                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed">
+                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed max-w-3xl mx-auto">
                       We promote Indian traditional art through decorative
                       Kundan items, celebrating culture and craftsmanship with
                       timeless beauty.
                     </p>
                   </div>
 
-                  <div className="bg-white/70 p-5 rounded-lg">
-                    <h4 className="font-bold text-[#7A5C3D] mb-2">
+                  <div className="bg-white/70 p-5 rounded-lg max-w-3xl mx-auto">
+                    <h4 className="font-bold text-[#7A5C3D] mb-2 text-center">
                       Our Commitment
                     </h4>
-                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed">
+                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed text-center">
                       Each piece is handcrafted with care, blending heritage and
                       modernity. By choosing us, you beautify your spaces and
                       support artisans who keep traditions alive.
@@ -64,7 +62,7 @@ export default function AboutSection() {
             </div>
           </section>
 
-          {/* Sonalli Thaakkar & WEJ Section */}
+          {/* Sonali Thakkar & WEJ Section */}
           <section className="py-6 px-6 md:px-6 bg-gradient-to-br from-[#7A5C3D]/5 to-[#5C452B]/10 text-[#5C452B] font-sans rounded-xl">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-8">
@@ -75,50 +73,47 @@ export default function AboutSection() {
                 <p className="text-lg text-[#5C452B]/80 max-w-3xl mx-auto">
                   Founded by{" "}
                   <span className="font-semibold text-[#7A5C3D]">
-                    Sonali Thakkar 
+                    Sonali Thakkar
                   </span>
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-                {/* Static Image */}
-                <div className="order-2 lg:order-1">
-                  <div className="relative w-full h-80 lg:h-96 overflow-hidden rounded-xl shadow-lg bg-white">
-                    <Image
-                      src="/images/sonali.jpeg"
-                      alt="Sonali Thaakkar WEJ"
-                      width={700}
-                      height={450}
-                      className="object-contain w-full h-full"
-                    />
-                  </div>
+              <div className="flex flex-col items-center gap-8">
+                {/* Circular Image */}
+                <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-[#7A5C3D]/30">
+                  <Image
+                    src="/images/sonali.jpg"
+                    alt="Sonali Thakkar"
+                    width={400}
+                    height={400}
+                    className="object-cover w-full h-full"
+                  />
                 </div>
 
                 {/* Content */}
-                <div className="order-1 lg:order-2 space-y-6">
-                  <div>
+                <div className="w-full space-y-6">
+                  <div className="text-center">
                     <h3 className="text-xl font-bold mb-3 text-[#7A5C3D]">
                       The Journey Begins
                     </h3>
-                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed">
+                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed max-w-3xl mx-auto mb-4">
                       Sometimes we choose the path, and sometimes the path
                       chooses us. Sonali Thakkar is one of the fortunate few
                       who never let her journey pause and transformed it into a
                       new identity.
                     </p>
-                  </div>
-
-                  <div>
-                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed">
+                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed max-w-3xl mx-auto">
                       For her, art and creativity are not just hobbies—they are
                       powerful forces that open doors to new dreams and endless
                       opportunities.
                     </p>
                   </div>
 
-                  <div className="bg-white/70 p-5 rounded-lg">
-                    <h4 className="font-bold text-[#7A5C3D] mb-2">About WEJ</h4>
-                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed">
+                  <div className="bg-white/70 p-5 rounded-lg max-w-3xl mx-auto">
+                    <h4 className="font-bold text-[#7A5C3D] mb-2 text-center">
+                      About WEJ
+                    </h4>
+                    <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed text-center">
                       From this passion was born Woman Empowering Journey (WEJ)
                       – a platform dedicated to financially, emotionally, and
                       mentally empowering women. Here, every woman discovers her
