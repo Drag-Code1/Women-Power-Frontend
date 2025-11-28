@@ -3,7 +3,7 @@
 
 import { useState } from 'react';
 import { MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
-import { Banner } from  "@/app/types/dashboard-banner-tab";
+import { Banner } from "@/app/types/dashboard-banner-tab";
 
 interface Props {
   banners: Banner[];
@@ -93,6 +93,15 @@ export default function BannerGrid({ banners, onEdit, onDelete, onPreview, isLoa
                   </div>
                 </>
               )}
+            </div>
+          </div>
+          
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-gray-900">Home Banner</span>
+              <span className="text-xs text-gray-500">
+                {new Date(banner.createdAt).toLocaleDateString()}
+              </span>
             </div>
           </div>
         </div>

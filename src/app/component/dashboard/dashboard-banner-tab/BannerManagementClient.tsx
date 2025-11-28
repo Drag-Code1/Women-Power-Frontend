@@ -2,10 +2,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Image } from 'lucide-react';
-import { Banner, BannerType, BANNER_TYPE_CONFIG } from  "@/app/types/dashboard-banner-tab";
+import { Plus, Image, Home } from 'lucide-react';
+import { Banner, BannerType, BANNER_TYPE_CONFIG } from "@/app/types/dashboard-banner-tab";
 import { createBannerApi, updateBannerApi, deleteBannerApi } from '@/app/lib/bannerApi';
-import BannerTypeSelector from './BannerTypeSelector';
 import BannerGrid from './BannerGrid';
 import BannerModal from './BannerModal';
 
@@ -15,30 +14,15 @@ interface Props {
 
 export default function BannerManagementClient({ initialBanners }: Props) {
   const [banners, setBanners] = useState<Banner[]>(initialBanners);
-  const [selectedType, setSelectedType] = useState<BannerType>('home_banner');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'add' | 'edit' | 'preview'>('add');
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const selectedType: BannerType = 'home_banner';
   const filteredBanners = banners.filter(b => b.type === selectedType);
   const config = BANNER_TYPE_CONFIG[selectedType];
   const canAddMore = config.maxCount === Infinity || filteredBanners.length < config.maxCount;
-
-  // Group banners by type for database format
-  useEffect(() => {
-    const grouped: Record<BannerType, string[]> = {
-      home_banner: [],
-      home_showcase: [],
-      home_giftsection: []
-    };
-    
-    banners.forEach(banner => {
-      grouped[banner.type].push(banner.img_url);
-    });
-    
-    console.log('Database Format:', grouped);
-  }, [banners]);
 
   const handleCreate = async (img_url: string) => {
     setIsLoading(true);
@@ -117,34 +101,40 @@ export default function BannerManagementClient({ initialBanners }: Props) {
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Banner Management
-          </h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Manage your website banners and promotional content
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Home className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Home Banner Management
+              </h1>
+              <p className="mt-1 text-sm text-gray-600">
+                Manage your website homepage banners
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Type Selector */}
-        <BannerTypeSelector
-          selectedType={selectedType}
-          onSelectType={setSelectedType}
-          banners={banners}
-        />
-
-        {/* Banners List */}
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="p-4 sm:p-6 border-b border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">
-                  {config.label}
-                </h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  Recommended size: {config.recommended}
-                </p>
+        {/* Banner Info Card */}
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">
+                {config.label}
+              </h2>
+              <p className="text-sm text-gray-600 mt-1">
+                {config.description}
+              </p>
+              <p className="text-sm text-gray-500 mt-2">
+                Recommended size: {config.recommended}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-500">
+                {filteredBanners.length} banner{filteredBanners.length !== 1 ? 's' : ''}
               </div>
               {canAddMore ? (
                 <button
@@ -162,7 +152,10 @@ export default function BannerManagementClient({ initialBanners }: Props) {
               )}
             </div>
           </div>
+        </div>
 
+        {/* Banners List */}
+        <div className="bg-white rounded-lg shadow-sm">
           <div className="p-4 sm:p-6">
             {filteredBanners.length === 0 ? (
               <div className="text-center py-12">

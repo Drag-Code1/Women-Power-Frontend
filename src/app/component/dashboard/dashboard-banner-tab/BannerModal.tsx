@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Upload } from 'lucide-react';
+import { X, Upload, Home } from 'lucide-react';
 import { Banner, BannerTypeConfig } from "@/app/types/dashboard-banner-tab";
 
 interface Props {
@@ -108,13 +108,18 @@ export default function BannerModal({
         <div className="bg-white h-full w-full max-w-2xl overflow-y-auto shadow-2xl animate-slideIn">
           {/* Header */}
           <div className="p-6 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-            <h2 className="text-xl font-semibold text-gray-900">
-              {mode === 'preview' 
-                ? 'Banner Preview' 
-                : mode === 'edit' 
-                ? 'Edit Banner' 
-                : 'Add New Banner'}
-            </h2>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Home className="w-5 h-5 text-blue-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {mode === 'preview' 
+                  ? 'Banner Preview' 
+                  : mode === 'edit' 
+                  ? 'Edit Banner' 
+                  : 'Add New Banner'}
+              </h2>
+            </div>
             <button
               onClick={handleClose}
               disabled={isLoading}
@@ -158,8 +163,13 @@ export default function BannerModal({
                   Banner Type
                 </label>
                 <div className="px-4 py-3 bg-gray-50 rounded-lg">
-                  <p className="font-medium text-gray-900">{config.label}</p>
-                  <p className="text-sm text-gray-600 mt-1">{config.description}</p>
+                  <div className="flex items-center gap-3">
+                    <Home className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="font-medium text-gray-900">{config.label}</p>
+                      <p className="text-sm text-gray-600 mt-1">{config.description}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

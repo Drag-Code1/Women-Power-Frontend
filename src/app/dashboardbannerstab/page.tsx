@@ -18,8 +18,8 @@ export default async function BannersPage() {
 
 // Optional: Add metadata
 export const metadata = {
-  title: 'Banner Management | Admin',
-  description: 'Manage website banners and promotional content',
+  title: 'Home Banner Management | Admin',
+  description: 'Manage website homepage banners',
 };
 
 // Optional: Revalidate data every 60 seconds

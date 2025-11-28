@@ -1,5 +1,5 @@
 // types/banner.ts
-export type BannerType = 'home_banner' | 'home_showcase' | 'home_giftsection';
+export type BannerType = 'home_banner';
 
 export interface Banner {
   id: string;
@@ -36,17 +36,5 @@ export const BANNER_TYPE_CONFIG: Record<BannerType, BannerTypeConfig> = {
     description: 'Main banner at the top of homepage',
     maxCount: Infinity,
     recommended: '1200x400px'
-  },
-  home_showcase: {
-    label: 'Home Showcase',
-    description: 'Multiple showcase banners',
-    maxCount: Infinity,
-    recommended: '600x400px'
-  },
-  home_giftsection: {
-    label: 'Gift Section',
-    description: 'Single gift section banner',
-    maxCount: 1,
-    recommended: '800x600px'
   }
 };
