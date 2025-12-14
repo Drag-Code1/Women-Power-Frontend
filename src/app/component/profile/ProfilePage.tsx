@@ -37,6 +37,8 @@ import HelpTab from './HelpTab';
 // Import AuthContext
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useCart } from '@/app/contexts/CartContext';
+import { API_BASE_URL } from '@/app/lib/config';
+import { getToken } from '@/app/lib/authApi';
 
 // Import types
 import { User, Address, Order } from './ProfileSection';
@@ -47,13 +49,13 @@ const ProfilePage: React.FC = () => {
   const router = useRouter();
   const returnUrl = searchParams?.get('returnUrl');
   const { addToCart } = useCart();
-  
+
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
-  
+
   // Address management states
-  const [addresses, setAddresses] = useState<Address[]>([ ]);
-  
+  const [addresses, setAddresses] = useState<Address[]>([]);
+
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [newAddress, setNewAddress] = useState<Omit<Address, 'id'>>({
@@ -66,7 +68,7 @@ const ProfilePage: React.FC = () => {
     mobileNo: '',
     userId: user?.id || ''
   });
-  
+
   const [editedUser, setEditedUser] = useState<User | null>(user);
 
   const orders: Order[] = [
@@ -117,7 +119,7 @@ const ProfilePage: React.FC = () => {
       console.log('🔄 Admin user detected on profile page, redirecting to dashboard');
       console.log('👤 User role:', user.role);
       console.log('📧 User email:', user.email);
-      
+
       // Add a small delay to ensure component is fully loaded
       setTimeout(() => {
         console.log('🚀 Redirecting admin to dashboard...');
@@ -129,7 +131,7 @@ const ProfilePage: React.FC = () => {
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated && !isLoading) {
-      const loginUrl = returnUrl 
+      const loginUrl = returnUrl
         ? `/login?returnUrl=${encodeURIComponent(returnUrl)}`
         : '/login';
       router.push(loginUrl);
@@ -137,70 +139,29 @@ const ProfilePage: React.FC = () => {
   }, [isAuthenticated, isLoading, returnUrl, router]);
 
   // Address management functions
-  const handleAddAddress = () => {
-    if (newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo) {
-      const address: Address = {
-        ...newAddress,
-        id: generateId()
-      };
-      setAddresses([...addresses, address]);
-      setNewAddress({
-        type: 'Home',
-        address: '',
-        pincode: '',
-        city: '',
-        state: '',
-        landmark: '',
-        mobileNo: '',
-        userId: user?.id || ''
+  const fetchAddresses = async () => {
+    const token = getToken();
+    if (!token) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/address`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
-      setShowAddAddress(false);
-    } else {
-      alert('Please fill all required fields');
+      if (res.ok) {
+        const body = await res.json();
+        setAddresses(body.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
     }
   };
 
-  const handleEditAddress = (address: Address) => {
-    setEditingAddress(address);
-    setNewAddress(address);
-    setShowAddAddress(true);
-  };
-
-  const handleUpdateAddress = () => {
-    if (editingAddress && newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo) {
-      setAddresses(addresses.map(addr => 
-        addr.id === editingAddress.id ? { ...newAddress, id: editingAddress.id } : addr
-      ));
-      setEditingAddress(null);
-      setNewAddress({
-        type: 'Home',
-        address: '',
-        pincode: '',
-        city: '',
-        state: '',
-        landmark: '',
-        mobileNo: '',
-        userId: user?.id || ''
-      });
-      setShowAddAddress(false);
-    } else {
-      alert('Please fill all required fields');
+  useEffect(() => {
+    if (user) {
+      fetchAddresses();
     }
-  };
-
-  const handleDeleteAddress = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this address?')) {
-      setAddresses(addresses.filter(addr => addr.id !== id));
-    }
-  };
-
-  const generateId = () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
-  };
+  }, [user]);
 
   const handleSaveProfile = () => {
     if (editedUser) {
@@ -254,21 +215,21 @@ const ProfilePage: React.FC = () => {
       <div className="max-w-7xl mx-auto p-2 lg:p-4">
         {/* Profile Header */}
         <ProfileHeader user={user} onLogout={handleLogout} />
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
-            <SidebarNavigation 
-              tabs={tabs} 
-              activeTab={activeTab} 
-              setActiveTab={setActiveTab} 
+            <SidebarNavigation
+              tabs={tabs}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
             />
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-3">
             <div className="bg-white rounded-sm p-4 lg:p-4">
-              
+
               {/* Profile Tab */}
               {activeTab === 'profile' && editedUser && (
                 <ProfileTab
@@ -297,10 +258,7 @@ const ProfilePage: React.FC = () => {
                   setEditingAddress={setEditingAddress}
                   newAddress={newAddress}
                   setNewAddress={setNewAddress}
-                  handleAddAddress={handleAddAddress}
-                  handleEditAddress={handleEditAddress}
-                  handleUpdateAddress={handleUpdateAddress}
-                  handleDeleteAddress={handleDeleteAddress}
+                  reloadAddresses={fetchAddresses}
                   user={user}
                 />
               )}

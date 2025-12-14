@@ -31,12 +31,12 @@ export const PopularCourses = async () => {
             <p className="text-gray-600 mb-4">
               {error}
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
+            <a
+              href="/"
+              className="inline-block bg-[#61503c] text-white px-6 py-2 rounded-md hover:bg-[#7a5b3e] transition-all duration-200 transform hover:scale-105"
             >
               Try Again
-            </button>
+            </a>
           </div>
         ) : popularCourses.length > 0 ? (
           <PopularCoursesClient courses={popularCourses} />

@@ -162,7 +162,7 @@ const AddressesTab: React.FC<AddressesTabProps> = ({
   const getAddressIcon = (type: string) => {
     switch (type) {
       case 'Home': return <Home className="w-5 h-5" />;
-      case 'Work': return <Work className="w-5 h-5" />;
+      case 'Office': return <Work className="w-5 h-5" />;
       default: return <LocationOn className="w-5 h-5" />;
     }
   };
@@ -262,12 +262,12 @@ const AddressesTab: React.FC<AddressesTabProps> = ({
                 <label className="block text-sm font-medium text-gray-700 mb-2">Address Type</label>
                 <select
                   value={newAddress.type}
-                  onChange={(e) => setNewAddress(prev => ({ ...prev, type: e.target.value as 'Home' | 'Work' | 'Other' }))}
+                  onChange={(e) => setNewAddress(prev => ({ ...prev, type: e.target.value as 'Home' | 'Office' }))}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
                   <option value="Home">Home</option>
                   <option value="Office">Office</option>
-              </select>
+                </select>
               </div>
 
               <div>
