@@ -4,13 +4,14 @@ import RelatedProductsWithCategory from '@/app/component/product/RelatedProducts
 import ProductReviews from '../component/product/ProductReviews'
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     id?: string;
-  };
+  }>;
 }
 
-function page({ searchParams }: PageProps) {
-  const productId = searchParams.id;
+async function page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const productId = params?.id;
 
   return (
     <div>

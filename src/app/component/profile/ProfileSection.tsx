@@ -38,6 +38,8 @@ import HelpTab from './HelpTab';
 // Import AuthContext
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useCart } from '@/app/contexts/CartContext';
+import { getToken } from '@/app/lib/authApi';
+import { API_BASE_URL } from '@/app/lib/config';
 
 // Types
 export interface User {
@@ -53,7 +55,7 @@ export interface User {
 
 export interface Address {
   id: string;
-  type: 'Home' | 'Work' | 'Other';
+  type: 'Home' | 'Office';
   address: string;
   pincode: string;
   city: string;
@@ -98,30 +100,9 @@ const ProfileSection: React.FC = () => {
   });
   
   // Address management states
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: '1a9d8bd1-30b4-42c0-8e0b-441c581c71c1',
-      type: 'Home',
-      address: '123 Main Street, Building 3A',
-      pincode: '560001',
-      city: 'Maharashtra',
-      state: 'Maharashtra',
-      landmark: 'Near City Mall',
-      mobileNo: '9877583210',
-      userId: '4cf0865c-ae9c-4381-84ce-4ddec3582db8'
-    },
-    {
-      id: '2a9d8bd1-30b4-42c0-8e0b-441c581c71c2',
-      type: 'Work',
-      address: '456 Business Park, Bandra Kurla Complex',
-      pincode: '400051',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      landmark: 'Near Metro Station',
-      mobileNo: '9876543210',
-      userId: '4cf0865c-ae9c-4381-84ce-4ddec3582db8'
-    }
-  ]);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [addressLoading, setAddressLoading] = useState(false);
+  const [addressError, setAddressError] = useState<string | null>(null);
   
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
@@ -180,6 +161,68 @@ const ProfileSection: React.FC = () => {
     }
   }, [user]);
 
+  const loadAddresses = async () => {
+    if (!user) {
+      console.log('[Profile] No user, skipping address load');
+      setAddresses([]);
+      setSelectedAddressState();
+      return;
+    }
+    const token = getToken();
+    if (!token) {
+      console.warn('[Profile] Missing token, cannot load addresses');
+      setAddressError('Please login to view addresses.');
+      setAddresses([]);
+      setSelectedAddressState();
+      return;
+    }
+
+    console.log('[Profile] Loading addresses for user', user.id);
+    setAddressLoading(true);
+    setAddressError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/address/${user.id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      });
+      console.log('[Profile] Address fetch status', res.status);
+      if (!res.ok) {
+        setAddressError(`Failed to load addresses (status ${res.status})`);
+        setAddresses([]);
+        setSelectedAddressState();
+        return;
+      }
+      const data = await res.json();
+      console.log('[Profile] Address response body', data);
+      if (Array.isArray(data?.data)) {
+        setAddresses(data.data);
+      } else {
+        setAddresses([]);
+      }
+      setSelectedAddressState();
+    } catch (err) {
+      console.error('Failed to load addresses', err);
+      setAddressError('Could not load saved addresses. Please try again.');
+      setAddresses([]);
+      setSelectedAddressState();
+    } finally {
+      setAddressLoading(false);
+    }
+  };
+
+  const setSelectedAddressState = () => {
+    // ensure controlled fields downstream pick first available
+    setNewAddress(prev => ({ ...prev, userId: user?.id || '' }));
+  };
+
+  useEffect(() => {
+    loadAddresses();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   // Redirect already logged-in admin users to dashboard
   useEffect(() => {
     if (user && !isLoading && user.role === 'admin') {
@@ -197,13 +240,38 @@ const ProfileSection: React.FC = () => {
 
 
   // Address management functions
-  const handleAddAddress = () => {
-    if (newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo) {
-      const address: Address = {
-        ...newAddress,
-        id: generateId()
-      };
-      setAddresses([...addresses, address]);
+  const handleAddAddress = async () => {
+    if (!user) {
+      alert('Please login to add an address');
+      return;
+    }
+    if (!(newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo)) {
+      alert('Please fill all required fields');
+      return;
+    }
+
+    const token = getToken();
+    if (!token) {
+      alert('Authorization token missing');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/address`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...newAddress, userId: user.id }),
+      });
+      console.log('[Profile] Add address status', res.status);
+      const body = await res.json().catch(() => ({}));
+      console.log('[Profile] Add address response', body);
+      if (!res.ok) {
+        throw new Error(body?.message || `Failed to add address (status ${res.status})`);
+      }
+      await loadAddresses();
       setNewAddress({
         type: 'Home',
         address: '',
@@ -215,8 +283,9 @@ const ProfileSection: React.FC = () => {
         userId: user?.id || ''
       });
       setShowAddAddress(false);
-    } else {
-      alert('Please fill all required fields');
+    } catch (err: any) {
+      console.error('Error adding address', err);
+      alert(err?.message || 'Failed to add address');
     }
   };
 
@@ -226,11 +295,33 @@ const ProfileSection: React.FC = () => {
     setShowAddAddress(true);
   };
 
-  const handleUpdateAddress = () => {
-    if (editingAddress && newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo) {
-      setAddresses(addresses.map(addr => 
-        addr.id === editingAddress.id ? { ...newAddress, id: editingAddress.id } : addr
-      ));
+  const handleUpdateAddress = async () => {
+    if (!editingAddress) return;
+    if (!(newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo)) {
+      alert('Please fill all required fields');
+      return;
+    }
+    const token = getToken();
+    if (!token) {
+      alert('Authorization token missing');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/address/${editingAddress.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(newAddress),
+      });
+      console.log('[Profile] Update address status', res.status);
+      const body = await res.json().catch(() => ({}));
+      console.log('[Profile] Update address response', body);
+      if (!res.ok) {
+        throw new Error(body?.message || `Failed to update address (status ${res.status})`);
+      }
+      await loadAddresses();
       setEditingAddress(null);
       setNewAddress({
         type: 'Home',
@@ -243,14 +334,38 @@ const ProfileSection: React.FC = () => {
         userId: user?.id || ''
       });
       setShowAddAddress(false);
-    } else {
-      alert('Please fill all required fields');
+    } catch (err: any) {
+      console.error('Error updating address', err);
+      alert(err?.message || 'Failed to update address');
     }
   };
 
-  const handleDeleteAddress = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this address?')) {
-      setAddresses(addresses.filter(addr => addr.id !== id));
+  const handleDeleteAddress = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this address?')) return;
+
+    const token = getToken();
+    if (!token) {
+      alert('Authorization token missing');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/address/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('[Profile] Delete address status', res.status);
+      const body = await res.json().catch(() => ({}));
+      console.log('[Profile] Delete address response', body);
+      if (!res.ok) {
+        throw new Error(body?.message || `Failed to delete address (status ${res.status})`);
+      }
+      await loadAddresses();
+    } catch (err: any) {
+      console.error('Error deleting address', err);
+      alert(err?.message || 'Failed to delete address');
     }
   };
 
@@ -521,10 +636,7 @@ const ProfileSection: React.FC = () => {
                   setEditingAddress={setEditingAddress}
                   newAddress={newAddress}
                   setNewAddress={setNewAddress}
-                  handleAddAddress={handleAddAddress}
-                  handleEditAddress={handleEditAddress}
-                  handleUpdateAddress={handleUpdateAddress}
-                  handleDeleteAddress={handleDeleteAddress}
+                  reloadAddresses={loadAddresses}
                   user={user}
                 />
               )}

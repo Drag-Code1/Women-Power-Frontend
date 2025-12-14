@@ -8,6 +8,9 @@ import Delete from '@mui/icons-material/Delete';
 import Cancel from '@mui/icons-material/Cancel';
 import { Address } from './ProfileSection';
 import { User } from '../../types/auth';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { getToken } from '@/app/lib/authApi';
+import { API_BASE_URL } from '@/app/lib/config';
 
 interface AddressesTabProps {
   addresses: Address[];
@@ -17,10 +20,7 @@ interface AddressesTabProps {
   setEditingAddress: (address: Address | null) => void;
   newAddress: Omit<Address, 'id'>;
   setNewAddress: React.Dispatch<React.SetStateAction<Omit<Address, 'id'>>>;
-  handleAddAddress: () => void;
-  handleEditAddress: (address: Address) => void;
-  handleUpdateAddress: () => void;
-  handleDeleteAddress: (id: string) => void;
+  reloadAddresses: () => Promise<void>;
   user: User;
 }
 
@@ -32,12 +32,133 @@ const AddressesTab: React.FC<AddressesTabProps> = ({
   setEditingAddress,
   newAddress,
   setNewAddress,
-  handleAddAddress,
-  handleEditAddress,
-  handleUpdateAddress,
-  handleDeleteAddress,
+  reloadAddresses,
   user
 }) => {
+  const { token } = useAuth();
+
+  const handleEditAddress = (address: Address) => {
+    setEditingAddress(address);
+    setNewAddress(address);
+    setShowAddAddress(true);
+  };
+
+  const handleAddAddress = async () => {
+    if (!(newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo)) {
+      alert('Please fill all required fields');
+      return;
+    }
+    const authToken = token || getToken();
+    if (!authToken) {
+      alert('Authorization token missing');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/address`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ ...newAddress, userId: user.id }),
+      });
+      console.log('[AddressesTab] Add address status', res.status);
+      const body = await res.json().catch(() => ({}));
+      console.log('[AddressesTab] Add address response', body);
+      if (!res.ok) {
+        throw new Error(body?.message || `Failed to add address (status ${res.status})`);
+      }
+      await reloadAddresses();
+      setNewAddress({
+        type: 'Home',
+        address: '',
+        pincode: '',
+        city: '',
+        state: '',
+        landmark: '',
+        mobileNo: '',
+        userId: user.id
+      });
+      setShowAddAddress(false);
+    } catch (err: any) {
+      console.error('Error adding address', err);
+      alert(err?.message || 'Failed to add address');
+    }
+  };
+
+  const handleUpdateAddress = async () => {
+    if (!editingAddress) return;
+    if (!(newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo)) {
+      alert('Please fill all required fields');
+      return;
+    }
+    const authToken = token || getToken();
+    if (!authToken) {
+      alert('Authorization token missing');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/address/${editingAddress.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify(newAddress),
+      });
+      console.log('[AddressesTab] Update address status', res.status);
+      const body = await res.json().catch(() => ({}));
+      console.log('[AddressesTab] Update address response', body);
+      if (!res.ok) {
+        throw new Error(body?.message || `Failed to update address (status ${res.status})`);
+      }
+      await reloadAddresses();
+      setEditingAddress(null);
+      setNewAddress({
+        type: 'Home',
+        address: '',
+        pincode: '',
+        city: '',
+        state: '',
+        landmark: '',
+        mobileNo: '',
+        userId: user.id
+      });
+      setShowAddAddress(false);
+    } catch (err: any) {
+      console.error('Error updating address', err);
+      alert(err?.message || 'Failed to update address');
+    }
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this address?')) return;
+    const authToken = token || getToken();
+    if (!authToken) {
+      alert('Authorization token missing');
+      return;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/address/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      console.log('[AddressesTab] Delete address status', res.status);
+      const body = await res.json().catch(() => ({}));
+      console.log('[AddressesTab] Delete address response', body);
+      if (!res.ok) {
+        throw new Error(body?.message || `Failed to delete address (status ${res.status})`);
+      }
+      await reloadAddresses();
+    } catch (err: any) {
+      console.error('Error deleting address', err);
+      alert(err?.message || 'Failed to delete address');
+    }
+  };
+
   const getAddressIcon = (type: string) => {
     switch (type) {
       case 'Home': return <Home className="w-5 h-5" />;
@@ -145,9 +266,8 @@ const AddressesTab: React.FC<AddressesTabProps> = ({
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 >
                   <option value="Home">Home</option>
-                  <option value="Work">Work</option>
-                  <option value="Other">Other</option>
-                </select>
+                  <option value="Office">Office</option>
+              </select>
               </div>
 
               <div>

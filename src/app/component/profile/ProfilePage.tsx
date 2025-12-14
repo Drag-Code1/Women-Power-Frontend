@@ -52,30 +52,7 @@ const ProfilePage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   
   // Address management states
-  const [addresses, setAddresses] = useState<Address[]>([
-    {
-      id: '1a9d8bd1-30b4-42c0-8e0b-441c581c71c1',
-      type: 'Home',
-      address: '123 Main Street, Building 3A',
-      pincode: '560001',
-      city: 'Maharashtra',
-      state: 'Maharashtra',
-      landmark: 'Near City Mall',
-      mobileNo: '9877583210',
-      userId: '4cf0865c-ae9c-4381-84ce-4ddec3582db8'
-    },
-    {
-      id: '2a9d8bd1-30b4-42c0-8e0b-441c581c71c2',
-      type: 'Work',
-      address: '456 Business Park, Bandra Kurla Complex',
-      pincode: '400051',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      landmark: 'Near Metro Station',
-      mobileNo: '9876543210',
-      userId: '4cf0865c-ae9c-4381-84ce-4ddec3582db8'
-    }
-  ]);
+  const [addresses, setAddresses] = useState<Address[]>([ ]);
   
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
