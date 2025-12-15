@@ -214,21 +214,14 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                     <span>Subtotal</span>
                     <span>₹{subtotal}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Shipping</span>
-                    <span>₹{shipping}</span>
-                  </div>
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount</span>
-                    <span>-₹{discount}</span>
-                  </div>
+                  
                   <div className="border-t border-gray-200 pt-2">
                     <div className="flex justify-between items-center">
                       <span className="text-base font-bold text-gray-900">
                         Total
                       </span>
                       <span className="text-xl font-bold text-[#61503c]">
-                        ₹{finalTotal}
+                        ₹{subtotal}
                       </span>
                     </div>
                   </div>
