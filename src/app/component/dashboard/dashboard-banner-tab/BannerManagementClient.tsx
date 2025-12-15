@@ -4,7 +4,8 @@
 import { useState, useEffect } from 'react';
 import { Plus, Image, Home } from 'lucide-react';
 import { Banner, BannerType, BANNER_TYPE_CONFIG } from "@/app/types/dashboard-banner-tab";
-import { createBannerApi, updateBannerApi, deleteBannerApi } from '@/app/lib/bannerApi';
+import { createBannerApi, updateBannerApi, deleteBannerApi, uploadImageApi } from '@/app/lib/bannerApi';
+// import { uploadToR2 } from '@/app/lib/utils/r2Client';
 import BannerGrid from './BannerGrid';
 import BannerModal from './BannerModal';
 
@@ -19,17 +20,25 @@ export default function BannerManagementClient({ initialBanners }: Props) {
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const selectedType: BannerType = 'home_banner';
-  const filteredBanners = banners.filter(b => b.type === selectedType);
+  const selectedType: BannerType = 'banner';
+  const filteredBanners = (banners || []).filter(b => b && b.type === selectedType);
   const config = BANNER_TYPE_CONFIG[selectedType];
   const canAddMore = config.maxCount === Infinity || filteredBanners.length < config.maxCount;
 
-  const handleCreate = async (img_url: string) => {
+  const handleCreate = async (data: { img_url: string; file?: File }) => {
     setIsLoading(true);
     try {
+      let finalImgUrl = data.img_url;
+
+      if (data.file) {
+        const uploadedUrl = await uploadImageApi(data.file);
+        finalImgUrl = uploadedUrl;
+      }
+
       const newBanner = await createBannerApi({
-        type: selectedType,
-        img_url
+        type: 'banner',
+        page_name: 'home',
+        img_url: finalImgUrl
       });
       setBanners([...banners, newBanner]);
       closeModal();
@@ -41,12 +50,19 @@ export default function BannerManagementClient({ initialBanners }: Props) {
     }
   };
 
-  const handleUpdate = async (img_url: string) => {
+  const handleUpdate = async (data: { img_url: string; file?: File }) => {
     if (!editingBanner) return;
-    
+
     setIsLoading(true);
     try {
-      const updated = await updateBannerApi(editingBanner.id, { img_url });
+      let finalImgUrl = data.img_url;
+
+      if (data.file) {
+        const uploadedUrl = await uploadImageApi(data.file);
+        finalImgUrl = uploadedUrl;
+      }
+
+      const updated = await updateBannerApi(editingBanner.id, { img_url: finalImgUrl });
       setBanners(banners.map(b => b.id === editingBanner.id ? updated : b));
       closeModal();
     } catch (error) {
@@ -59,7 +75,7 @@ export default function BannerManagementClient({ initialBanners }: Props) {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this banner?')) return;
-    
+
     setIsLoading(true);
     try {
       await deleteBannerApi(id);

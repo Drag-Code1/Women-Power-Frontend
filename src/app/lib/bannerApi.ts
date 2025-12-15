@@ -1,6 +1,6 @@
-// lib/api/bannerApi.ts
 import { Banner, CreateBannerDTO, UpdateBannerDTO } from "../types/dashboard-banner-tab";
 import { API_BASE_URL } from './config';
+import { getAuthHeaders } from './authApi';
 
 // ============================================
 // SERVER-SIDE API CALLS (for SSR)
@@ -80,15 +80,25 @@ export async function createBannerApi(payload: CreateBannerDTO): Promise<Banner>
   try {
     const res = await fetch(`${API_BASE_URL}/banner/`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'Failed to create banner');
+      const errorText = await res.text();
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch (e) {
+        errorData = { raw: errorText };
+      }
+
+      console.error(`Create banner failed (Status: ${res.status} ${res.statusText})`, {
+        error: errorData,
+        rawResponse: errorText,
+        payload
+      });
+      throw new Error((errorData && (errorData.message || errorData.error)) || `Failed to create banner: ${res.status} ${res.statusText}`);
     }
 
     const data = await res.json();
@@ -103,9 +113,7 @@ export async function updateBannerApi(id: string, payload: UpdateBannerDTO): Pro
   try {
     const res = await fetch(`${API_BASE_URL}/banner/${id}`, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
       body: JSON.stringify(payload),
     });
 
@@ -126,9 +134,7 @@ export async function deleteBannerApi(id: string): Promise<void> {
   try {
     const res = await fetch(`${API_BASE_URL}/banner/${id}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getAuthHeaders(),
     });
 
     if (!res.ok) {
@@ -141,25 +147,16 @@ export async function deleteBannerApi(id: string): Promise<void> {
   }
 }
 
+// Replaced broken /v1/upload with R2 upload flow
+import { uploadToR2 } from './utils/r2Client';
+
 export async function uploadImageApi(file: File): Promise<string> {
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const res = await fetch(`${API_BASE_URL}/upload`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'Failed to upload image');
-    }
-
-    const data = await res.json();
-    return data.url;
+    const uploaded = await uploadToR2(file);
+    // Return the key, which the R2Image component can resolve
+    return uploaded.key;
   } catch (error) {
-    console.error('Error uploading image:', error);
+    console.error('Error uploading image to R2:', error);
     throw error;
   }
 }

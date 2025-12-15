@@ -1,9 +1,10 @@
 // components/admin/BannerGrid.tsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { MoreVertical, Eye, Edit2, Trash2 } from 'lucide-react';
+import { useState } from "react";
+import { MoreVertical, Eye, Edit2, Trash2 } from "lucide-react";
 import { Banner } from "@/app/types/dashboard-banner-tab";
+import R2Image from "../dashboardallproductstab/R2Image";
 
 interface Props {
   banners: Banner[];
@@ -13,7 +14,13 @@ interface Props {
   isLoading: boolean;
 }
 
-export default function BannerGrid({ banners, onEdit, onDelete, onPreview, isLoading }: Props) {
+export default function BannerGrid({
+  banners,
+  onEdit,
+  onDelete,
+  onPreview,
+  isLoading,
+}: Props) {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   const toggleMenu = (id: string) => {
@@ -25,23 +32,23 @@ export default function BannerGrid({ banners, onEdit, onDelete, onPreview, isLoa
     setOpenMenuId(null);
   };
 
+
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
       {banners.map((banner) => (
-        <div 
-          key={banner.id} 
+        <div
+          key={banner.id}
           className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative"
         >
           <div className="aspect-video bg-gray-100 relative">
-            <img 
-              src={banner.img_url} 
+            <R2Image
+              src={banner.img_url}
+              fallbackSrc="https://via.placeholder.com/600x400?text=Image+Not+Found"
               alt="Banner"
               className="w-full h-full object-cover"
-              onError={(e) => {
-                e.currentTarget.src = 'https://via.placeholder.com/600x400?text=Image+Not+Found';
-              }}
             />
-            
+
             {/* Three Dot Menu */}
             <div className="absolute top-2 right-2 z-20">
               <button
@@ -54,17 +61,17 @@ export default function BannerGrid({ banners, onEdit, onDelete, onPreview, isLoa
               >
                 <MoreVertical className="w-5 h-5 text-gray-700" />
               </button>
-              
+
               {/* Dropdown Menu */}
               {openMenuId === banner.id && (
                 <>
                   {/* Backdrop to close menu */}
-                  <div 
+                  <div
                     className="fixed inset-0 z-30"
                     onClick={() => setOpenMenuId(null)}
                   />
-                  
-                  <div 
+
+                  <div
                     className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-40"
                     onClick={(e) => e.stopPropagation()}
                   >
@@ -95,10 +102,12 @@ export default function BannerGrid({ banners, onEdit, onDelete, onPreview, isLoa
               )}
             </div>
           </div>
-          
+
           <div className="p-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-900">Home Banner</span>
+              <span className="text-sm font-medium text-gray-900">
+                Home Banner
+              </span>
               <span className="text-xs text-gray-500">
                 {new Date(banner.createdAt).toLocaleDateString()}
               </span>

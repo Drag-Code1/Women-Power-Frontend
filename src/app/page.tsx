@@ -10,10 +10,18 @@ import { TopRatedArtists } from "./component/product/TopRatedArtists";
 import { PopularCourses } from "./component/product/PopularCourses";
 
 
-export default function Home() {
+import { fetchBannersServer } from "./lib/bannerApi";
+
+
+export default async function Home() {
+  const banners = await fetchBannersServer();
+  const bannerImages = banners.length > 0
+    ? banners.map(b => b.img_url)
+    : undefined;
+
   return (
     <div>
-      <ImageSlider />
+      <ImageSlider images={bannerImages} />
       <TopCategories />
       <BestSellers />
       <TopRatedArtists />

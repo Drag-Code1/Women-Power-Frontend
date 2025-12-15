@@ -10,30 +10,39 @@ interface Props {
   banner: Banner | null;
   config: BannerTypeConfig;
   onClose: () => void;
-  onCreate: (img_url: string) => Promise<void>;
-  onUpdate: (img_url: string) => Promise<void>;
+  onCreate: (data: { img_url: string; file?: File }) => Promise<void>;
+  onUpdate: (data: { img_url: string; file?: File }) => Promise<void>;
   isLoading: boolean;
 }
 
-export default function BannerModal({ 
-  mode, 
-  banner, 
-  config, 
-  onClose, 
-  onCreate, 
-  onUpdate, 
-  isLoading 
+import R2Image from "../dashboardallproductstab/R2Image";
+
+// ...
+
+export default function BannerModal({
+  mode,
+  banner,
+  config,
+  onClose,
+  onCreate,
+  onUpdate,
+  isLoading
 }: Props) {
   const [imagePreview, setImagePreview] = useState<string>('');
   const [imgUrl, setImgUrl] = useState<string>('');
+  const [selectedFile, setSelectedFile] = useState<File | undefined>(undefined);
+
+
 
   useEffect(() => {
     if (banner) {
       setImagePreview(banner.img_url);
-      setImgUrl(banner.img_url);
+      setImgUrl(banner.img_url); // Keep original relative URL if editing without changing image
+      setSelectedFile(undefined);
     } else {
       setImagePreview('');
       setImgUrl('');
+      setSelectedFile(undefined);
     }
   }, [banner]);
 
@@ -52,6 +61,8 @@ export default function BannerModal({
         return;
       }
 
+      setSelectedFile(file);
+
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
@@ -68,10 +79,15 @@ export default function BannerModal({
       return;
     }
 
+    const data = {
+      img_url: imgUrl,
+      file: selectedFile
+    };
+
     if (mode === 'edit') {
-      await onUpdate(imgUrl);
+      await onUpdate(data);
     } else {
-      await onCreate(imgUrl);
+      await onCreate(data);
     }
   };
 
@@ -96,8 +112,8 @@ export default function BannerModal({
           animation: slideIn 0.3s ease-out;
         }
       `}</style>
-      
-      <div 
+
+      <div
         className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-end z-50"
         onClick={(e) => {
           if (e.target === e.currentTarget) {
@@ -113,11 +129,11 @@ export default function BannerModal({
                 <Home className="w-5 h-5 text-blue-600" />
               </div>
               <h2 className="text-xl font-semibold text-gray-900">
-                {mode === 'preview' 
-                  ? 'Banner Preview' 
-                  : mode === 'edit' 
-                  ? 'Edit Banner' 
-                  : 'Add New Banner'}
+                {mode === 'preview'
+                  ? 'Banner Preview'
+                  : mode === 'edit'
+                    ? 'Edit Banner'
+                    : 'Add New Banner'}
               </h2>
             </div>
             <button
@@ -128,18 +144,16 @@ export default function BannerModal({
               <X className="w-6 h-6" />
             </button>
           </div>
-          
+
           {/* Content */}
           {mode === 'preview' ? (
             // Preview Mode
             <div className="p-6">
-              <img 
-                src={banner?.img_url} 
+              <R2Image
+                src={banner?.img_url}
                 alt="Banner Preview"
                 className="w-full rounded-lg"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://via.placeholder.com/1200x400?text=Image+Not+Found';
-                }}
+                fallbackSrc="https://via.placeholder.com/1200x400?text=Image+Not+Found"
               />
               <div className="mt-6 grid grid-cols-2 gap-4">
                 <div>
@@ -178,12 +192,12 @@ export default function BannerModal({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Banner Image *
                 </label>
-                
+
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-500 transition-colors">
                   {imagePreview ? (
                     <div className="space-y-4">
-                      <img 
-                        src={imagePreview} 
+                      <R2Image
+                        src={imagePreview}
                         alt="Preview"
                         className="w-full h-48 object-cover rounded-lg"
                       />

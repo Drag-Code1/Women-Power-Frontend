@@ -1,5 +1,5 @@
 // types/banner.ts
-export type BannerType = 'home_banner';
+export type BannerType = 'banner';
 
 export interface Banner {
   id: string;
@@ -16,7 +16,8 @@ export interface BannerTypeConfig {
 }
 
 export interface CreateBannerDTO {
-  type: BannerType;
+  type: string;
+  page_name: string;
   img_url: string;
 }
 
@@ -31,7 +32,7 @@ export interface ApiResponse<T> {
 }
 
 export const BANNER_TYPE_CONFIG: Record<BannerType, BannerTypeConfig> = {
-  home_banner: {
+  banner: {
     label: 'Home Banner',
     description: 'Main banner at the top of homepage',
     maxCount: Infinity,
