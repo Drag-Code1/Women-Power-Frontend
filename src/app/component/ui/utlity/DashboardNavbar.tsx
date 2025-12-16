@@ -35,6 +35,7 @@ const DashboardNavbar = ({
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="relative">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center border-2 border-blue-300">
+                  
                   <span className="text-xl sm:text-2xl font-bold text-blue-700">W</span>
                 </div>
               </div>
