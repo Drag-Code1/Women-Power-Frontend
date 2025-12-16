@@ -187,13 +187,6 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
               </div>
             ))}
           </nav>
-
-          {/* Footer */}
-          <div className="p-5 border-t border-gray-200/60 bg-gradient-to-t from-gray-50 to-white/50 backdrop-blur-sm">
-            <div className="text-xs text-gray-500 text-center font-medium tracking-wide">
-              © 2025 Whoemen Empower
-            </div>
-          </div>
         </div>
       </div>
     </>

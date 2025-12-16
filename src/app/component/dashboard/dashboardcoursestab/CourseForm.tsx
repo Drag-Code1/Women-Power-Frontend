@@ -122,7 +122,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
           >
             <option value="Beginner">Beginner</option>
             <option value="Intermediate">Intermediate</option>
-            <option value="Expert">Expert</option>
+            <option value="Expert">Advance</option>
           </select>
         </div>
       </div>
