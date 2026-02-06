@@ -40,7 +40,7 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
   const fetchAllEvents = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const eventsData = await getEventsApi();
       setAllEvents(eventsData);
@@ -56,24 +56,24 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
   // Apply client-side filtering
   const applyFilters = useCallback(() => {
     let filteredEvents = [...allEvents];
-    
+
     // If there's a search term, filter by search
     if (searchTerm.trim()) {
       const searchLower = searchTerm.toLowerCase();
-      filteredEvents = filteredEvents.filter((event: Event) => 
+      filteredEvents = filteredEvents.filter((event: Event) =>
         event.title.toLowerCase().includes(searchLower) ||
         event.description.toLowerCase().includes(searchLower) ||
         event.keywords.toLowerCase().includes(searchLower)
       );
     }
-    
+
     // Filter by status
     if (selectedStatus !== "All") {
-      filteredEvents = filteredEvents.filter((event: Event) => 
+      filteredEvents = filteredEvents.filter((event: Event) =>
         event.status === selectedStatus
       );
     }
-    
+
     setEvents(filteredEvents);
   }, [allEvents, searchTerm, selectedStatus]);
 
@@ -168,10 +168,7 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
     <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
       <section className="min-h-screen bg-white rounded-sm">
         <div className="max-w-7xl mx-auto px-4 py-4">
-          <FeaturedEventsSlider
-            featuredEvents={featuredEvents}
-            formatDate={formatDate}
-          />
+          <FeaturedEventsSlider />
 
           <EventFilters
             searchTerm={searchTerm}
@@ -207,9 +204,8 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
             </div>
           ) : filteredEvents.length > 0 ? (
             <div
-              className={`transition-opacity duration-200 ${
-                isTransitioning ? "opacity-50" : "opacity-100"
-              }`}
+              className={`transition-opacity duration-200 ${isTransitioning ? "opacity-50" : "opacity-100"
+                }`}
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {paginatedEvents.map((event) => (
@@ -257,11 +253,10 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
                 <button
                   onClick={goToPrevPage}
                   disabled={currentPage === 1 || isTransitioning}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium ${
-                    currentPage === 1 || isTransitioning
+                  className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium ${currentPage === 1 || isTransitioning
                       ? "text-gray-400 cursor-not-allowed opacity-50"
                       : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                    }`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                   <span className="hidden sm:inline">Previous</span>
@@ -274,13 +269,11 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
                         key={i}
                         onClick={() => goToPage(page)}
                         disabled={isTransitioning}
-                        className={`px-3 py-2 rounded-md text-sm font-medium ${
-                          currentPage === page
+                        className={`px-3 py-2 rounded-md text-sm font-medium ${currentPage === page
                             ? "bg-[#61503c] text-white shadow-md"
                             : "text-gray-700 hover:bg-gray-100"
-                        } ${
-                          isTransitioning ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
+                          } ${isTransitioning ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
                       >
                         {page}
                       </button>
@@ -295,11 +288,10 @@ const EventsSectionClient = ({ initialEvents, featuredEvents, statuses }: Props)
                 <button
                   onClick={goToNextPage}
                   disabled={currentPage === totalPages || isTransitioning}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium ${
-                    currentPage === totalPages || isTransitioning
+                  className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium ${currentPage === totalPages || isTransitioning
                       ? "text-gray-400 cursor-not-allowed opacity-50"
                       : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                    }`}
                 >
                   <span className="hidden sm:inline">Next</span>
                   <ChevronRight className="w-4 h-4" />
