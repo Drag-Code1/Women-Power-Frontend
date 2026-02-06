@@ -38,22 +38,52 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
   useEffect(() => {
     const load = async () => {
       try {
-        const [cats, arts] = await Promise.all([getCategoriesApi(), getArtistsApi()]);
-        
+        // Fetch categories and first page of artists to get total pages
+        const [cats, artistsFirstPage] = await Promise.all([
+          getCategoriesApi(),
+          import("@/app/lib/api").then(m => m.getArtistsPaginated(1))
+        ]);
+
         // Handle categories
         const categoriesArr = Array.isArray(cats) ? cats : (cats?.data || []);
         setCategories(categoriesArr);
-        
-        // Handle artists - normalize the data structure
-        const artistsArr = Array.isArray(arts) ? arts : (arts?.data || []);
-        const normalizedArtists = artistsArr.map((artist: any) => ({
+
+        // Handle artists - fetch all pages if needed
+        let allArtistsRaw = artistsFirstPage.data || [];
+        if (artistsFirstPage.totalPages > 1) {
+          const pagePromises = [];
+          for (let i = 2; i <= artistsFirstPage.totalPages; i++) {
+            pagePromises.push(import("@/app/lib/api").then(m => m.getArtistsPaginated(i)));
+          }
+          const otherPages = await Promise.all(pagePromises);
+          otherPages.forEach(page => {
+            if (page.data) {
+              allArtistsRaw = [...allArtistsRaw, ...page.data];
+            }
+          });
+        }
+
+        // Normalize the data structure
+        const normalizedArtists = allArtistsRaw.map((artist: any) => ({
           id: artist.id || artist.artist_id || artist._id || "",
           artist_Name: artist.artist_Name || artist.name || artist.artist_name || artist.id || "Unknown Artist"
         }));
-        setArtists(normalizedArtists);
-        
-        console.log("Loaded artists:", normalizedArtists);
-        console.log("Current formData.artist_id:", formData.artist_id);
+
+        // Deduplicate artists based on ID
+        const uniqueArtistsMap = new Map();
+        normalizedArtists.forEach((artist: any) => {
+          if (artist.id && !uniqueArtistsMap.has(artist.id)) {
+            uniqueArtistsMap.set(artist.id, artist);
+          }
+        });
+        const uniqueArtists = Array.from(uniqueArtistsMap.values()) as { id: string; artist_Name: string }[];
+
+        // Sort artists alphabetically
+        uniqueArtists.sort((a, b) => a.artist_Name.localeCompare(b.artist_Name));
+
+        setArtists(uniqueArtists);
+
+        console.log("Loaded all artists (unique):", uniqueArtists.length);
       } catch (error) {
         console.error("Error loading form data:", error);
         setCategories([]);
@@ -69,12 +99,12 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
         <label className="block text-sm font-medium text-gray-700 mb-3">
           Product Thumbnail (Main Image) *
         </label>
-        
+
         <div className="space-y-2">
           <p className="text-xs text-gray-600">
             This image will be shown as the main product image
           </p>
-          
+
           {thumbnailPreview ? (
             <div className="relative w-full h-48">
               <R2Image
@@ -107,7 +137,7 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
                 className="hidden"
               />
             </label>
-            
+
             <input
               type="url"
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -124,14 +154,14 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
         <label className="block text-sm font-medium text-gray-700 mb-3">
           Additional Product Images (Optional - Up to 2 images)
         </label>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[0, 1].map((index) => (
             <div key={index} className="space-y-2">
               <p className="text-xs text-gray-600 text-center">
                 Additional Image {index + 1}
               </p>
-              
+
               {imagePreview[index] ? (
                 <div className="relative w-full h-32">
                   <R2Image
@@ -164,7 +194,7 @@ export const DrawerFormMode: React.FC<DrawerFormModeProps> = ({
                     className="hidden"
                   />
                 </label>
-                
+
                 <input
                   type="url"
                   className="w-full px-2 py-1.5 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-blue-500 focus:border-transparent"
