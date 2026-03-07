@@ -67,7 +67,8 @@ export async function uploadToR2(
     throw new Error(`Failed to get access URL: ${accessRes.status}`);
   }
 
-  const { accessUrl } = await accessRes.json();
+  const data = await accessRes.json();
+  const accessUrl = data.accessUrl || data.url || data.signedUrl;
 
   // 4️⃣ Return key and access URL
   return { key, accessUrl };
