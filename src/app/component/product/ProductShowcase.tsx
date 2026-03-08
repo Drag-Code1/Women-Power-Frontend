@@ -39,7 +39,7 @@ const ProductShowcase: React.FC = () => {
       <div className="bg-white py-6 px-4 rounded-sm ">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-lg overflow-hidden flex flex-col lg:flex-row items-center">
-            
+
             {/* Image Section */}
             <div className="lg:w-1/2 relative bg-white">
               <div className="relative max-w-md mx-auto">
@@ -59,11 +59,10 @@ const ProductShowcase: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => goToImage(index)}
-                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300  ${
-                        index === currentImageIndex 
-                          ? 'bg-[#61503c]' 
-                          : 'bg-gray-300 hover:bg-gray-400'
-                      }`}
+                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300  ${index === currentImageIndex
+                        ? 'bg-[#61503c]'
+                        : 'bg-gray-300 hover:bg-gray-400'
+                        }`}
                     />
                   ))}
                 </div>
@@ -74,20 +73,18 @@ const ProductShowcase: React.FC = () => {
             <div className="lg:w-1/2 p-6 flex flex-col justify-center">
               <div className="space-y-4">
                 <h1 className="text-2xl lg:text-3xl font-bold text-gray-800 leading-tight">
-                  Crafting dreams into reality
+                  Beyond Art — A Woman’s Journey of Growth
                 </h1>
-                
+
                 <p className="text-gray-600 text-base leading-relaxed">
-                  "Woman Empowering Journey" ~ Handcrafted by Namrta Gupta. We founded with a vision 
-                  to encourage the Indian traditional art in the form of Decorative Kundan Items, 
-                  which create the exceptional aura….
+                  WOMAN.ej  -Woman Empowering Journey is a creative and empowering platform dedicated to helping women unlock their potential through skills, activities, empowerment, and achievement. This initiative is designed to provide women with diverse opportunities to learn various forms of art and creativity, guided by expert mentors.
                 </p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Zoom Animation */}
       <style jsx>{`
         @keyframes zoom {

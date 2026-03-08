@@ -38,16 +38,16 @@ export default function AboutSection() {
                 <div className="w-full space-y-6">
                   <div className="text-center">
                     <h3 className="text-xl font-bold mb-3 text-[#7A5C3D]">
-                      Traditional Artistry
+                      Founder
                     </h3>
                     <p className="text-sm md:text-base text-[#5C452B]/90 leading-relaxed max-w-3xl mx-auto">
-                      We promote Indian traditional art through decorative
-                      Kundan items, celebrating culture and craftsmanship with
-                      timeless beauty.
+                      Namrta Gupta is the Founder of Woman Empowering Journey and Suave Kundan Rangoli. Through Woman Empowering Journey, she empowers women to learn creative skills, build confidence, and explore opportunities for personal and financial growth through workshops, activities, and learning sessions.<br>
+                      </br>
+                      She is also an artist with 8+ years of experience, known for creating elegant and reusable Kundan Rangoli designs admired globally.
                     </p>
                   </div>
 
-                  <div className="bg-white/70 p-5 rounded-lg max-w-3xl mx-auto">
+                  {/* <div className="bg-white/70 p-5 rounded-lg max-w-3xl mx-auto">
                     <h4 className="font-bold text-[#7A5C3D] mb-2 text-center">
                       Our Commitment
                     </h4>
@@ -56,7 +56,7 @@ export default function AboutSection() {
                       modernity. By choosing us, you beautify your spaces and
                       support artisans who keep traditions alive.
                     </p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -71,7 +71,7 @@ export default function AboutSection() {
                   <span className="text-[#7A5C3D]">(WEJ)</span>
                 </h2>
                 <p className="text-lg text-[#5C452B]/80 max-w-3xl mx-auto">
-                  Founded by{" "}
+                  Co-Founder by  {" "}
                   <span className="font-semibold text-[#7A5C3D]">
                     Sonali Thakkar
                   </span>
