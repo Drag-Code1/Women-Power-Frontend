@@ -21,6 +21,7 @@ export default function ArtistManagementClient({ initialArtists, pagination }: A
     formData,
     imagePreview,
     openDropdownId,
+    isSubmitting,
     isFormValid,
     categoryOptions,
     openModal,
@@ -98,7 +99,7 @@ export default function ArtistManagementClient({ initialArtists, pagination }: A
           onFormChange={handleFormChange}
           onImageUpload={handleImageUpload}
           onSubmit={handleSubmit}
-          isFormValid={isFormValid}
+          isFormValid={isFormValid && !isSubmitting}
           categoryOptions={categoryOptions}
         />
       </div>

@@ -17,6 +17,7 @@ interface ArtistModalProps {
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
   isFormValid: boolean;
+  isSubmitting?: boolean;
   categoryOptions: CategoryOption[];
 }
 
@@ -31,6 +32,7 @@ export default function ArtistModal({
   onImageUpload,
   onSubmit,
   isFormValid,
+  isSubmitting = false,
   categoryOptions
 }: ArtistModalProps) {
   if (!isOpen) return null;
@@ -72,17 +74,21 @@ export default function ArtistModal({
           <div className="flex gap-3 mt-8">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-medium disabled:opacity-50"
             >
               {modalType === 'view' ? 'Close' : 'Cancel'}
             </button>
             {modalType !== 'view' && (
               <button
                 onClick={onSubmit}
-                disabled={!isFormValid}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                disabled={!isFormValid || isSubmitting}
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center gap-2"
               >
-                {modalType === 'create' ? 'Create' : 'Update'}
+                {isSubmitting && (
+                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                )}
+                {modalType === 'create' ? (isSubmitting ? 'Creating...' : 'Create') : (isSubmitting ? 'Updating...' : 'Update')}
               </button>
             )}
           </div>

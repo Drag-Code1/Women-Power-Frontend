@@ -125,8 +125,12 @@ export default function ProductsPage() {
   );
   const uniqueArtists = getUniqueArtists(products);
 
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
   // ✅ Save (Add / Edit)
   const handleSave = async () => {
+    if (isSaving) return;
+
     // Basic validation
     if (!formData.p_Name || !formData.p_Name.trim()) {
       alert("Product name is required!");
@@ -148,6 +152,7 @@ export default function ProductsPage() {
       return;
     }
 
+    setIsSaving(true);
     try {
       if (drawerMode === "add") {
         const newProduct: Partial<Product> = {
@@ -188,10 +193,12 @@ export default function ProductsPage() {
         // Guard invalid foreign keys to avoid FK constraint error
         if (!updatedData.artist_id || updatedData.artist_id === "all") {
           alert("Please select a valid artist");
+          setIsSaving(false);
           return;
         }
         if (!updatedData.category_id || updatedData.category_id === "all") {
           alert("Please select a valid category");
+          setIsSaving(false);
           return;
         }
 
@@ -216,6 +223,8 @@ export default function ProductsPage() {
         error?.message ||
           "❌ An error occurred. Please check your connection and try again."
       );
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -416,6 +425,7 @@ export default function ProductsPage() {
         currentImageIndex={currentImageIndex}
         onClose={closeDrawer}
         onSave={handleSave}
+        isSubmitting={isSaving}
         onInputChange={handleInputChange}
         onThumbnailSelect={handleThumbnailSelect}
         onImageSelect={handleImageSelect}

@@ -27,6 +27,7 @@ interface ProductDrawerProps {
   onPrevImage: () => void;
   onSetImageIndex: (index: number) => void;
   onViewDetails: (id: string) => void;
+  isSubmitting?: boolean;
 }
 
 export const ProductDrawer: React.FC<ProductDrawerProps> = ({
@@ -50,6 +51,7 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
   onPrevImage,
   onSetImageIndex,
   onViewDetails,
+  isSubmitting = false,
 }) => {
   return (
     <>
@@ -76,7 +78,8 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
             </h2>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
+              disabled={isSubmitting}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100 disabled:opacity-50"
             >
               <X className="w-5 h-5" />
             </button>
@@ -112,21 +115,26 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
             <div className="flex gap-3 p-6 border-t border-gray-200 bg-white">
               <button
                 onClick={onClose}
-                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors duration-150"
+                disabled={isSubmitting}
+                className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors duration-150 disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={onSave}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors duration-150"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors duration-150 flex items-center justify-center gap-2 disabled:opacity-50"
                 disabled={
+                  isSubmitting ||
                   !formData.p_Name ||
                   !formData.category_id ||
                   !formData.artist_id ||
                   !formData.description
                 }
               >
-                {drawerMode === "add" ? "Add Product" : "Update Product"}
+                {isSubmitting && (
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                )}
+                {drawerMode === "add" ? (isSubmitting ? "Adding..." : "Add Product") : (isSubmitting ? "Updating..." : "Update Product")}
               </button>
             </div>
           )}
@@ -134,4 +142,4 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
       </div>
     </>
   );
-};
+};

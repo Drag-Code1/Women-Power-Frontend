@@ -24,6 +24,8 @@ export function useArtistManager(initialArtists: Artist[]) {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     (async () => {
       try {
@@ -64,6 +66,7 @@ export function useArtistManager(initialArtists: Artist[]) {
     }
     setIsModalOpen(true);
     setOpenDropdownId(null);
+    setIsSubmitting(false); // Reset on open
   };
 
   const closeModal = () => {
@@ -71,6 +74,7 @@ export function useArtistManager(initialArtists: Artist[]) {
     setSelectedArtist(null);
     setFormData(initialFormData);
     setImagePreview('');
+    setIsSubmitting(false);
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,12 +95,15 @@ export function useArtistManager(initialArtists: Artist[]) {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     if (modalType === 'create') {
       try {
         const found = categoryOptions.find((c) => (formData.category_id ? c.id === formData.category_id : c.name === formData.category));
         const categoryId = found?.id || '';
         if (!categoryId) {
           alert('Please select a valid category.');
+          setIsSubmitting(false);
           return;
         }
         const created = await createArtist({
@@ -117,9 +124,11 @@ export function useArtistManager(initialArtists: Artist[]) {
           image: buildR2PublicUrl(created.artist_profile_pic) || imagePreview
         };
         setArtists([...artists, newArtist]);
+        closeModal();
       } catch (e) {
         console.error('Failed to create artist', e);
         alert('Failed to create artist. Please try again.');
+        setIsSubmitting(false);
       }
     } else if (modalType === 'edit' && selectedArtist) {
       try {
@@ -127,6 +136,7 @@ export function useArtistManager(initialArtists: Artist[]) {
         const categoryId = found?.id || selectedArtist.category_id || '';
         if (!categoryId) {
           alert('Please select a valid category.');
+          setIsSubmitting(false);
           return;
         }
         const updatedServer = await updateArtist(String(selectedArtist.id), {
@@ -151,17 +161,13 @@ export function useArtistManager(initialArtists: Artist[]) {
             ? updatedLocal
             : artist
         ));
+        closeModal();
       } catch (e) {
         console.error('Failed to update artist', e);
         alert('Failed to update artist. Please try again.');
-        setArtists(artists.map(artist => 
-          artist.id === selectedArtist.id 
-            ? { ...artist, ...formData, experience: Number(formData.experience) }
-            : artist
-        ));
+        setIsSubmitting(false);
       }
     }
-    closeModal();
   };
 
   const handleDelete = async (id: string | number) => {
@@ -193,6 +199,7 @@ export function useArtistManager(initialArtists: Artist[]) {
     formData,
     imagePreview,
     openDropdownId,
+    isSubmitting,
     isFormValid,
     categoryOptions,
     openModal,
