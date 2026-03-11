@@ -3,7 +3,7 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Course, ModalMode } from '@/app/types/dashboardcoursetab';
-import R2Image from "../dashboardallproductstab/R2Image";
+import R2Image from "@/app/component/common/R2Image";
 
 interface CourseFormProps {
   formData: Course;

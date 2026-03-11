@@ -6,7 +6,7 @@ import {
   formatEventDateTime,
 } from "@/app/lib/utils/dashboardevent-utils";
 import type { Event, ModalMode } from "@/app/types/dashboardeventtab";
-import R2Image from "../dashboardallproductstab/R2Image";
+import R2Image from "@/app/component/common/R2Image";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
 
 interface EventCardProps {

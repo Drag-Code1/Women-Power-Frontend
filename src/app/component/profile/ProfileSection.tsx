@@ -67,11 +67,18 @@ export interface Address {
 
 export interface Order {
   id: string;
-  date: string;
+  order_date: string;
   status: 'delivered' | 'shipped' | 'processing' | 'cancelled';
-  total: number;
-  items: number;
-  image: string;
+  totalPrice: string;
+  productCount: number;
+  address?: {
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+    mobileNo: string;
+    type: string;
+  };
 }
 
 const ProfileSection: React.FC = () => {
@@ -80,7 +87,7 @@ const ProfileSection: React.FC = () => {
   const router = useRouter();
   const returnUrl = searchParams?.get('returnUrl');
   const { addToCart } = useCart();
-  
+
   const [activeTab, setActiveTab] = useState('profile');
   const [isEditing, setIsEditing] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
@@ -89,7 +96,7 @@ const ProfileSection: React.FC = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  
+
   // Signup form states
   const [signupData, setSignupData] = useState({
     firstName: '',
@@ -98,12 +105,12 @@ const ProfileSection: React.FC = () => {
     email: '',
     mobileNo: ''
   });
-  
+
   // Address management states
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [addressLoading, setAddressLoading] = useState(false);
   const [addressError, setAddressError] = useState<string | null>(null);
-  
+
   const [showAddAddress, setShowAddAddress] = useState(false);
   const [editingAddress, setEditingAddress] = useState<Address | null>(null);
   const [newAddress, setNewAddress] = useState<Omit<Address, 'id'>>({
@@ -116,35 +123,11 @@ const ProfileSection: React.FC = () => {
     mobileNo: '',
     userId: user?.id || ''
   });
-  
+
   const [editedUser, setEditedUser] = useState<User | null>(user);
 
-  const orders: Order[] = [
-    {
-      id: 'ORD001',
-      date: '2024-01-15',
-      status: 'delivered',
-      total: 2499,
-      items: 2,
-      image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=80&h=80&fit=crop'
-    },
-    {
-      id: 'ORD002',
-      date: '2024-01-10',
-      status: 'shipped',
-      total: 1299,
-      items: 1,
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80&h=80&fit=crop'
-    },
-    {
-      id: 'ORD003',
-      date: '2024-01-05',
-      status: 'processing',
-      total: 3999,
-      items: 3,
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop'
-    }
-  ];
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: Person },
@@ -229,7 +212,7 @@ const ProfileSection: React.FC = () => {
       console.log('🔄 Admin user detected on profile page, redirecting to dashboard');
       console.log('👤 User role:', user.role);
       console.log('📧 User email:', user.email);
-      
+
       // Add a small delay to ensure component is fully loaded
       setTimeout(() => {
         console.log('🚀 Redirecting admin to dashboard...');
@@ -238,6 +221,38 @@ const ProfileSection: React.FC = () => {
     }
   }, [user, isLoading]);
 
+
+  const loadOrders = async () => {
+    if (!user) return;
+    const token = getToken();
+    if (!token) return;
+
+    setOrdersLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/order/${user.id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          setOrders(data.data);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load orders', err);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Address management functions
   const handleAddAddress = async () => {
@@ -400,16 +415,16 @@ const ProfileSection: React.FC = () => {
         console.log('OTP verification successful');
         console.log('👤 User data from OTP verification:', loggedInUser);
         console.log('🎯 User role:', loggedInUser?.role);
-        
+
         setShowOtpVerification(false);
         setSuccess('Login successful!');
         // Reset form
         setEmailAddress('');
         setOtp(['', '', '', '', '', '']);
-        
+
         // Role-based routing after successful OTP verification
         console.log('🔄 Starting role-based redirect...');
-        
+
         if (loggedInUser?.role === 'admin') {
           console.log('🔐 Admin user detected, redirecting to admin dashboard');
           // Add a small delay to ensure state updates are complete
@@ -441,7 +456,7 @@ const ProfileSection: React.FC = () => {
       const newOtp = [...otp];
       newOtp[index] = value;
       setOtp(newOtp);
-      
+
       if (value && index < 5) {
         const nextInput = document.getElementById(`otp-${index + 1}`);
         nextInput?.focus();
@@ -455,20 +470,20 @@ const ProfileSection: React.FC = () => {
       setError('Please fill all required fields');
       return;
     }
-    
+
     if (!signupData.email.includes('@')) {
       setError('Please enter a valid email address');
       return;
     }
-    
+
     if (signupData.mobileNo.length !== 10) {
       setError('Please enter a valid 10-digit mobile number');
       return;
     }
-    
+
     setError(null);
     setSuccess(null);
-    
+
     try {
       await signup(signupData);
       setSuccess('Account created successfully! Please login with your email.');
@@ -488,7 +503,7 @@ const ProfileSection: React.FC = () => {
   };
 
   const generateId = () => {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
       const r = Math.random() * 16 | 0;
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
@@ -559,7 +574,7 @@ const ProfileSection: React.FC = () => {
               {success}
             </div>
           )}
-          
+
           <LoginSignup
             authMode={authMode}
             setAuthMode={setAuthMode}
@@ -592,22 +607,22 @@ const ProfileSection: React.FC = () => {
       <div className="max-w-7xl mx-auto p-2 lg:p-4">
         {/* Profile Header */}
         <ProfileHeader user={user} onLogout={handleLogout} />
-        
+
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
-            <SidebarNavigation 
-              tabs={tabs} 
-              activeTab={activeTab} 
-              setActiveTab={setActiveTab} 
+            <SidebarNavigation
+              tabs={tabs}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
             />
           </div>
 
           {/* Main Content */}
           <div className="lg:col-span-3">
             <div className="bg-white rounded-sm p-4 lg:p-4">
-              
+
               {/* Profile Tab */}
               {activeTab === 'profile' && editedUser && (
                 <ProfileTab

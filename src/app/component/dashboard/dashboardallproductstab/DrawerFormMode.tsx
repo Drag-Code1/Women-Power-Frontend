@@ -5,7 +5,7 @@ import { ImagePlus, X } from "lucide-react";
 import { ProductFormData } from "@/app/types/dashboardproduct";
 import { getArtistsApi, getCategoriesApi } from "@/app/lib/api";
 import { calculateDiscountedPrice, formatCategoryName } from "@/app/lib/utils/dashboardproduct-utils";
-import R2Image from "./R2Image";
+import R2Image from "@/app/component/common/R2Image";
 
 interface DrawerFormModeProps {
   formData: ProductFormData;

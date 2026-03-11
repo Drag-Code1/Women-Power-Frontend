@@ -6,6 +6,18 @@ import "@/app/globals.css";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { getToken } from "@/app/lib/authApi";
 import { API_BASE_URL } from "@/app/lib/config";
+import R2Image from "@/app/component/common/R2Image";
+import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
+
+interface OrderItem {
+  quantity: number;
+  price: string;
+  Product: {
+    p_Name: string;
+    thumbnail: string;
+    price: string;
+  };
+}
 
 interface Order {
   id: string;
@@ -23,6 +35,7 @@ interface Order {
     mobileNo: string;
     type: string;
   };
+  OrderItems?: OrderItem[];
 }
 
 const OrderDashboard = () => {
@@ -81,9 +94,33 @@ const OrderDashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const handleViewOrder = (order: Order) => {
+  const handleViewOrder = async (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
+    setLoading(true);
+
+    const token = getToken();
+    try {
+      const res = await fetch(`${API_BASE_URL}/order/details/${order.id}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const body = await res.json();
+        if (body.success && body.data) {
+          setSelectedOrder(body.data);
+          if (body.data.Address) {
+            setFetchedAddress(body.data.Address);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch full order details", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -414,33 +451,89 @@ const OrderDashboard = () => {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-xs text-gray-500 uppercase mb-1">Total Amount</p>
+                  <p className="text-xl font-bold text-blue-600">
                     ₹{parseFloat(selectedOrder.totalPrice || "0").toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                     })}
                   </p>
                 </div>
+
+                {/* Products Section */}
+                <div className="md:col-span-2 space-y-3">
+                  <p className="text-xs text-gray-500 uppercase flex items-center gap-2">
+                    <ShoppingBag className="w-3 h-3" /> Ordered Products
+                  </p>
+                  <div className="bg-gray-50 rounded-xl border border-gray-100 divide-y divide-gray-200">
+                    {selectedOrder.OrderItems && selectedOrder.OrderItems.length > 0 ? (
+                      selectedOrder.OrderItems.map((item, idx) => (
+                        <div key={idx} className="p-4 flex items-center gap-4">
+                          <div className="w-16 h-16 rounded-lg overflow-hidden bg-white border border-gray-200 flex-shrink-0">
+                            <R2Image 
+                              src={item.Product?.thumbnail} 
+                              fallbackSrc={DEFAULT_THUMBNAIL}
+                              alt={item.Product?.p_Name} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-bold text-gray-900 truncate">
+                              {item.Product?.p_Name || "Unknown Product"}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              Qty: <span className="font-semibold text-gray-700">{item.quantity}</span> × ₹{parseFloat(item.price).toLocaleString("en-IN")}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-gray-900">
+                              ₹{(item.quantity * parseFloat(item.price)).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-8 text-center bg-white rounded-xl">
+                        {loading ? (
+                           <div className="flex flex-col items-center gap-2">
+                             <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                             <p className="text-xs text-gray-500 tracking-tight">Loading products...</p>
+                           </div>
+                        ) : (
+                          <p className="text-sm text-gray-400 italic">No products listed</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* Address Section */}
                 {(fetchedAddress || addressLoading) && (
-                  <div className="md:col-span-2 bg-gray-50 p-4 rounded-lg">
-                    <p className="text-xs text-gray-500 uppercase mb-2">Shipping Address</p>
+                  <div className="md:col-span-2 bg-blue-50/50 p-6 rounded-2xl border border-blue-100/50">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Package className="w-4 h-4 text-blue-600" />
+                      <p className="text-xs font-bold text-blue-700 uppercase tracking-wider">Shipping Address</p>
+                    </div>
                     {addressLoading ? (
-                      <div className="animate-pulse space-y-2">
-                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                      <div className="animate-pulse space-y-3">
+                        <div className="h-4 bg-blue-100 rounded w-3/4"></div>
+                        <div className="h-4 bg-blue-100 rounded w-1/2"></div>
                       </div>
                     ) : fetchedAddress ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{fetchedAddress.address}</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold text-gray-900 leading-relaxed">
+                            {fetchedAddress.address}
+                          </p>
                           <p className="text-sm text-gray-600">
                             {fetchedAddress.city}, {fetchedAddress.state} - {fetchedAddress.pincode}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500 mb-1">Contact</p>
-                          <p className="text-sm font-medium text-gray-900">{fetchedAddress.mobileNo}</p>
-                          <span className="inline-block px-2 py-1 bg-gray-200 text-gray-700 text-xs rounded mt-2">
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-[10px] font-bold text-blue-600/60 uppercase mb-1">Contact Details</p>
+                            <p className="text-sm font-bold text-gray-900">{fetchedAddress.mobileNo}</p>
+                          </div>
+                          <span className="inline-flex items-center px-2.5 py-1 bg-white border border-blue-200 text-blue-700 text-[10px] font-bold rounded-full uppercase tracking-tight">
                             {fetchedAddress.type}
                           </span>
                         </div>

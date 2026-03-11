@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { MoreVertical, Eye, Edit2, Trash2 } from "lucide-react";
 import { Banner } from "@/app/types/dashboard-banner-tab";
-import R2Image from "../dashboardallproductstab/R2Image";
+import R2Image from "@/app/component/common/R2Image";
 
 interface Props {
   banners: Banner[];

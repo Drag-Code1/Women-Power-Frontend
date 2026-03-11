@@ -1,7 +1,7 @@
 // components/artist/ArtistFormView.tsx
 import { Upload, User } from 'lucide-react';
 import { ArtistFormData } from '@/app/types/dashboard-artist-tab';
-import R2Image from "../dashboardallproductstab/R2Image";
+import R2Image from "@/app/component/common/R2Image";
 
 interface ArtistFormViewProps {
   formData: ArtistFormData;

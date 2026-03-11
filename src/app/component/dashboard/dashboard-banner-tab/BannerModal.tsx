@@ -15,7 +15,7 @@ interface Props {
   isLoading: boolean;
 }
 
-import R2Image from "../dashboardallproductstab/R2Image";
+import R2Image from "@/app/component/common/R2Image";
 
 // ...
 

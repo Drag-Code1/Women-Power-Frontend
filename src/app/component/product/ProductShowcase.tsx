@@ -41,10 +41,10 @@ const ProductShowcase: React.FC = () => {
           <div className="bg-white rounded-lg overflow-hidden flex flex-col lg:flex-row items-center">
 
             {/* Image Section */}
-            <div className="lg:w-1/2 relative bg-white">
-              <div className="relative max-w-md mx-auto">
-                <div className="relative rounded-lg bg-white shadow-sm overflow-hidden">
-                  <div className="aspect-[4/3] relative overflow-hidden">
+            <div className="w-full lg:w-1/2 relative bg-white">
+              <div className="relative w-full lg:max-w-2xl mx-auto">
+                <div className="relative rounded-xl bg-white shadow-md overflow-hidden border border-gray-100">
+                  <div className="aspect-[16/10] sm:aspect-[4/3] relative overflow-hidden">
                     <img
                       src={productImages[currentImageIndex].src}
                       alt={productImages[currentImageIndex].alt}
@@ -59,8 +59,8 @@ const ProductShowcase: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => goToImage(index)}
-                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300  ${index === currentImageIndex
-                        ? 'bg-[#61503c]'
+                      className={`w-3 h-3 rounded-full transition-all duration-300  ${index === currentImageIndex
+                        ? 'bg-[#61503c] scale-125'
                         : 'bg-gray-300 hover:bg-gray-400'
                         }`}
                     />

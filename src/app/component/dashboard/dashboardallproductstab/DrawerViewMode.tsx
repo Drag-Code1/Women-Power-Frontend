@@ -5,7 +5,7 @@ import { ChevronLeft, ChevronRight, Star, TrendingUp } from "lucide-react";
 import { Product } from "@/app/types/dashboardproduct";
 import { calculateDiscountedPrice, getAllImages } from "@/app/lib/utils/dashboardproduct-utils";
 import { DEFAULT_THUMBNAIL } from "@/app/data/dashboardproductdata";
-import R2Image from "./R2Image";
+import R2Image from "@/app/component/common/R2Image";
 
 interface DrawerViewModeProps {
   selectedProduct: Product | null;

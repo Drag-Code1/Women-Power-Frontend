@@ -168,9 +168,9 @@ const CheckoutPage = () => {
         notes: { paymentIntentId, selectedPayment },
         handler: async (response: any) => {
           try {
-            await verifyPayment(response, token || undefined);
+            const verifyRes = await verifyPayment(response, token || undefined);
             alert("Payment successful! Your order has been placed.");
-            router.push("/orderdetails");
+            router.push(`/orderdetails?id=${verifyRes.data.orderId}`);
           } catch (err: any) {
             console.error("Payment verification failed", err);
             alert(err?.message || "Payment verification failed");
@@ -279,11 +279,10 @@ const CheckoutPage = () => {
                     {addresses.map((addr) => (
                       <label
                         key={addr.id}
-                        className={`flex items-start gap-3 border rounded-lg p-4 cursor-pointer transition ${
-                          selectedAddress === addr.id
+                        className={`flex items-start gap-3 border rounded-lg p-4 cursor-pointer transition ${selectedAddress === addr.id
                             ? "border-[#61503c] bg-[#61503c]/5"
                             : "border-gray-200 hover:border-gray-300"
-                        }`}
+                          }`}
                       >
                         <input
                           type="radio"
@@ -337,11 +336,10 @@ const CheckoutPage = () => {
                 ].map((method) => (
                   <label
                     key={method.id}
-                    className={`flex items-center gap-3 border rounded-lg p-4 cursor-pointer transition ${
-                      selectedPayment === method.id
+                    className={`flex items-center gap-3 border rounded-lg p-4 cursor-pointer transition ${selectedPayment === method.id
                         ? "border-[#61503c] bg-[#61503c]/5"
                         : "border-gray-200 hover:border-gray-300"
-                    }`}
+                      }`}
                   >
                     <input
                       type="radio"

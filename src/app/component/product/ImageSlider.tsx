@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import R2Image from "../dashboard/dashboardallproductstab/R2Image";
+import R2Image from "@/app/component/common/R2Image";
 
 interface ImageSliderProps {
   images?: string[];
@@ -49,7 +49,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-4 px-2 sm:px-4 w-full">
-      <div className="relative w-full h-[200px] sm:h-[300px] md:h-[400px] lg:h-[500px] overflow-hidden rounded-lg shadow-md">
+      <div className="relative w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] overflow-hidden rounded-xl shadow-lg">
         <div
           className="flex transition-transform duration-700 ease-in-out h-full"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}

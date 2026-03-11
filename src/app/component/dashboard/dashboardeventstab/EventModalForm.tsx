@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { X, ImageIcon, Upload } from 'lucide-react';
 import { EVENT_CATEGORIES } from '@/app/data/dashboardeventsdata';
 import type { EventFormData, ModalMode } from '@/app/types/dashboardeventtab';
-import R2Image from "../dashboardallproductstab/R2Image";
+import R2Image from "@/app/component/common/R2Image";
 
 interface EventModalFormProps {
   formData: EventFormData;
