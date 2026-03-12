@@ -49,7 +49,7 @@ const ImageSlider: React.FC<ImageSliderProps> = ({
 
   return (
     <div className="bg-[#f1f2f4] py-2 sm:py-4 px-2 sm:px-4 w-full">
-      <div className="relative w-full h-[250px] sm:h-[350px] md:h-[450px] lg:h-[550px] overflow-hidden rounded-xl shadow-lg">
+      <div className="relative w-full aspect-[16/7] sm:aspect-none sm:h-[350px] md:h-[450px] lg:h-[550px] overflow-hidden rounded-xl shadow-lg">
         <div
           className="flex transition-transform duration-700 ease-in-out h-full"
           style={{ transform: `translateX(-${currentIndex * 100}%)` }}
