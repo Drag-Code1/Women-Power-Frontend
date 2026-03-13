@@ -13,6 +13,7 @@ interface CourseModalProps {
   thumbnailPreview: string;
   onClose: () => void;
   onSave: () => void;
+  isSaving: boolean;
   onFormChange: (data: Course) => void;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onImageRemove: () => void;
@@ -26,6 +27,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
   thumbnailPreview,
   onClose,
   onSave,
+  isSaving,
   onFormChange,
   onImageChange,
   onImageRemove,
@@ -63,6 +65,7 @@ const CourseModal: React.FC<CourseModalProps> = ({
               onImageChange={onImageChange}
               onImageRemove={onImageRemove}
               onSave={onSave}
+              isSaving={isSaving}
               onCancel={onClose}
               categoryOptions={categoryOptions}
             />

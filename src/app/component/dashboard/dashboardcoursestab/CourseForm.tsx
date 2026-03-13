@@ -13,6 +13,7 @@ interface CourseFormProps {
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onImageRemove: () => void;
   onSave: () => void;
+  isSaving: boolean;
   onCancel: () => void;
   categoryOptions: Array<{ id: string; name: string }>;
 }
@@ -25,6 +26,7 @@ const CourseForm: React.FC<CourseFormProps> = ({
   onImageChange,
   onImageRemove,
   onSave,
+  isSaving,
   onCancel,
   categoryOptions
 }) => {
@@ -185,9 +187,12 @@ const CourseForm: React.FC<CourseFormProps> = ({
       <div className="flex gap-3 pt-4">
         <button
           onClick={onSave}
-          className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold transition-colors"
+          disabled={isSaving}
+          className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
+            isSaving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          } text-white`}
         >
-          {mode === 'add' ? 'Add Course' : 'Update Course'}
+          {isSaving ? 'Saving...' : (mode === 'add' ? 'Add Course' : 'Update Course')}
         </button>
         <button
           onClick={onCancel}

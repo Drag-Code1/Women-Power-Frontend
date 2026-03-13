@@ -10,7 +10,7 @@ const API_BASE = `${API_BASE_URL.replace(/\/$/, '')}/r2`;
 export async function uploadToR2(
   input: File | Blob | string
 ): Promise<{ key: string; accessUrl: string }> {
-  // 🧩 Normalize input into a Blob
+  // 1️⃣ Determine Content-Type and normalize input into a Blob
   let blob: Blob;
 
   if (input instanceof File || input instanceof Blob) {
@@ -30,13 +30,15 @@ export async function uploadToR2(
     throw new Error("Invalid input: must be a File, Blob, or base64 data URL string.");
   }
 
+  const fileType = blob.type || "application/octet-stream";
+
   // 1️⃣ Get presigned upload URL
   const uploadUrlRes = await fetch(`${API_BASE}/generate-upload-url`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       fileName: input instanceof File ? input.name : `upload-${Date.now()}`,
-      fileType: blob.type || "application/octet-stream",
+      fileType,
     }),
   });
 
@@ -47,11 +49,22 @@ export async function uploadToR2(
   const { uploadUrl, key } = await uploadUrlRes.json();
 
   // 2️⃣ Upload file directly to R2
-  const putRes = await fetch(uploadUrl, {
-    method: "PUT",
-    headers: { "Content-Type": blob.type },
-    body: blob,
-  });
+  let putRes: Response;
+  try {
+    putRes = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: { "Content-Type": fileType },
+      body: blob,
+    });
+  } catch (err: any) {
+    console.error("❌ R2 Fetch Network Error:", err);
+    if (err.message === "Failed to fetch") {
+      throw new Error(
+        "Upload failed. This is likely a CORS issue or interference from a browser extension (like 'Video Downloader Professional'). Please ensure R2 CORS is configured and try disabling extensions."
+      );
+    }
+    throw err;
+  }
 
   if (!putRes.ok) {
     const bodyText = await putRes.text().catch(() => "");

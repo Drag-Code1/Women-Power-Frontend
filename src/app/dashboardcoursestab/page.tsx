@@ -18,6 +18,7 @@ export default function CoursesPage() {
     openMenuId,
     formData,
     thumbnailPreview,
+    isSaving,
     openModal,
     closeModal,
     handleImageChange,
@@ -100,6 +101,7 @@ export default function CoursesPage() {
         formData={formData}
         onClose={closeModal}
         onSave={handleSave}
+        isSaving={isSaving}
         thumbnailPreview={thumbnailPreview}
         onImageChange={handleImageChange}
         onImageRemove={handleImageRemove}

@@ -17,6 +17,8 @@ export const useCourseManagement = (initialCourses: Course[]) => {
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
 
+  const [isSaving, setIsSaving] = useState(false);
+
   const [formData, setFormData] = useState<Course>({
     id: '',
     thumbnail: '',
@@ -61,6 +63,7 @@ export const useCourseManagement = (initialCourses: Course[]) => {
     setIsModalOpen(false);
     setThumbnailFile(null);
     setThumbnailPreview('');
+    setIsSaving(false);
   };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,6 +88,9 @@ export const useCourseManagement = (initialCourses: Course[]) => {
       return;
     }
 
+    if (isSaving) return;
+    setIsSaving(true);
+
     if (modalMode === 'add') {
       try {
         const categories = await getCategoriesApi();
@@ -92,6 +98,7 @@ export const useCourseManagement = (initialCourses: Course[]) => {
         const categoryId = found?.id || '';
         if (!categoryId) {
           alert('Please select a valid category');
+          setIsSaving(false);
           return;
         }
         const payload = {
@@ -125,6 +132,8 @@ export const useCourseManagement = (initialCourses: Course[]) => {
       } catch (e) {
         console.error('Failed to create course', e);
         alert('Failed to create course. Please try again.');
+      } finally {
+        setIsSaving(false);
       }
     } else if (modalMode === 'edit') {
       try {
@@ -133,6 +142,7 @@ export const useCourseManagement = (initialCourses: Course[]) => {
         const categoryId = found?.id || '';
         if (!categoryId) {
           alert('Please select a valid category');
+          setIsSaving(false);
           return;
         }
         const payload = {
@@ -166,6 +176,8 @@ export const useCourseManagement = (initialCourses: Course[]) => {
         console.error('Failed to update course', e);
         const msg = (e as any)?.message || 'Failed to update course. Please try again.';
         alert(msg);
+      } finally {
+        setIsSaving(false);
       }
     }
   };
@@ -195,6 +207,7 @@ export const useCourseManagement = (initialCourses: Course[]) => {
     openMenuId,
     formData,
     thumbnailPreview,
+    isSaving,
     openModal,
     closeModal,
     handleImageChange,

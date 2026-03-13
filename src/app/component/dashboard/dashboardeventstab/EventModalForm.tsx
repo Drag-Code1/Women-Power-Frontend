@@ -14,6 +14,7 @@ interface EventModalFormProps {
   setBannerPreview: (preview: string) => void;
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'thumbnail' | 'banner') => void;
   onSubmit: () => void;
+  isSaving: boolean;
   onCancel: () => void;
   modalMode: ModalMode;
   categoryOptions?: Array<{ id: string; name: string }>;
@@ -28,6 +29,7 @@ export const EventModalForm: React.FC<EventModalFormProps> = ({
   setBannerPreview,
   onImageUpload,
   onSubmit,
+  isSaving,
   onCancel,
   modalMode,
   categoryOptions
@@ -241,9 +243,12 @@ export const EventModalForm: React.FC<EventModalFormProps> = ({
         </button>
         <button
           onClick={onSubmit}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          disabled={isSaving}
+          className={`flex-1 px-4 py-2 text-white rounded-lg transition-colors ${
+            isSaving ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          }`}
         >
-          {modalMode === 'add' ? 'Add Event' : 'Save Changes'}
+          {isSaving ? 'Saving...' : (modalMode === 'add' ? 'Add Event' : 'Save Changes')}
         </button>
       </div>
     </div>

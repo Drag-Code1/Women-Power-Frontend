@@ -27,6 +27,8 @@ export const useEventManager = (initialEvents: Event[]) => {
   });
   const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([]);
 
+  const [isSaving, setIsSaving] = useState(false);
+
   useEffect(() => {
     (async () => {
       try {
@@ -72,6 +74,7 @@ export const useEventManager = (initialEvents: Event[]) => {
     setIsModalOpen(false);
     setSelectedEvent(null);
     resetForm();
+    setIsSaving(false);
   };
 
   const handleImageUpload = async (
@@ -96,6 +99,8 @@ export const useEventManager = (initialEvents: Event[]) => {
   };
 
   const handleAdd = async () => {
+    if (isSaving) return;
+    setIsSaving(true);
     try {
       // Resolve category_id from selected category (accepts id or name)
       const resolvedCategoryId = (() => {
@@ -132,11 +137,15 @@ export const useEventManager = (initialEvents: Event[]) => {
     } catch (err) {
       console.error('Failed to create event', err);
       alert((err as any)?.message || 'Failed to create event');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleEdit = async () => {
+    if (isSaving) return;
     if (selectedEvent) {
+      setIsSaving(true);
       try {
         // Map dashboard form to API payload
         const categoryId = categoryOptions.find(c => c.name === formData.category)?.id || formData.category || '';
@@ -170,6 +179,8 @@ export const useEventManager = (initialEvents: Event[]) => {
       } catch (err) {
         console.error('Failed to update event', err);
         alert((err as any)?.message || 'Failed to update event');
+      } finally {
+        setIsSaving(false);
       }
     }
   };
@@ -213,6 +224,7 @@ export const useEventManager = (initialEvents: Event[]) => {
     handleImageUpload,
     handleSubmit,
     handleDelete,
-    categoryOptions
+    categoryOptions,
+    isSaving
   };
 };

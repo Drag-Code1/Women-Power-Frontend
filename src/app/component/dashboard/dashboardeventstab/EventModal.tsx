@@ -17,6 +17,7 @@ interface EventModalProps {
   setBannerPreview: (preview: string) => void;
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'thumbnail' | 'banner') => void;
   onSubmit: () => void;
+  isSaving: boolean;
   onClose: () => void;
   categoryOptions?: Array<{ id: string; name: string }>;
 }
@@ -33,6 +34,7 @@ export const EventModal: React.FC<EventModalProps> = ({
   setBannerPreview,
   onImageUpload,
   onSubmit,
+  isSaving,
   onClose,
   categoryOptions
 }) => {
@@ -61,6 +63,7 @@ export const EventModal: React.FC<EventModalProps> = ({
               setBannerPreview={setBannerPreview}
               onImageUpload={onImageUpload}
               onSubmit={onSubmit}
+              isSaving={isSaving}
               onCancel={onClose}
               modalMode={mode}
               categoryOptions={categoryOptions}

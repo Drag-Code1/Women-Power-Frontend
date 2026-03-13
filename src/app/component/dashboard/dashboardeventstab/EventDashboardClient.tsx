@@ -29,27 +29,9 @@ export const EventDashboardClient: React.FC<EventDashboardClientProps> = ({ init
     handleImageUpload,
     handleSubmit,
     handleDelete,
-    categoryOptions
-  } = useEventManager(initialEvents) as {
-    events: Event[];
-    isModalOpen: boolean;
-    modalMode: ModalMode;
-    selectedEvent: Event | null;
-    activeDropdown: string | null;
-    thumbnailPreview: string;
-    bannerPreview: string;
-    formData: any;
-    setFormData: React.Dispatch<React.SetStateAction<any>>;
-    setThumbnailPreview: React.Dispatch<React.SetStateAction<string>>;
-    setBannerPreview: React.Dispatch<React.SetStateAction<string>>;
-    setActiveDropdown: React.Dispatch<React.SetStateAction<string | null>>;
-    openModal: (mode: ModalMode, event?: Event) => void;
-    closeModal: () => void;
-    handleImageUpload: (e: React.ChangeEvent<HTMLInputElement>, type: 'thumbnail' | 'banner') => void;
-    handleSubmit: () => void;
-    handleDelete: (id: string) => void;
-    categoryOptions: Array<{ id: string; name: string }>;
-  };
+    categoryOptions,
+    isSaving
+  } = useEventManager(initialEvents) as any;
 
   return (
     <div className="min-h-screen bg-[#f2f3f5] p-4" onClick={() => setActiveDropdown(null)}>
@@ -75,7 +57,7 @@ export const EventDashboardClient: React.FC<EventDashboardClientProps> = ({ init
   </button>
 </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
+          {events.map((event: any) => (
             <EventCard
               key={event.id}
               event={event}
@@ -99,6 +81,7 @@ export const EventDashboardClient: React.FC<EventDashboardClientProps> = ({ init
           setBannerPreview={setBannerPreview}
           onImageUpload={handleImageUpload}
           onSubmit={handleSubmit}
+          isSaving={isSaving}
           onClose={closeModal}
           categoryOptions={categoryOptions}
         />
