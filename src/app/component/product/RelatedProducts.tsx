@@ -255,10 +255,6 @@ const RelatedProducts: React.FC<RelatedProductsProps> = ({ categoryId }) => {
   };
 
   const handleAddToCart = async (product: Product) => {
-    if (!user) {
-      alert('Please login to add items to cart');
-      return;
-    }
 
     try {
       setAddingToCart(product.id);

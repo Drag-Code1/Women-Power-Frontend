@@ -95,13 +95,18 @@ export const sendLoginOtp = async (email: string): Promise<LoginResponse> => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.message) errorMessage = errorData.message;
+      } catch (e) {}
+      throw new Error(errorMessage);
     }
 
     const result = await response.json();
     return result;
   } catch (error) {
-    console.error('Error sending login OTP:', error);
+    console.warn('API message for sending login OTP:', error);
     throw error;
   }
 };
@@ -118,7 +123,12 @@ export const verifyOtp = async (email: string, otp: number): Promise<OtpVerifica
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.message) errorMessage = errorData.message;
+      } catch (e) {}
+      throw new Error(errorMessage);
     }
 
     const result = await response.json();

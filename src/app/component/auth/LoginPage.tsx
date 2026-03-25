@@ -61,8 +61,13 @@ const LoginPage: React.FC = () => {
         setShowOtpVerification(true);
         setSuccess('OTP sent successfully to your email!');
       } catch (error: any) {
-        console.error('Error sending OTP:', error);
+        console.warn('Handling OTP message:', error);
         setError(error.message || 'Failed to send OTP. Please try again.');
+        
+        if (error.message && error.message.includes('sign up first')) {
+          setAuthMode('signup');
+          setSignupData(prev => ({ ...prev, email: emailAddress }));
+        }
       }
     } else {
       setError('Please enter a valid email address');

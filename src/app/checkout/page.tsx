@@ -48,6 +48,18 @@ const CheckoutPage = () => {
   const [selectedPayment, setSelectedPayment] = useState<"card" | "upi" | "netbanking">("card");
   const [paymentLoading, setPaymentLoading] = useState(false);
 
+  // New Address inline states
+  const [isAddingAddress, setIsAddingAddress] = useState(false);
+  const [newAddress, setNewAddress] = useState<Partial<Address>>({
+    type: "Home",
+    address: "",
+    city: "",
+    state: "",
+    pincode: "",
+    landmark: "",
+    mobileNo: "",
+  });
+
   const subtotal = useMemo(() => {
     return cartItems.reduce((sum, item) => {
       const price = parseFloat(item.product?.price || "0");
@@ -111,6 +123,45 @@ const CheckoutPage = () => {
       setAddressError("Could not load saved addresses. Please try again.");
       setAddresses([]);
       setSelectedAddress("");
+    } finally {
+      setAddressLoading(false);
+    }
+  };
+
+  const handleAddAddress = async () => {
+    if (!(newAddress.address && newAddress.city && newAddress.state && newAddress.pincode && newAddress.mobileNo)) {
+      alert("Please fill all required fields");
+      return;
+    }
+    if (!token || !user) return;
+    
+    setAddressLoading(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/address`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ ...newAddress, userId: user.id }),
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to add address");
+      }
+      
+      const body = await res.json().catch(() => ({}));
+      await loadAddresses();
+      
+      if (body?.data?.id) {
+         setSelectedAddress(body.data.id);
+      }
+      
+      setIsAddingAddress(false);
+      setNewAddress({ type: "Home", address: "", city: "", state: "", pincode: "", landmark: "", mobileNo: "" });
+    } catch (err: any) {
+      console.error("Add address error:", err);
+      alert("Failed to add address. Please try again.");
     } finally {
       setAddressLoading(false);
     }
@@ -262,12 +313,14 @@ const CheckoutPage = () => {
                   <p className="text-sm text-gray-500">Step 1</p>
                   <h2 className="text-lg font-semibold text-gray-900">Delivery Address</h2>
                 </div>
-                <button
-                  onClick={() => router.push("/profile")}
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  Add / Manage
-                </button>
+                {!isAddingAddress && (
+                  <button
+                    onClick={() => setIsAddingAddress(true)}
+                    className="text-sm font-semibold text-[#61503c] bg-[#61503c]/10 px-3 py-1 rounded-md hover:bg-[#61503c]/20 transition-colors"
+                  >
+                    + Add New Address
+                  </button>
+                )}
               </div>
               <div className="p-6 space-y-4">
                 {addressLoading ? (
@@ -308,16 +361,117 @@ const CheckoutPage = () => {
                     ))}
                   </div>
                 )}
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={loadAddresses}
-                    className="text-xs text-gray-600 hover:underline"
-                    disabled={addressLoading}
-                  >
-                    {addressLoading ? "Refreshing…" : "Refresh"}
-                  </button>
-                </div>
+
+                {isAddingAddress && (
+                  <div className="border border-[#61503c]/30 rounded-lg p-4 bg-[#61503c]/5 mt-4 space-y-4">
+                    <h3 className="text-md font-semibold text-gray-900 mb-2">Add New Address</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Type</label>
+                        <select
+                          className="w-full text-sm p-2 border rounded-md"
+                          value={newAddress.type}
+                          onChange={(e) => setNewAddress({ ...newAddress, type: e.target.value })}
+                        >
+                          <option value="Home">Home</option>
+                          <option value="Office">Office</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Mobile No</label>
+                        <input
+                          type="tel"
+                          placeholder="Phone number"
+                          className="w-full text-sm p-2 border rounded-md"
+                          value={newAddress.mobileNo}
+                          onChange={(e) => setNewAddress({ ...newAddress, mobileNo: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Full Address</label>
+                      <textarea
+                        rows={2}
+                        placeholder="Flat, House no., Building, Company, Apartment"
+                        className="w-full text-sm p-2 border rounded-md"
+                        value={newAddress.address}
+                        onChange={(e) => setNewAddress({ ...newAddress, address: e.target.value })}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="col-span-2 md:col-span-2">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">City</label>
+                        <input
+                          type="text"
+                          placeholder="City/Town/District"
+                          className="w-full text-sm p-2 border rounded-md"
+                          value={newAddress.city}
+                          onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                        />
+                      </div>
+                      <div className="col-span-1 border-gray-300">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">State</label>
+                        <input
+                          type="text"
+                          placeholder="State"
+                          className="w-full text-sm p-2 border rounded-md"
+                          value={newAddress.state}
+                          onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                        />
+                      </div>
+                      <div className="col-span-1 border-gray-300">
+                        <label className="block text-xs font-medium text-gray-700 mb-1">Pincode</label>
+                        <input
+                          type="text"
+                          placeholder="6-digit"
+                          className="w-full text-sm p-2 border rounded-md"
+                          value={newAddress.pincode}
+                          onChange={(e) => setNewAddress({ ...newAddress, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Landmark (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="E.g. Near Apollo Hospital"
+                        className="w-full text-sm p-2 border rounded-md"
+                        value={newAddress.landmark}
+                        onChange={(e) => setNewAddress({ ...newAddress, landmark: e.target.value })}
+                      />
+                    </div>
+                    <div className="flex gap-3 justify-end mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingAddress(false)}
+                        className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-md"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleAddAddress}
+                        disabled={addressLoading}
+                        className="px-4 py-2 text-sm text-white bg-[#61503c] rounded-md hover:bg-[#504030] disabled:opacity-50"
+                      >
+                        {addressLoading ? "Saving..." : "Save Address"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {!isAddingAddress && (
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      onClick={loadAddresses}
+                      className="text-xs text-gray-600 hover:underline"
+                      disabled={addressLoading}
+                    >
+                      {addressLoading ? "Refreshing…" : "Refresh Addresses"}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 

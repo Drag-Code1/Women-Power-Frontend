@@ -110,7 +110,13 @@ const OrderDashboard = () => {
       if (res.ok) {
         const body = await res.json();
         if (body.success && body.data) {
-          setSelectedOrder(body.data);
+          setSelectedOrder({
+            ...body.data,
+            firstName: order.firstName || body.data.firstName,
+            lastName: order.lastName || body.data.lastName,
+            productCount: order.productCount || body.data.productCount,
+            totalPrice: order.totalPrice || body.data.totalPrice,
+          });
           if (body.data.Address) {
             setFetchedAddress(body.data.Address);
           }

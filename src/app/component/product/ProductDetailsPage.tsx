@@ -104,10 +104,6 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
     : [];
 
   const handleAddToCart = async (): Promise<void> => {
-    if (!user) {
-      alert('Please login to add items to cart');
-      return;
-    }
 
     if (!product) {
       alert('Product not found');

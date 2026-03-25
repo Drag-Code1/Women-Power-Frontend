@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error(response.message || 'Failed to send OTP');
       }
     } catch (error) {
-      console.error('Send OTP error:', error);
+      console.warn('Send OTP message:', error);
       throw error;
     } finally {
       setAuthState(prev => ({ ...prev, isLoading: false }));

@@ -4,6 +4,7 @@ import { useAuth } from "./AuthContext";
 // Cart API functions ok
 import { addToCartApi, getCartItemsApi, updateCartItemApi, removeFromCartApi, CartItem } from "../lib/cartApi";
 import { getToken, getUser } from "../lib/authApi";
+import { useRouter } from "next/navigation";
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -37,6 +38,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Fetch cart items when user changes
   useEffect(() => {
@@ -90,8 +92,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     console.log('  - currentToken from getToken():', currentToken ? currentToken.substring(0, 20) + '...' : 'null');
 
     if (!currentUser || !currentToken) {
-      console.error('❌ Missing user or token:', { currentUser: !!currentUser, currentToken: !!currentToken });
-      throw new Error("Please login to add items to cart");
+      router.push('/login');
+      return new Promise<void>(() => {});
     }
 
     try {
@@ -118,7 +120,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const currentToken = getToken();
 
     if (!currentToken) {
-      throw new Error("Please login to update cart");
+      router.push('/login');
+      return new Promise<void>(() => {});
     }
 
     try {
@@ -137,7 +140,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const currentToken = getToken();
 
     if (!currentToken) {
-      throw new Error("Please login to remove items from cart");
+      router.push('/login');
+      return new Promise<void>(() => {});
     }
 
     try {
