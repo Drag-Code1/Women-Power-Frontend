@@ -34,7 +34,7 @@ import OrdersTab from './OrdersTab';
 import AddressesTab from './AddressesTab';
 import HelpTab from './HelpTab';
 
-// Import AuthContext
+// Import AuthContextj
 import { useAuth } from '@/app/contexts/AuthContext';
 import { useCart } from '@/app/contexts/CartContext';
 import { API_BASE_URL } from '@/app/lib/config';
