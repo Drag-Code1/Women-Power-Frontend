@@ -71,32 +71,7 @@ const ProfilePage: React.FC = () => {
 
   const [editedUser, setEditedUser] = useState<User | null>(user);
 
-  const orders: Order[] = [
-    {
-      id: 'ORD001',
-      date: '2024-01-15',
-      status: 'delivered',
-      total: 2499,
-      items: 2,
-      image: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=80&h=80&fit=crop'
-    },
-    {
-      id: 'ORD002',
-      date: '2024-01-10',
-      status: 'shipped',
-      total: 1299,
-      items: 1,
-      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=80&h=80&fit=crop'
-    },
-    {
-      id: 'ORD003',
-      date: '2024-01-05',
-      status: 'processing',
-      total: 3999,
-      items: 3,
-      image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&h=80&fit=crop'
-    }
-  ];
+  const orders: Order[] = [];
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: Person },
