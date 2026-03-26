@@ -1,16 +1,14 @@
-import React from 'react'
+'use client'
+
+import React, { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import ArtistProfile from '../component/product/ArtistProfile'
 import ArtistWork from '../component/product/ArtistWork';
 import ArtistReviews from '../component/product/ArtistReviews';
 
-interface PageProps {
-  searchParams: {
-    id?: string;
-  };
-}
-
-async function page({ searchParams }: PageProps) {
-  const artistId = searchParams.id;
+function ArtistDetailsContent() {
+  const searchParams = useSearchParams();
+  const artistId = searchParams.get('id');
 
   if (!artistId) {
     return (
@@ -32,4 +30,10 @@ async function page({ searchParams }: PageProps) {
   )
 }
 
-export default page;
+export default function page() {
+  return (
+    <Suspense fallback={<div>Loading artist details...</div>}>
+      <ArtistDetailsContent />
+    </Suspense>
+  )
+}

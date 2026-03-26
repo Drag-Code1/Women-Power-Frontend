@@ -1,4 +1,4 @@
-﻿// Cart API functions
+// Cart API functions
 import { getAuthenticatedHeaders, getCurrentToken } from './authenticatedApi';
 import { getToken } from './authApi';
 import { API_BASE_URL } from './config';
@@ -34,7 +34,7 @@ export const addToCartApi = async (cartData: AddToCartRequest, token?: string) =
   // Get token from localStorage if not provided
   const authToken = token || getToken();
   
-  console.log('ðŸ›’ addToCartApi called with:', {
+  console.log('🛒 addToCartApi called with:', {
     cartData,
     tokenProvided: !!token,
     tokenFromStorage: !!authToken,
@@ -42,7 +42,7 @@ export const addToCartApi = async (cartData: AddToCartRequest, token?: string) =
   });
   
   if (!authToken) {
-    console.error('âŒ No authentication token available');
+    console.error('❌ No authentication token available');
     throw new Error('Authorization token missing');
   }
   
@@ -56,8 +56,8 @@ export const addToCartApi = async (cartData: AddToCartRequest, token?: string) =
       body: JSON.stringify(cartData),
     });
     
-    console.log('ðŸ›’ API Response Status:', res.status);
-    console.log('ðŸ›’ API Response Headers:', Object.fromEntries(res.headers.entries()));
+    console.log('🛒 API Response Status:', res.status);
+    console.log('🛒 API Response Headers:', Object.fromEntries(res.headers.entries()));
     
     const contentType = res.headers.get('content-type') || '';
     let parsed: any = null;
@@ -68,7 +68,7 @@ export const addToCartApi = async (cartData: AddToCartRequest, token?: string) =
     }
     
     if (!res.ok) {
-      console.error('âŒ Cart API Error:', {
+      console.error('❌ Cart API Error:', {
         status: res.status,
         statusText: res.statusText,
         response: parsed
@@ -81,10 +81,10 @@ export const addToCartApi = async (cartData: AddToCartRequest, token?: string) =
       throw error;
     }
     
-    console.log('âœ… Add to Cart API Success:', parsed);
+    console.log('✅ Add to Cart API Success:', parsed);
     return parsed as AddToCartResponse;
   } catch (error) {
-    console.error('âŒ Cart API Exception:', error);
+    console.error('❌ Cart API Exception:', error);
     throw error;
   }
 };
@@ -99,7 +99,7 @@ export const getCartItemsApi = async (userId: string, token?: string) => {
     return [] as CartItem[];
   }
   
-  console.log('ðŸ”‘ Getting cart items with token:', authToken ? authToken.substring(0, 20) + '...' : 'null');
+  console.log('🔑 Getting cart items with token:', authToken ? authToken.substring(0, 20) + '...' : 'null');
   
   const res = await fetch(`${API_BASE_URL}/cart/${userId}`, {
     method: 'GET',
@@ -107,7 +107,7 @@ export const getCartItemsApi = async (userId: string, token?: string) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${authToken}`
     },
-    cache: 'no-store'
+    cache: 'force-cache'
   });
   
   // If unauthorized/forbidden, return empty array to avoid noisy errors in UI
@@ -132,7 +132,7 @@ export const getCartItemsApi = async (userId: string, token?: string) => {
   }
   
   // Debug: Log the API response
-  console.log('ðŸ›’ Get Cart Items API Response:', parsed);
+  console.log('🛒 Get Cart Items API Response:', parsed);
 
   const apiItems = (parsed?.data || []) as Array<{
     id: string;

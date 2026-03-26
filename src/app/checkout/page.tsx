@@ -96,7 +96,7 @@ const CheckoutPage = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        cache: "no-store",
+        cache: 'force-cache',
       });
       console.log("[Checkout] Address fetch status", res.status);
       if (!res.ok) {

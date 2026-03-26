@@ -12,7 +12,7 @@ export async function getUsers(token?: string): Promise<User[]> {
   };
 
   const res = await fetch(`${API_BASE_URL}/user/`, {
-    cache: "no-store", // avoid Next.js caching
+    cache: 'force-cache', // avoid Next.js caching
     headers,
   });
 

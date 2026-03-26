@@ -142,4 +142,4 @@ export const ProductDrawer: React.FC<ProductDrawerProps> = ({
       </div>
     </>
   );
-};
+};

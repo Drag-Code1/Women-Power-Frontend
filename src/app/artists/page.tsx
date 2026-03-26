@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: "Browse and filter through our amazing collection of artists",
 };
 
-export const dynamic = 'force-dynamic';
+// Export as static
 
 export default function Page() {
   return <ArtistDirectoryWrapper />;

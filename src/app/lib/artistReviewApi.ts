@@ -16,7 +16,7 @@ export const getArtistReviewsApi = async (artistId: string, token?: string) => {
   }
   
   const res = await fetch(`${API_BASE_URL}/artist-review/${artistId}`, { 
-    cache: 'no-store',
+    cache: 'force-cache',
     headers
   });
   

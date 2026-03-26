@@ -1,5 +1,5 @@
 // app/events/page.tsx (Server Component)
-export const dynamic = 'force-dynamic';
+
 import EventsSectionClient from "../component/events/EventsSectionClient";
 import { API_BASE_URL } from "../lib/config";
 
@@ -29,7 +29,7 @@ async function getEvents(): Promise<{
   try {
     // Fetch events from API
     const res = await fetch(`${API_BASE_URL}/event/`, {
-      cache: 'no-store'
+      cache: 'force-cache'
     });
     
     if (!res.ok) {

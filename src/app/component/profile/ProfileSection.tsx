@@ -169,7 +169,7 @@ const ProfileSection: React.FC = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        cache: 'no-store',
+        cache: 'force-cache',
       });
       console.log('[Profile] Address fetch status', res.status);
       if (!res.ok) {
@@ -234,7 +234,7 @@ const ProfileSection: React.FC = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        cache: 'no-store',
+        cache: 'force-cache',
       });
       if (res.ok) {
         const data = await res.json();

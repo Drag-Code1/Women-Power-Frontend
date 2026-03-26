@@ -18,7 +18,9 @@ const nextConfig: NextConfig = {
         pathname: '/uploads/**',
       },
     ],
+    unoptimized: true,
   },
+  output: 'export',
 };
 
 export default nextConfig;

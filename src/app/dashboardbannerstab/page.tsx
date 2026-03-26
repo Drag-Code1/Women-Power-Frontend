@@ -23,4 +23,4 @@ export const metadata = {
 };
 
 // Optional: Revalidate data every 60 seconds
-export const dynamic = 'force-dynamic';
+// Revalidate as static

@@ -1,5 +1,4 @@
 import ImageSlider from "./component/product/ImageSlider";
-export const dynamic = 'force-dynamic';
 import { TopCategories } from "./component/product/TopCategories";
 import { BestSellers } from "./component/product/BestSellers";
 import { TrendingProducts } from "./component/product/TrandingProduct";

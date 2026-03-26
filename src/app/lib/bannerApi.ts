@@ -10,7 +10,7 @@ export async function fetchBannersServer(): Promise<Banner[]> {
   try {
     // Try the backend API first
     const res = await fetch(`${API_BASE_URL}/banner/`, {
-      cache: 'no-store',
+      cache: 'force-cache',
       headers: {
         'Content-Type': 'application/json',
       },

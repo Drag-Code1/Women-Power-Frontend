@@ -37,7 +37,7 @@ export const productService = {
       const res = await fetch(url, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        cache: 'force-cache',
       });
       const parseJsonSafely = async (r: Response) => {
         const contentType = r.headers.get("content-type") || "";
@@ -82,7 +82,7 @@ export const productService = {
       const response = await fetch(`${API_BASE_URL}/product/trending`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        cache: 'force-cache',
       });
 
       if (!response.ok) {
@@ -108,7 +108,7 @@ export const productService = {
       const primary = await fetch(`${API_BASE_URL}/product/`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        cache: 'force-cache',
       });
 
       const parseJsonSafely = async (res: Response) => {
@@ -130,7 +130,7 @@ export const productService = {
         const legacy = await fetch(`/api/products`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
-          cache: "no-store",
+          cache: 'force-cache',
         });
         if (!legacy.ok) {
           console.warn(`Legacy products endpoint also failed (${legacy.status}).`);
@@ -160,7 +160,7 @@ export const productService = {
       const response = await fetch(`${API_BASE_URL}/product/${id}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        cache: 'force-cache',
       });
 
       if (!response.ok) {
@@ -193,7 +193,7 @@ export const productService = {
       const response = await fetch(`${API_BASE_URL}/product/related/${categoryId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        cache: 'force-cache',
       });
 
       if (!response.ok) {
@@ -428,7 +428,7 @@ export const productService = {
       const res = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        cache: "no-store",
+        cache: 'force-cache',
         body: JSON.stringify({ isTrending }),
       });
 
