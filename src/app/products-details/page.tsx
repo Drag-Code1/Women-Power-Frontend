@@ -1,25 +1,28 @@
-import React from 'react'
+'use client'
+
+import React, { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import ProductDetailsPage from '@/app/component/product/ProductDetailsPage'
 import RelatedProductsWithCategory from '@/app/component/product/RelatedProductsWithCategory'
 import ProductReviews from '../component/product/ProductReviews'
 
-interface PageProps {
-  searchParams: Promise<{
-    id?: string;
-  }>;
-}
-
-async function page({ searchParams }: PageProps) {
-  const params = await searchParams;
-  const productId = params?.id;
+function ProductDetailsContent() {
+  const searchParams = useSearchParams();
+  const productId = searchParams.get('id');
 
   return (
     <div>
-      <ProductDetailsPage productId={productId} />
-      <RelatedProductsWithCategory productId={productId} />
-      <ProductReviews productId={productId} />
+      <ProductDetailsPage productId={productId || undefined} />
+      <RelatedProductsWithCategory productId={productId || undefined} />
+      <ProductReviews productId={productId || undefined} />
     </div>
   )
 }
 
-export default page;
+export default function page() {
+  return (
+    <Suspense fallback={<div>Loading product details...</div>}>
+      <ProductDetailsContent />
+    </Suspense>
+  )
+}

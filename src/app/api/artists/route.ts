@@ -1,4 +1,5 @@
 // app/api/artists/route.ts
+export const dynamic = "force-static";
 
 export interface Artist {
   id: string;
