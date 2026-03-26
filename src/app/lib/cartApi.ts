@@ -109,7 +109,7 @@ export const getCartItemsApi = async (userId: string, token?: string) => {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${authToken}`
     },
-    cache: 'force-cache'
+    cache: 'no-store'
   });
   
   // If unauthorized/forbidden, return empty array to avoid noisy errors in UI
