@@ -19,10 +19,13 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
+    return new Date(dateString).toLocaleString('en-IN', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
     });
   };
 

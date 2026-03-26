@@ -62,22 +62,24 @@ export const addToCartApi = async (cartData: AddToCartRequest, token?: string) =
     const contentType = res.headers.get('content-type') || '';
     let parsed: any = null;
     try {
-      parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
-    } catch {
-      parsed = {};
+      if (contentType.includes('application/json')) {
+        parsed = await res.json();
+      } else {
+        const text = await res.text();
+        parsed = { message: text };
+      }
+    } catch (parseError) {
+      console.error('❌ Error parsing response:', parseError);
+      parsed = { message: 'Failed to parse response body' };
     }
     
     if (!res.ok) {
-      console.error('❌ Cart API Error:', {
-        status: res.status,
-        statusText: res.statusText,
-        response: parsed
-      });
-      
-      const msg = parsed?.message || parsed?.error || `Failed to add item to cart (status ${res.status})`;
+      const msg = parsed?.message || parsed?.error || `Cart operation failed (status ${res.status})`;
       const error = new Error(msg);
       // @ts-ignore
-      (error as any).details = parsed;
+      error.status = res.status;
+      // @ts-ignore
+      error.details = parsed;
       throw error;
     }
     
@@ -118,16 +120,24 @@ export const getCartItemsApi = async (userId: string, token?: string) => {
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
-    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
-  } catch {
-    parsed = {};
+    if (contentType.includes('application/json')) {
+      parsed = await res.json();
+    } else {
+      const text = await res.text();
+      parsed = { message: text };
+    }
+  } catch (parseError) {
+    console.error('❌ Error parsing response:', parseError);
+    parsed = { message: 'Failed to parse response body' };
   }
   
   if (!res.ok) {
     const msg = parsed?.message || parsed?.error || `Failed to fetch cart items (status ${res.status})`;
     const error = new Error(msg);
     // @ts-ignore
-    (error as any).details = parsed;
+    error.status = res.status;
+    // @ts-ignore
+    error.details = parsed;
     throw error;
   }
   
@@ -172,16 +182,24 @@ export const updateCartItemApi = async (cartItemId: string, quantity: number, to
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
-    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
-  } catch {
-    parsed = {};
+    if (contentType.includes('application/json')) {
+      parsed = await res.json();
+    } else {
+      const text = await res.text();
+      parsed = { message: text };
+    }
+  } catch (parseError) {
+    console.error('❌ Error parsing response:', parseError);
+    parsed = { message: 'Failed to parse response body' };
   }
   
   if (!res.ok) {
     const msg = parsed?.message || parsed?.error || `Failed to update cart item (status ${res.status})`;
     const error = new Error(msg);
     // @ts-ignore
-    (error as any).details = parsed;
+    error.status = res.status;
+    // @ts-ignore
+    error.details = parsed;
     throw error;
   }
   
@@ -208,16 +226,24 @@ export const removeFromCartApi = async (cartItemId: string, token?: string) => {
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
-    parsed = contentType.includes('application/json') ? await res.json() : { message: await res.text() };
-  } catch {
-    parsed = {};
+    if (contentType.includes('application/json')) {
+      parsed = await res.json();
+    } else {
+      const text = await res.text();
+      parsed = { message: text };
+    }
+  } catch (parseError) {
+    console.error('❌ Error parsing response:', parseError);
+    parsed = { message: 'Failed to parse response body' };
   }
   
   if (!res.ok) {
     const msg = parsed?.message || parsed?.error || `Failed to remove cart item (status ${res.status})`;
     const error = new Error(msg);
     // @ts-ignore
-    (error as any).details = parsed;
+    error.status = res.status;
+    // @ts-ignore
+    error.details = parsed;
     throw error;
   }
   

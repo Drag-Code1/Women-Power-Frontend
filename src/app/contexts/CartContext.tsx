@@ -34,7 +34,7 @@ interface CartProviderProps {
 }
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const { user, token } = useAuth();
+  const { user, token, logout } = useAuth();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,8 +110,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
       // Refresh cart items from API to get updated data
       await refreshCart();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error adding to cart:", err);
+      if (err.status === 401) {
+        logout();
+        router.push('/login');
+      }
       throw err;
     }
   };
@@ -130,8 +134,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
       // Refresh cart items from API to get updated data
       await refreshCart();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error updating cart item:", err);
+      if (err.status === 401) {
+        logout();
+        router.push('/login');
+      }
       throw err;
     }
   };
@@ -150,8 +158,12 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
       // Refresh cart items from API to get updated data
       await refreshCart();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error removing from cart:", err);
+      if (err.status === 401) {
+        logout();
+        router.push('/login');
+      }
       throw err;
     }
   };

@@ -285,7 +285,7 @@ const OrderDashboard = () => {
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-4 h-4 text-gray-400" />
                           <span className="text-sm text-gray-600">
-                            {new Date(order.order_date).toLocaleDateString("en-IN")}
+                            {new Date(order.order_date).toLocaleString("en-IN", { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}
                           </span>
                         </div>
                       </td>
@@ -385,7 +385,7 @@ const OrderDashboard = () => {
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Calendar className="w-4 h-4" />
-                    <span>{new Date(order.order_date).toLocaleDateString("en-IN")}</span>
+                    <span>{new Date(order.order_date).toLocaleString("en-IN", { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                   </div>
                   <div className="text-sm text-gray-800 font-medium">
                     {order.firstName} {order.lastName}
