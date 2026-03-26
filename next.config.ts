@@ -1,18 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',   // VERY IMPORTANT
-
+  // Skip ESLint during production builds to avoid fail-on-warn
   eslint: {
     ignoreDuringBuilds: true,
   },
-
+  // Keep TS type checking; flip to true only if you want to bypass TS errors
   typescript: {
     ignoreBuildErrors: false,
   },
-
   images: {
-    unoptimized: true,   // Required for static export
     remotePatterns: [
       {
         protocol: 'https',
