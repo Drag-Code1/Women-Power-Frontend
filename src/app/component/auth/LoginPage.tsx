@@ -104,9 +104,9 @@ const LoginPage: React.FC = () => {
           }, 100);
         } else {
           const target = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/';
-          console.log('👤 Regular user detected, redirecting to:', target);
+          console.log('👤 Regular user detected, refreshing site and redirecting to:', target);
           setTimeout(() => {
-            router.push(target);
+            window.location.href = target;
           }, 100);
         }
       } catch (error: any) {

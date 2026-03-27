@@ -427,20 +427,15 @@ const ProfileSection: React.FC = () => {
 
         if (loggedInUser?.role === 'admin') {
           console.log('🔐 Admin user detected, redirecting to admin dashboard');
-          // Add a small delay to ensure state updates are complete
           setTimeout(() => {
             window.location.href = "/dashboardmaintab";
           }, 100);
         } else {
-          const target = returnUrl && returnUrl.startsWith('/') ? returnUrl : null;
-          if (target) {
-            console.log('👤 Regular user detected, redirecting to returnUrl:', target);
-            setTimeout(() => {
-              router.push(target);
-            }, 100);
-          } else {
-            console.log('👤 Regular user detected, staying on profile page');
-          }
+          const target = returnUrl && returnUrl.startsWith('/') ? returnUrl : '/';
+          console.log('👤 Regular user detected, refreshing site and redirecting to:', target);
+          setTimeout(() => {
+            window.location.href = target;
+          }, 100);
         }
       } catch (error: any) {
         console.error('OTP verification error:', error);
