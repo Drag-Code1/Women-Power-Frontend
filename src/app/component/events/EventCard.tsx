@@ -38,16 +38,20 @@ const EventCard: React.FC<EventCardProps> = ({
   const handleJoinEvent = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click if you add card-level click later
     if (event.status !== 'completed') {
-      const whatsappGroupUrl = "https://chat.whatsapp.com/FWVKMPyz3QuKBcbv3jnmOm";
-      window.open(whatsappGroupUrl, '_blank');
+      const phoneNumber = "917378832026";
+      const message = encodeURIComponent(`Hello, I'm interested in joining the event: "${event.title}". Please provide more details.`);
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
     }
   };
 
   // Optional: Make entire card clickable
   const handleCardClick = () => {
     if (event.status !== 'completed') {
-      const whatsappGroupUrl = "https://chat.whatsapp.com/FWVKMPyz3QuKBcbv3jnmOm";
-      window.open(whatsappGroupUrl, '_blank');
+      const phoneNumber = "917378832026";
+      const message = encodeURIComponent(`Hello, I'm interested in joining the event: "${event.title}". Please provide more details.`);
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
     }
   };
   

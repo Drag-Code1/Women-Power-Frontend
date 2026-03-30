@@ -27,14 +27,18 @@ const CourseCard = ({ course }: { course: Course }) => {
   // WhatsApp redirect handler for button
   const handleEnrollClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click
-    const whatsappGroupUrl = "https://chat.whatsapp.com/FWVKMPyz3QuKBcbv3jnmOm";
-    window.open(whatsappGroupUrl, '_blank');
+    const phoneNumber = "917378832026";
+    const message = encodeURIComponent(`Hello, I'm interested in enrolling for the course: "${course.title}". Please provide more details.`);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   // WhatsApp redirect handler for card
   const handleCardClick = () => {
-    const whatsappGroupUrl = "https://chat.whatsapp.com/FWVKMPyz3QuKBcbv3jnmOm";
-    window.open(whatsappGroupUrl, '_blank');
+    const phoneNumber = "917378832026";
+    const message = encodeURIComponent(`Hello, I'm interested in enrolling for the course: "${course.title}". Please provide more details.`);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
