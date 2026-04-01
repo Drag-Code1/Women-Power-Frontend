@@ -29,7 +29,7 @@ async function getEvents(): Promise<{
   try {
     // Fetch events from API
     const res = await fetch(`${API_BASE_URL}/event/`, {
-      cache: 'force-cache'
+      cache: 'no-store'
     });
     
     if (!res.ok) {

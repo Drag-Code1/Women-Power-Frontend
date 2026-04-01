@@ -41,7 +41,7 @@ export const getProductReviewsApi = async (productId: string, token?: string) =>
   }
   
   const res = await fetch(`${API_BASE_URL}/product-review/${productId}`, { 
-    cache: 'force-cache',
+    cache: 'no-store',
     headers
   });
   

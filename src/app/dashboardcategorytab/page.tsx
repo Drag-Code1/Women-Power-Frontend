@@ -8,7 +8,7 @@ export const metadata = {
 };
 
 async function fetchCategories() {
-  const res = await fetch(`${API_BASE_URL}/category/`, { cache: 'force-cache' });
+  const res = await fetch(`${API_BASE_URL}/category/`, { cache: 'no-store' });
   const body = await res.json();
   return body.data;
 }

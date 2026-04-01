@@ -12,7 +12,7 @@ export async function getContacts(token?: string): Promise<Contact[]> {
   };
 
   const res = await fetch(`${API_BASE_URL}/contact-details/`, {
-    cache: 'force-cache', // no caching in Next.js
+    cache: 'no-store', // no caching in Next.js
     headers,
   });
 

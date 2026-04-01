@@ -37,13 +37,11 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
   };
 
   const handleSubmit = async (data: CategoryFormData) => {
-    const { key } = await uploadToR2(data.image);
-
     if (modalType === "create") {
       try {
         const created = await createCategory({
           name: data.name,
-          image: key,
+          image: typeof data.image === "string" ? data.image : undefined,
         });
         setCategories([...categories, created as Category]);
       } catch (e) {
@@ -53,7 +51,7 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
       try {
         const updated = await updateCategory(selectedCategory.id, {
           name: data.name,
-          image: key,
+          image: typeof data.image === "string" ? data.image : "",
         });
         setCategories(
           categories.map((cat) =>
