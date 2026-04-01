@@ -202,11 +202,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
   // Split specification by comma and create array
   const specificationItems: string[] = product.specification 
     ? product.specification.split(',').map(item => item.trim()).filter(item => item !== '')
-    : [
-        "Premium quality roses sourced from the finest gardens",
-        "Long-lasting freshness with proper care instructions included",
-        "Eco-friendly packaging with sustainable materials"
-      ];
+    : [];
 
   return (
      <div className="bg-[#f1f2f4] py-2 sm:py-2 px-2 sm:px-4">
@@ -370,20 +366,22 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
               {product.description ? (
                 <p>{product.description}</p>
               ) : (
-                <p>Sunset Overdrive flowers2 is a beautiful arrangement of vibrant roses that capture the warm hues of a sunset. Each flower is carefully selected and arranged to create a stunning visual display that brings the beauty of nature into your space. Perfect for special occasions or as a thoughtful gift to brighten someone's day.</p>
+                <p>No description available for this product.</p>
               )}
             </div>
           </div>
           
           {/* Specifications Section */}
-          <div className="mb-8">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Specifications</h3>
-            <ul className="list-disc pl-5 space-y-2 text-gray-600">
-              {specificationItems.map((item: string, index: number) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </div>
+          {specificationItems.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Specifications</h3>
+              <ul className="list-disc pl-5 space-y-2 text-gray-600">
+                {specificationItems.map((item: string, index: number) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           
           {/* Product Information Section */}
           <div className="border-t border-gray-200 pt-6">
