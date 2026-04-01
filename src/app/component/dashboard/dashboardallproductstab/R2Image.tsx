@@ -20,7 +20,7 @@ export default function R2Image({ src, alt = "", className = "", fallbackSrc = "
   const candidate = useMemo(() => {
     if (!src) return "";
     if (isDirectUrl(src)) return src;
-    return buildR2PublicUrl(src);
+    return src;
   }, [src]);
 
   useEffect(() => {
