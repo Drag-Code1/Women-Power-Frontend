@@ -20,7 +20,11 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: true,
   },
-  output: 'export',
+  // If you need static export, you must remove all 'cache: no-store' from server-side fetches.
+  // Otherwise, remove 'output: export' to build a dynamic server app.
+  // output: 'export',
+  // Disable font optimization to avoid fetch errors during build in offline/restricted environments
+  optimizeFonts: false,
 };
 
 export default nextConfig;

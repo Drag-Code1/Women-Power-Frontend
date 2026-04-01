@@ -1,5 +1,5 @@
 // app/api/courses/route.ts
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 import { NextResponse } from 'next/server';
 
 export interface Course {
