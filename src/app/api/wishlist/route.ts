@@ -1,4 +1,5 @@
 // app/api/wishlist/route.ts
+export const dynamic = "force-static";
 
 import { NextRequest, NextResponse } from 'next/server';
 

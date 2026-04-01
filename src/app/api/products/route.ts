@@ -1,4 +1,5 @@
 // app/api/products/route.ts
+export const dynamic = "force-static";
 
 import { NextResponse } from "next/server";
 import { allProducts } from "@/app/data/products";
