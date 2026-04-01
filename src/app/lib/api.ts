@@ -1,13 +1,13 @@
 import { API_BASE_URL } from './config';
 export const fetchArtists = async () => {
-  const res = await fetch(`${API_BASE_URL}/artist/`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/artist/`);
   const data = await res.json();
   return data;
 }
 
 // Category APIs (v1)
 export const getCategoriesApi = async () => {
-  const res = await fetch(`${API_BASE_URL}/category/`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/category/`);
   const body = await res.json();
   const list = body.data || [];
   try {
@@ -22,7 +22,7 @@ export const getCategoriesApi = async () => {
 
 // Get category details by ID
 export const getCategoryDetailsApi = async (categoryId: string) => {
-  const res = await fetch(`${API_BASE_URL}/category/${categoryId}`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/category/${categoryId}`);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -91,7 +91,7 @@ export const deleteCategory = async (id: string) => {
 
 export const getArtistsApi = async (page: number = 1) => {
   const url = `${API_BASE_URL}/artist/?page=${encodeURIComponent(page)}`;
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await fetch(url);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -113,7 +113,7 @@ export const getArtistsApi = async (page: number = 1) => {
 // Search artists by name
 export const searchArtistsApi = async (query: string) => {
   const url = `${API_BASE_URL}/artist/${encodeURIComponent(query)}`;
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await fetch(url);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -166,7 +166,7 @@ export const filterArtistsApi = async (filters: {
 // Get artist details by ID
 export const getArtistDetailsApi = async (id: string) => {
   const url = `${API_BASE_URL}/artist/details/${encodeURIComponent(id)}`;
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await fetch(url);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -189,7 +189,7 @@ export const getArtistsPaginated = async (
   page: number = 1
 ): Promise<{ totalArtists: number; totalPages: number; currentPage: number; data: any[] }> => {
   const url = `${API_BASE_URL}/artist/?page=${encodeURIComponent(page)}`;
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await fetch(url);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -214,7 +214,7 @@ export const getArtistsPaginated = async (
 };
 
 export const getCoursesApi = async () => {
-  const res = await fetch(`${API_BASE_URL}/course/`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/course/`);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -517,14 +517,14 @@ export const deleteArtist = async (id: string) => {
 };
 
 export const fetchFeaturedEvents = async () => {
-  const res = await fetch('/api/featured-events', { cache: 'no-store' });
+  const res = await fetch('/api/featured-events');
   const data = await res.json();
   return data;
 }
 
 export const fetchEvents = async () => {
   console.log("Fetching events...");
-  const res = await fetch('/api/events', { cache: 'no-store' });
+  const res = await fetch('/api/events');
   const data = await res.json();
   return data;
 }
@@ -533,7 +533,7 @@ export const fetchEvents = async () => {
 import { buildR2PublicUrl } from './utils/dashboardartist-utils';
 
 export const getEventsV1 = async () => {
-  const res = await fetch(`${API_BASE_URL}/event/`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/event/`);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -565,7 +565,7 @@ export const getEventsV1 = async () => {
 
 // Get all events for events page
 export const getEventsApi = async () => {
-  const res = await fetch(`${API_BASE_URL}/event/`, { cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}/event/`);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -636,7 +636,7 @@ export const filterEventsApi = async (filters: {
 // Get latest events for dashboard (limited to 4)
 export const getLatestEvents = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/event/`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE_URL}/event/`);
     const contentType = res.headers.get('content-type') || '';
     let parsed: any = null;
     try {
@@ -1029,7 +1029,7 @@ export const getTrendingProducts = async () => {
 // Products API - Get all products with pagination
 export const getProductsApi = async (page: number = 1) => {
   const url = `${API_BASE_URL}/product/?page=${encodeURIComponent(page)}`;
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await fetch(url);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -1051,7 +1051,7 @@ export const getProductsApi = async (page: number = 1) => {
 // Search products by name
 export const searchProductsApi = async (query: string) => {
   const url = `${API_BASE_URL}/product/search/${encodeURIComponent(query)}`;
-  const res = await fetch(url, { cache: 'no-store' });
+  const res = await fetch(url);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
