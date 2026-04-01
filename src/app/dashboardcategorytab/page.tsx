@@ -1,26 +1,29 @@
-import { Suspense } from 'react';
+'use client';
+import { useState, useEffect } from 'react';
 import CategoryList from '@/app/component/dashboard/dashboardcategorytab/CategoryList';
-import { API_BASE_URL } from '@/app/lib/config';
+import { getCategoriesApi } from '@/app/lib/api';
 
-export const metadata = {
-  title: 'Category Management',
-  description: 'Manage your product categories',
-};
+export default function CategoriesPage() {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-async function fetchCategories() {
-  const res = await fetch(`${API_BASE_URL}/category/`);
-  const body = await res.json();
-  return body.data;
-}
+  useEffect(() => {
+    async function load() {
+      try {
+        const body = await getCategoriesApi();
+        setCategories(body);
+      } catch (err) {
+        console.error('Failed to items:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
-export default async function CategoriesPage() {
-  const categories = await fetchCategories();
+  if (loading) return <LoadingSkeleton />;
 
-  return (
-    <Suspense fallback={<LoadingSkeleton />}>
-      <CategoryList initialCategories={categories} />
-    </Suspense>
-  );
+  return <CategoryList initialCategories={categories} />;
 }
 
 function LoadingSkeleton() {

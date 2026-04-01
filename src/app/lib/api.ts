@@ -1,4 +1,7 @@
 import { API_BASE_URL } from './config';
+import { getAuthHeaders } from './authApi';
+import { uploadToR2 } from './utils/r2Client';
+import { buildR2PublicUrl } from './utils/dashboardartist-utils';
 export const fetchArtists = async () => {
   const res = await fetch(`${API_BASE_URL}/artist/`);
   const data = await res.json();
@@ -7,13 +10,12 @@ export const fetchArtists = async () => {
 
 // Category APIs (v1)
 export const getCategoriesApi = async () => {
-  const res = await fetch(`${API_BASE_URL}/category/`);
+  const res = await fetch(`${API_BASE_URL}/category/`, { cache: 'no-store' });
   const body = await res.json();
   const list = body.data || [];
   try {
-    const { buildR2PublicUrl } = await import('./utils/dashboardartist-utils');
     return Array.isArray(list)
-      ? list.map((c: any) => ({ ...c, image: buildR2PublicUrl(c?.image || '') }))
+      ? list.map((c: any) => ({ ...c, image: c?.image || '' }))
       : list;
   } catch {
     return list;
@@ -41,13 +43,15 @@ export const getCategoryDetailsApi = async (categoryId: string) => {
 };
 
 export const createCategory = async (payload: { name: string; image?: string }) => {
-  const { getAuthHeaders } = await import('./authApi');
   let imageKey = payload.image || '';
-  // If image is a data URL, upload to R2 first and send the key
+  // If it's a data URL, upload to R2 and get key
   if (imageKey && /^data:\w+\/[\w.+-]+;base64,/.test(imageKey)) {
-    const { uploadToR2 } = await import('./utils/r2Client');
     const uploaded = await uploadToR2(imageKey);
     imageKey = uploaded.key;
+  } else if (imageKey && /^https?:\/\//i.test(imageKey)) {
+    // If it's already a full URL, try to extract the key from the end
+    // (Assuming the key is the last part of the URL)
+    imageKey = imageKey.split('/').pop() || imageKey;
   }
 
   const res = await fetch(`${API_BASE_URL}/category/`, {
@@ -60,12 +64,13 @@ export const createCategory = async (payload: { name: string; image?: string }) 
 };
 
 export const updateCategory = async (id: string, payload: { name: string; image: string }) => {
-  const { getAuthHeaders } = await import('./authApi');
   let imageKey = payload.image || '';
   if (imageKey && /^data:\w+\/[\w.+-]+;base64,/.test(imageKey)) {
     const { uploadToR2 } = await import('./utils/r2Client');
     const uploaded = await uploadToR2(imageKey);
     imageKey = uploaded.key;
+  } else if (imageKey && /^https?:\/\//i.test(imageKey)) {
+    imageKey = imageKey.split('/').pop() || imageKey;
   }
   const res = await fetch(`${API_BASE_URL}/category/${id}`, {
     method: 'PUT',
@@ -77,7 +82,6 @@ export const updateCategory = async (id: string, payload: { name: string; image:
 };
 
 export const deleteCategory = async (id: string) => {
-  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`${API_BASE_URL}/category/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
@@ -230,11 +234,10 @@ export const getCoursesApi = async () => {
   }
   const list = parsed.data || [];
   try {
-    const { buildR2PublicUrl } = await import('./utils/dashboardartist-utils');
     return Array.isArray(list)
       ? list.map((c: any) => ({
           ...c,
-          thumbnail: buildR2PublicUrl(c?.thumbnail || ''),
+          thumbnail: c?.thumbnail || '',
         }))
       : list;
   } catch {
@@ -295,7 +298,6 @@ export const filterCoursesApi = async (filters: {
 };
 
 export const deleteCourse = async (id: string) => {
-  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`${API_BASE_URL}/course/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
@@ -322,14 +324,12 @@ export const createCourse = async (payload: {
   price: number | string;
   discount: number;
 }) => {
-  const { getAuthHeaders } = await import('./authApi');
   // If thumbnail is a data URL, upload to R2 and keep only the key
   let thumbKey = payload.thumbnail || '';
   const isDataUrl = (v?: string) => !!v && /^data:\\w+\/[\\w.+-]+;base64,/.test(v);
   // Runtime-safe version (no extra escaping)
   const _isDataUrl = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
   if (thumbKey && (isDataUrl(thumbKey) || _isDataUrl(thumbKey))) {
-    const { uploadToR2 } = await import('./utils/r2Client');
     const uploaded = await uploadToR2(thumbKey);
     thumbKey = uploaded.key;
   }
@@ -369,12 +369,10 @@ export const updateCourse = async (
     discount: number;
   }
 ) => {
-  const { getAuthHeaders } = await import('./authApi');
   let thumbKey = payload.thumbnail || '';
   const isDataUrl2 = (v?: string) => !!v && /^data:\\w+\/[\\w.+-]+;base64,/.test(v);
   const _isDataUrl2 = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
   if (thumbKey && (isDataUrl2(thumbKey) || _isDataUrl2(thumbKey))) {
-    const { uploadToR2 } = await import('./utils/r2Client');
     const uploaded = await uploadToR2(thumbKey);
     thumbKey = uploaded.key;
   }
@@ -414,10 +412,8 @@ export const createArtist = async (
     imageData?: string; // base64 data URL from file input
   }
 ) => {
-  const { getAuthHeaders } = await import('./authApi');
   let r2Key: string | undefined;
   if (isDataUrl(payload.imageData)) {
-    const { uploadToR2 } = await import('./utils/r2Client');
     const uploaded = await uploadToR2(payload.imageData as string);
     r2Key = uploaded.key; // store only the key in DB
   }
@@ -463,10 +459,8 @@ export const updateArtist = async (
     imageData?: string; // optional base64 data URL if user selected a new image
   }
 ) => {
-  const { getAuthHeaders } = await import('./authApi');
   let r2Key: string | undefined;
   if (isDataUrl(payload.imageData)) {
-    const { uploadToR2 } = await import('./utils/r2Client');
     const uploaded = await uploadToR2(payload.imageData as string);
     r2Key = uploaded.key;
   }
@@ -502,7 +496,6 @@ export const updateArtist = async (
 };
 
 export const deleteArtist = async (id: string) => {
-  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`${API_BASE_URL}/artist/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
@@ -527,10 +520,9 @@ export const fetchEvents = async () => {
 }
 
 // Events API (v1)
-import { buildR2PublicUrl } from './utils/dashboardartist-utils';
 
 export const getEventsV1 = async () => {
-  const res = await fetch(`${API_BASE_URL}/event/`);
+  const res = await fetch(`${API_BASE_URL}/event/`, { cache: 'no-store' });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -549,14 +541,14 @@ export const getEventsV1 = async () => {
   // Normalize to dashboard Event type
   return list.map((it: any) => ({
     id: it.id,
-    thumbnail: buildR2PublicUrl(it.e_image || ''),
+    thumbnail: it.e_image || '',
     category: it.category_id || '',
     title: it.title || '',
     description: it.description || '',
     dateTime: it.date_time || '',
     status: (it.status || 'upcoming'),
     keywords: typeof it.keywords === 'string' ? it.keywords.split(',').map((k: string) => k.trim()).filter(Boolean) : Array.isArray(it.keywords) ? it.keywords : [],
-    banner: buildR2PublicUrl(it.banner || undefined),
+    banner: it.banner || undefined,
   }));
 };
 
@@ -671,42 +663,60 @@ export const getLatestEvents = async () => {
 };
 
 export const createEventV1 = async (
-  payload: {
-    e_image: string;
-    category_id: string;
-    title: string;
-    description: string;
-    date_time: string;
-    status: string;
-    keywords: string;
-    banner?: string;
-  }
+  payload: any
 ) => {
-  const { getAuthHeaders } = await import('./authApi');
+  // Extract and map fields to backend model
+  const {
+    thumbnail,
+    category,
+    category_id,
+    title,
+    description,
+    dateTime,
+    status,
+    keywords,
+    banner
+  } = payload;
+
   // Upload data-URL images to R2 and send keys
-  let imgKey = payload.e_image || '';
-  let bannerKey = payload.banner || '';
-  const isDataUrl = (v?: string) => !!v && /^data:\\w+\/[\\w.+-]+;base64,/.test(v);
+  let imgKey = thumbnail || '';
+  let bannerKey = banner || '';
+  
   const _isDataUrl = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
-  if (imgKey && (isDataUrl(imgKey) || _isDataUrl(imgKey))) {
+  
+  if (imgKey && _isDataUrl(imgKey)) {
     const { uploadToR2 } = await import('./utils/r2Client');
     const uploaded = await uploadToR2(imgKey);
     imgKey = uploaded.key;
+  } else if (imgKey && /^https?:\/\//i.test(imgKey)) {
+    imgKey = imgKey.split('/').pop() || imgKey;
   }
-  if (bannerKey && (isDataUrl(bannerKey) || _isDataUrl(bannerKey))) {
+
+  if (bannerKey && _isDataUrl(bannerKey)) {
     const { uploadToR2 } = await import('./utils/r2Client');
     const uploadedB = await uploadToR2(bannerKey);
     bannerKey = uploadedB.key;
+  } else if (bannerKey && /^https?:\/\//i.test(bannerKey)) {
+    bannerKey = bannerKey.split('/').pop() || bannerKey;
   }
+
+  const backendPayload = {
+    e_image: imgKey,
+    category_id: category_id || category, // Backend expects UUID
+    title,
+    description,
+    date_time: dateTime, // Backend expects date_time
+    status: status || 'upcoming',
+    keywords: Array.isArray(keywords) ? keywords.join(', ') : keywords,
+    banner: bannerKey || undefined,
+  };
+
   const res = await fetch(`${API_BASE_URL}/event/`, {
     method: 'POST',
     headers: getAuthHeaders(),
-    body: JSON.stringify({
-      ...payload,
-      e_image: imgKey,
-      ...(bannerKey ? { banner: bannerKey } : {}),
-    }),
+    body: JSON.stringify(backendPayload),
   });
+
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -714,11 +724,12 @@ export const createEventV1 = async (
   } catch {
     parsed = {};
   }
+
   if (!res.ok) {
     const msg = parsed?.message || parsed?.error || `Failed to create event (status ${res.status})`;
     const error = new Error(msg);
     // @ts-ignore
-    (error as any).details = parsed;
+    (error as any).details = backendPayload;
     throw error;
   }
   return parsed?.data ?? parsed;
@@ -726,41 +737,58 @@ export const createEventV1 = async (
 
 export const updateEventV1 = async (
   id: string,
-  payload: {
-    e_image: string;
-    category_id: string;
-    title: string;
-    description: string;
-    date_time: string;
-    status: string;
-    keywords: string;
-    banner?: string;
-  }
+  payload: any
 ) => {
-  const { getAuthHeaders } = await import('./authApi');
-  let imgKey = payload.e_image || '';
-  let bannerKey = payload.banner || '';
-  const isDataUrl2 = (v?: string) => !!v && /^data:\\w+\/[\\w.+-]+;base64,/.test(v);
-  const _isDataUrl2 = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
-  if (imgKey && (isDataUrl2(imgKey) || _isDataUrl2(imgKey))) {
+  const {
+    thumbnail,
+    category,
+    category_id,
+    title,
+    description,
+    dateTime,
+    status,
+    keywords,
+    banner
+  } = payload;
+
+  let imgKey = thumbnail || '';
+  let bannerKey = banner || '';
+  
+  const _isDataUrl = (v?: string) => !!v && /^data:\w+\/[\w.+-]+;base64,/.test(v);
+  
+  if (imgKey && _isDataUrl(imgKey)) {
     const { uploadToR2 } = await import('./utils/r2Client');
     const uploaded = await uploadToR2(imgKey);
     imgKey = uploaded.key;
+  } else if (imgKey && /^https?:\/\//i.test(imgKey)) {
+    imgKey = imgKey.split('/').pop() || imgKey;
   }
-  if (bannerKey && (isDataUrl2(bannerKey) || _isDataUrl2(bannerKey))) {
+
+  if (bannerKey && _isDataUrl(bannerKey)) {
     const { uploadToR2 } = await import('./utils/r2Client');
     const uploadedB = await uploadToR2(bannerKey);
     bannerKey = uploadedB.key;
+  } else if (bannerKey && /^https?:\/\//i.test(bannerKey)) {
+    bannerKey = bannerKey.split('/').pop() || bannerKey;
   }
+
+  const backendPayload = {
+    e_image: imgKey,
+    category_id: category_id || category,
+    title,
+    description,
+    date_time: dateTime,
+    status: status || 'upcoming',
+    keywords: Array.isArray(keywords) ? keywords.join(', ') : keywords,
+    banner: bannerKey || undefined,
+  };
+
   const res = await fetch(`${API_BASE_URL}/event/${id}`, {
     method: 'PUT',
     headers: getAuthHeaders(),
-    body: JSON.stringify({
-      ...payload,
-      e_image: imgKey,
-      ...(bannerKey ? { banner: bannerKey } : {}),
-    }),
+    body: JSON.stringify(backendPayload),
   });
+
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -768,24 +796,18 @@ export const updateEventV1 = async (
   } catch {
     parsed = {};
   }
+
   if (!res.ok) {
     const msg = parsed?.message || parsed?.error || `Failed to update event (status ${res.status})`;
-    console.error('Event update failed:', {
-      status: res.status,
-      statusText: res.statusText,
-      response: parsed,
-      payload
-    });
     const error = new Error(msg);
     // @ts-ignore
-    (error as any).details = parsed;
+    (error as any).details = backendPayload;
     throw error;
   }
   return parsed?.data ?? parsed;
 };
 
 export const deleteEventV1 = async (id: string) => {
-  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`${API_BASE_URL}/event/${id}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
@@ -841,7 +863,6 @@ export const getDashboardCounts = async (): Promise<{
   courseCount: number;
   eventCount: number;
 }> => {
-  const { getAuthHeaders } = await import('./authApi');
   const res = await fetch(`${API_BASE_URL}/dashboard/`, { 
     cache: 'no-store',
     headers: getAuthHeaders(),
@@ -1098,8 +1119,6 @@ export async function postcontactForm(formData: {
   msg: string;
 }) {
   try {
-    const { getAuthHeaders } = await import('./authApi');
-    
     const response = await fetch(`${API_BASE_URL}/contact-details/`, {
       method: "POST",
       headers: getAuthHeaders(),

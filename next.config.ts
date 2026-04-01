@@ -20,8 +20,7 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: true,
   },
-  // If you need static export, you must remove all 'cache: no-store' from server-side fetches.
-  // Otherwise, remove 'output: export' to build a dynamic server app.
+  // Required for Cloudflare Pages (static deployment)
   output: 'export',
 };
 

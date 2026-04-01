@@ -64,14 +64,21 @@ export default function CategoryList({ initialCategories }: CategoryListProps) {
     }
   };
 
-  // ✅ Updated handleDelete
   const handleDelete = async (id: string, image: string) => {
+    if (!confirm("Are you sure you want to delete this category?")) return;
     try {
-      await deleteFromR2(image); // delete image from R2
+      // Try to delete from R2, but don't let it block DB deletion
+      try {
+        if (image) await deleteFromR2(image);
+      } catch (r2Error) {
+        console.warn("Failed to delete image from R2, proceeding with DB deletion", r2Error);
+      }
+      
       await deleteCategory(id); // delete category from DB
       setCategories(categories.filter((cat) => cat.id !== id));
     } catch (e) {
       console.error("Failed to delete category", e);
+      alert("Failed to delete category. Please try again.");
     }
   };
 

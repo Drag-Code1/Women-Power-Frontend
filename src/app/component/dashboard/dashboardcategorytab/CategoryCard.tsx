@@ -12,6 +12,8 @@ interface CategoryCardProps {
   onDelete: (id: string, image: string) => void; // ✅ updated
 }
 
+const isDirectUrl = (val?: string) => !!val && /^(https?:|data:|blob:)/i.test(val);
+
 export default function CategoryCard({
   category,
   onView,
@@ -24,6 +26,10 @@ export default function CategoryCard({
 
   useEffect(() => {
     async function fetchImage() {
+      if (isDirectUrl(category.image)) {
+        setImageUrl(category.image);
+        return;
+      }
       try {
         console.log("Fetching image for:", category.image);
         const url = await getFromR2(category.image);
@@ -38,15 +44,14 @@ export default function CategoryCard({
       fetchImage();
     } else {
       console.warn("⚠️ category.image is empty:", category);
+      setImageUrl(""); // Clear if empty
     }
   }, [category.image]);
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
-
     setIsDeleting(true);
     try {
-      onDelete(category.id, category.image); // ✅ now passing both
+      await onDelete(category.id, category.image);
     } finally {
       setIsDeleting(false);
       setOpenDropdown(false);

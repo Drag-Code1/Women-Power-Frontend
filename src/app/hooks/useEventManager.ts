@@ -1,11 +1,19 @@
 'use client';
-import { useState } from 'react';
-import { generateEventId, readImageAsDataURL } from '../lib/utils/dashboardevent-utils';
-import type { Event, EventFormData } from '../types/dashboardeventtab'; 
-import { updateEventV1, createEventV1, getCategoriesApi, deleteEventV1 } from '../lib/api';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import type { Event, ModalMode, EventFormData } from '@/app/types/dashboardeventtab';
+import { createEventV1, updateEventV1, deleteEventV1, getCategoriesApi } from '@/app/lib/api';
+import { readFileAsDataURL } from '@/app/lib/utils/dashboardartist-utils';
 
-type ModalMode = 'add' | 'edit';
+const initialFormData: EventFormData = {
+  title: '',
+  description: '',
+  category: '',
+  dateTime: '',
+  status: 'upcoming',
+  keywords: [],
+  thumbnail: '',
+  banner: ''
+};
 
 export const useEventManager = (initialEvents: Event[]) => {
   const [events, setEvents] = useState<Event[]>(initialEvents);
@@ -15,18 +23,8 @@ export const useEventManager = (initialEvents: Event[]) => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string>('');
   const [bannerPreview, setBannerPreview] = useState<string>('');
-  const [formData, setFormData] = useState<EventFormData>({
-    thumbnail: '',
-    category: '',
-    title: '',
-    description: '',
-    dateTime: '',
-    status: 'upcoming',
-    keywords: [],
-    banner: ''
-  });
+  const [formData, setFormData] = useState<EventFormData>(initialFormData);
   const [categoryOptions, setCategoryOptions] = useState<Array<{ id: string; name: string }>>([]);
-
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -40,31 +38,21 @@ export const useEventManager = (initialEvents: Event[]) => {
     })();
   }, []);
 
-  const resetForm = () => {
-    setFormData({
-      thumbnail: '',
-      category: '',
-      title: '',
-      description: '',
-      dateTime: '',
-      status: 'upcoming',
-      keywords: [],
-      banner: ''
-    });
-    setThumbnailPreview('');
-    setBannerPreview('');
-  };
-
   const openModal = (mode: ModalMode, event?: Event) => {
     setModalMode(mode);
     if (event) {
       setSelectedEvent(event);
-      setFormData(event);
-      setThumbnailPreview(event.thumbnail);
+      setFormData({
+        ...event,
+        dateTime: event.dateTime ? new Date(event.dateTime).toISOString().slice(0, 16) : ''
+      });
+      setThumbnailPreview(event.thumbnail || '');
       setBannerPreview(event.banner || '');
     } else {
       setSelectedEvent(null);
-      resetForm();
+      setFormData(initialFormData);
+      setThumbnailPreview('');
+      setBannerPreview('');
     }
     setIsModalOpen(true);
     setActiveDropdown(null);
@@ -73,137 +61,102 @@ export const useEventManager = (initialEvents: Event[]) => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedEvent(null);
-    resetForm();
+    setFormData(initialFormData);
+    setThumbnailPreview('');
+    setBannerPreview('');
     setIsSaving(false);
   };
 
-  const handleImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: 'thumbnail' | 'banner'
-  ) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'thumbnail' | 'banner') => {
     const file = e.target.files?.[0];
     if (file) {
       try {
-        const result = await readImageAsDataURL(file);
+        const dataUrl = await readFileAsDataURL(file);
         if (type === 'thumbnail') {
-          setThumbnailPreview(result);
-          setFormData({ ...formData, thumbnail: result });
+          setThumbnailPreview(dataUrl);
+          setFormData(prev => ({ ...prev, thumbnail: dataUrl }));
         } else {
-          setBannerPreview(result);
-          setFormData({ ...formData, banner: result });
+          setBannerPreview(dataUrl);
+          setFormData(prev => ({ ...prev, banner: dataUrl }));
         }
       } catch (error) {
-        console.error('Error uploading image:', error);
+        console.error('Error reading file:', error);
       }
     }
   };
 
-  const handleAdd = async () => {
+  const handleSubmit = async () => {
     if (isSaving) return;
     setIsSaving(true);
+
     try {
-      // Resolve category_id from selected category (accepts id or name)
-      const resolvedCategoryId = (() => {
-        const raw = String(formData.category || '');
-        const found = categoryOptions.find(c => c.id === raw || c.name === raw);
-        return found?.id || raw;
-      })();
+      // Find category ID if selected by name
+      const found = categoryOptions.find(c => c.name === formData.category || c.id === formData.category);
+      const categoryId = found?.id || '';
+
+      if (!categoryId) {
+        alert('Please select a valid category');
+        setIsSaving(false);
+        return;
+      }
 
       const payload = {
-        e_image: String(formData.thumbnail || ''),
-        category_id: resolvedCategoryId,
-        title: String(formData.title || ''),
-        description: String(formData.description || ''),
-        date_time: String(formData.dateTime || ''),
-        status: String(formData.status || 'upcoming'),
-        keywords: Array.isArray(formData.keywords) ? formData.keywords.join(',') : String((formData as any).keywords || ''),
-        banner: String(formData.banner || ''),
+        ...formData,
+        category_id: categoryId,
+        thumbnail: formData.thumbnail || thumbnailPreview,
+        banner: formData.banner || bannerPreview,
       };
-      const created = await createEventV1(payload);
-      const categoryName = categoryOptions.find(c => c.id === (created.category_id || payload.category_id))?.name || (created.category_id || payload.category_id);
-      const newEvent: Event = {
-        id: created.id || generateEventId(),
-        thumbnail: created.e_image || payload.e_image,
-        category: categoryName,
-        title: created.title || payload.title,
-        description: created.description || payload.description,
-        dateTime: created.date_time || payload.date_time,
-        status: created.status || payload.status,
-        keywords: typeof created.keywords === 'string' ? created.keywords.split(',').map((k: string) => k.trim()).filter(Boolean) : Array.isArray(created.keywords) ? created.keywords : (Array.isArray(formData.keywords) ? formData.keywords : []),
-        banner: created.banner || payload.banner,
-      };
-      setEvents([...events, newEvent]);
+
+      if (modalMode === 'add') {
+        const created = await createEventV1(payload);
+        const mapped: Event = {
+          id: created.id,
+          title: created.title,
+          description: created.description,
+          category: found?.name || '',
+          dateTime: created.date_time,
+          status: created.status,
+          keywords: Array.isArray(created.keywords) ? created.keywords : (created.keywords || '').split(',').map((k: string) => k.trim()),
+          thumbnail: created.e_image,
+          banner: created.banner
+        };
+        setEvents(prev => [...prev, mapped]);
+      } else if (modalMode === 'edit' && selectedEvent) {
+        const updated = await updateEventV1(selectedEvent.id, payload);
+        const mapped: Event = {
+          id: updated.id,
+          title: updated.title,
+          description: updated.description,
+          category: found?.name || '',
+          dateTime: updated.date_time,
+          status: updated.status,
+          keywords: Array.isArray(updated.keywords) ? updated.keywords : (updated.keywords || '').split(',').map((k: string) => k.trim()),
+          thumbnail: updated.e_image,
+          banner: updated.banner
+        };
+        setEvents(prev => prev.map(e => e.id === selectedEvent.id ? mapped : e));
+      }
       closeModal();
-    } catch (err) {
-      console.error('Failed to create event', err);
-      alert((err as any)?.message || 'Failed to create event');
+    } catch (e) {
+      console.error('Failed to save event', e);
+      alert('Failed to save event. Please try again.');
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleEdit = async () => {
-    if (isSaving) return;
-    if (selectedEvent) {
-      setIsSaving(true);
-      try {
-        // Map dashboard form to API payload
-        const categoryId = categoryOptions.find(c => c.name === formData.category)?.id || formData.category || '';
-        const payload = {
-          e_image: formData.thumbnail || '',
-          category_id: categoryId,
-          title: formData.title || '',
-          description: formData.description || '',
-          date_time: formData.dateTime || '',
-          status: formData.status || 'upcoming',
-          keywords: Array.isArray(formData.keywords) ? formData.keywords.join(',') : (formData.keywords as any) || '',
-          banner: formData.banner || '',
-        };
-        const updated = await updateEventV1(selectedEvent.id, payload);
-        const categoryName = categoryOptions.find(c => c.id === (updated.category_id || payload.category_id))?.name || (updated.category_id || payload.category_id);
-        const normalized: Event = {
-          id: updated.id || selectedEvent.id,
-          thumbnail: updated.e_image || payload.e_image,
-          category: categoryName,
-          title: updated.title || payload.title,
-          description: updated.description || payload.description,
-          dateTime: updated.date_time || payload.date_time,
-          status: updated.status || payload.status,
-          keywords: typeof updated.keywords === 'string' ? updated.keywords.split(',').map((k: string) => k.trim()).filter(Boolean) : Array.isArray(updated.keywords) ? updated.keywords : (Array.isArray(formData.keywords) ? formData.keywords : []),
-          banner: updated.banner || payload.banner,
-        };
-        setEvents(
-          events.map((e) => (e.id === selectedEvent.id ? normalized : e))
-        );
-        closeModal();
-      } catch (err) {
-        console.error('Failed to update event', err);
-        alert((err as any)?.message || 'Failed to update event');
-      } finally {
-        setIsSaving(false);
-      }
-    }
-  };
-
   const handleDelete = async (id: string) => {
+    if (!id) return;
     if (confirm('Are you sure you want to delete this event?')) {
       try {
         await deleteEventV1(id);
-        setEvents(events.filter((e) => e.id !== id));
-        setActiveDropdown(null);
-      } catch (err) {
-        console.error('Failed to delete event', err);
-        alert((err as any)?.message || 'Failed to delete event');
+        setEvents(prev => prev.filter(e => e.id !== id));
+      } catch (e) {
+        console.error('Failed to delete event', e);
+        alert('Failed to delete event. Please try again.');
       }
     }
-  };
-
-  const handleSubmit = () => {
-    if (modalMode === 'add') {
-      handleAdd();
-    } else {
-      handleEdit();
-    }
+    setActiveDropdown(null);
   };
 
   return {
