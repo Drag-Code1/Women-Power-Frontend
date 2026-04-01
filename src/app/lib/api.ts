@@ -144,7 +144,6 @@ export const filterArtistsApi = async (filters: {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(filters),
-    cache: 'no-store'
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -245,9 +244,7 @@ export const getCoursesApi = async () => {
 
 // Search courses by title, coordinator, or description
 export const searchCoursesApi = async (query: string) => {
-  const res = await fetch(`${API_BASE_URL}/course/search?q=${encodeURIComponent(query)}`, { 
-    cache: 'no-store' 
-  });
+  const res = await fetch(`${API_BASE_URL}/course/search?q=${encodeURIComponent(query)}`);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -585,9 +582,7 @@ export const getEventsApi = async () => {
 
 // Search events by title, description, or keywords
 export const searchEventsApi = async (query: string) => {
-  const res = await fetch(`${API_BASE_URL}/event/search?q=${encodeURIComponent(query)}`, { 
-    cache: 'no-store' 
-  });
+  const res = await fetch(`${API_BASE_URL}/event/search?q=${encodeURIComponent(query)}`);
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
   try {
@@ -614,7 +609,6 @@ export const filterEventsApi = async (filters: {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(filters),
-    cache: 'no-store'
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -978,9 +972,7 @@ export const verifyOTP = async (email: string, otp: number) => {
 
 // Best Seller Products API
 export const getBestSellerProducts = async () => {
-  const res = await fetch(`${API_BASE_URL}/product/best-seller`, { 
-    cache: 'no-store' 
-  });
+  const res = await fetch(`${API_BASE_URL}/product/best-seller`);
   
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -1003,9 +995,7 @@ export const getBestSellerProducts = async () => {
 
 // Trending Products API
 export const getTrendingProducts = async () => {
-  const res = await fetch(`${API_BASE_URL}/product/trending`, { 
-    cache: 'no-store' 
-  });
+  const res = await fetch(`${API_BASE_URL}/product/trending`);
   
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
@@ -1081,7 +1071,6 @@ export const filterProductsApi = async (filters: {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(filters),
-    cache: 'no-store'
   });
   const contentType = res.headers.get('content-type') || '';
   let parsed: any = null;
