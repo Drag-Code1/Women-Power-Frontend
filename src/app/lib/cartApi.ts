@@ -133,6 +133,13 @@ export const getCartItemsApi = async (userId: string, token?: string) => {
   
   if (!res.ok) {
     const msg = parsed?.message || parsed?.error || `Failed to fetch cart items (status ${res.status})`;
+    
+    // If specifically "Cart not found", treat as empty cart
+    if (res.status === 404 || msg.includes("Cart not found")) {
+      console.log('🛒 Cart not found for user, returning empty array');
+      return [] as CartItem[];
+    }
+    
     const error = new Error(msg);
     // @ts-ignore
     error.status = res.status;
