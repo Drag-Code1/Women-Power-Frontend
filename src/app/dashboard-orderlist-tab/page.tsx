@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Eye, X, Package, Calendar, ShoppingBag, Hash } from "lucide-react";
+import { Eye, X, Package, Calendar, ShoppingBag, Hash, CheckCircle, XCircle } from "lucide-react";
 import "@/app/globals.css";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { getToken } from "@/app/lib/authApi";
@@ -36,6 +36,7 @@ interface Order {
     type: string;
   };
   OrderItems?: OrderItem[];
+  status?: string;
 }
 
 const OrderDashboard = () => {
@@ -176,6 +177,53 @@ const OrderDashboard = () => {
     setSelectedOrder(null);
   };
 
+  const handleStatusUpdate = async (orderId: string, newStatus: string) => {
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/order/${orderId}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (res.ok) {
+        // Refresh orders list
+        loadOrders();
+        // Update selected order in modal if it's the one being modified
+        if (selectedOrder && selectedOrder.id === orderId) {
+          setSelectedOrder({ ...selectedOrder, status: newStatus });
+        }
+      } else {
+        const body = await res.json().catch(() => ({}));
+        alert(body?.message || "Failed to update status");
+      }
+    } catch (err) {
+      console.error("Status update error:", err);
+      alert("An error occurred while updating status");
+    }
+  };
+
+  const getStatusStyle = (status: string | undefined) => {
+    switch (status?.toLowerCase()) {
+      case "completed":
+      case "delivered":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "rejected":
+        return "bg-red-100 text-red-700 border-red-200";
+      case "shipped":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+      case "processing":
+        return "bg-amber-100 text-amber-700 border-amber-200";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentOrders = orders.slice(indexOfFirstItem, indexOfLastItem);
@@ -255,6 +303,9 @@ const OrderDashboard = () => {
                     Amount
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Action
                   </th>
                 </tr>
@@ -307,6 +358,11 @@ const OrderDashboard = () => {
                           ₹{parseFloat(order.totalPrice || "0").toLocaleString("en-IN", {
                             minimumFractionDigits: 2,
                           })}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase border ${getStatusStyle(order.status)}`}>
+                          {order.status || "processing"}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -552,10 +608,34 @@ const OrderDashboard = () => {
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-gray-50 p-4 rounded-b-2xl border-t border-gray-200">
+            <div className="sticky bottom-0 bg-gray-50 p-4 rounded-b-2xl border-t border-gray-200 flex gap-3">
+              <button
+                onClick={() => handleStatusUpdate(selectedOrder.id, "rejected")}
+                disabled={selectedOrder.status === "rejected"}
+                className={`flex-1 py-3 flex items-center justify-center gap-2 font-semibold rounded-lg transition-colors ${
+                  selectedOrder.status === "rejected"
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-red-50 text-red-600 hover:bg-red-100 border border-red-200"
+                }`}
+              >
+                <XCircle className="w-5 h-5" />
+                Reject
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(selectedOrder.id, "completed")}
+                disabled={selectedOrder.status === "completed"}
+                className={`flex-1 py-3 flex items-center justify-center gap-2 font-semibold rounded-lg transition-colors ${
+                  selectedOrder.status === "completed"
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200"
+                }`}
+              >
+                <CheckCircle className="w-5 h-5" />
+                Complete
+              </button>
               <button
                 onClick={closeModal}
-                className="w-full py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors"
+                className="flex-1 py-3 bg-gray-800 hover:bg-gray-900 text-white font-semibold rounded-lg transition-colors"
               >
                 Close
               </button>
