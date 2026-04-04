@@ -62,8 +62,3 @@ export default function CoursesPage() {
   );
 }
 
-// Optional: Generate metadata
-export const metadata = {
-  title: 'Online Courses | Learning Platform',
-  description: 'Browse our collection of online courses and start learning today',
-};
