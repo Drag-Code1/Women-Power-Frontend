@@ -331,23 +331,17 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ productId }) =>
                   {addingToCart ? 'Adding to Cart...' : 'Add to Cart'}
                 </button>
                 
-                <div className="flex gap-3">
-                  <a href={`/checkout?productId=${product.id}&quantity=${quantity}`} className="flex-1 border border-gray-200 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-                    <ShoppingCart size={18} />
-                    Buy Now
-                  </a>
-                  
                   <button
                     onClick={handleToggleWishlist}
-                    className={`px-4 py-3 rounded-lg border transition-all duration-200 ${
+                    className={`flex-1 py-3 px-6 rounded-lg border transition-all duration-200 flex items-center justify-center gap-2 ${
                       isWishlisted
                         ? "border-red-200 bg-red-50 text-red-600"
                         : "border-gray-200 hover:bg-gray-50 text-gray-600 hover:border-red-200"
                     }`}
                   >
                     <Heart size={18} className={isWishlisted ? "fill-current" : ""} />
+                    {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
                   </button>
-                </div>
               </div>
             </div>
           </div>
